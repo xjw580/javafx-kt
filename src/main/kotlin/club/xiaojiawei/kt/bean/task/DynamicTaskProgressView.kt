@@ -121,70 +121,72 @@ class DynamicTaskProgressView<T : TaskBuilder> : VBox() {
         })
     }
 
-    fun addTask(task: CompositeTask) {
+    fun addTask(taskList: List<CompositeTask>) {
         runUI {
-            // 如果任务已存在，不重复添加
-            if (taskContainers.containsKey(task.id)) return@runUI
+            for (task in taskList) {
+                // 如果任务已存在，不重复添加
+                if (taskContainers.containsKey(task.id)) return@runUI
 
-            val container = VBox(8.0)
-            container.style =
-                "-fx-border-color: #cccccc; -fx-border-width: 1; -fx-padding: 10; -fx-background-color: #fafafa;"
+                val container = VBox(8.0)
+                container.style =
+                    "-fx-border-color: #cccccc; -fx-border-width: 1; -fx-padding: 10; -fx-background-color: #fafafa;"
 
-            // 任务头部（标题和控制按钮）
-            val headerBox = HBox(10.0)
-            headerBox.style = "-fx-alignment: center-left;"
+                // 任务头部（标题和控制按钮）
+                val headerBox = HBox(10.0)
+                headerBox.style = "-fx-alignment: center-left;"
 
-            val label = Label("任务: ${task.name}")
-            label.style = "-fx-font-weight: bold; -fx-font-size: 14px;"
+                val label = Label("任务: ${task.name}")
+                label.style = "-fx-font-weight: bold; -fx-font-size: 14px;"
 
-            val controlBox = HBox(5.0)
-            controlBox.style = "-fx-alignment: center-right;"
+                val controlBox = HBox(5.0)
+                controlBox.style = "-fx-alignment: center-right;"
 
-            val pauseBtn = Button("暂停")
-            pauseBtn.isDisable = true
-            pauseBtn.style = "-fx-font-size: 11px; -fx-padding: 3 8 3 8;"
-            pauseBtn.setOnAction { onPauseTask?.invoke(task.id) }
+                val pauseBtn = Button("暂停")
+                pauseBtn.isDisable = true
+                pauseBtn.style = "-fx-font-size: 11px; -fx-padding: 3 8 3 8;"
+                pauseBtn.setOnAction { onPauseTask?.invoke(task.id) }
 
-            val resumeBtn = Button("继续")
-            resumeBtn.style = "-fx-font-size: 11px; -fx-padding: 3 8 3 8;"
-            resumeBtn.setOnAction { onResumeTask?.invoke(task.id) }
-            resumeBtn.isDisable = true // 初始状态禁用
+                val resumeBtn = Button("继续")
+                resumeBtn.style = "-fx-font-size: 11px; -fx-padding: 3 8 3 8;"
+                resumeBtn.setOnAction { onResumeTask?.invoke(task.id) }
+                resumeBtn.isDisable = true // 初始状态禁用
 
-            val cancelBtn = Button("取消")
-            cancelBtn.style =
-                "-fx-font-size: 11px; -fx-padding: 3 8 3 8; -fx-background-color: #f44336; -fx-text-fill: white;"
-            cancelBtn.setOnAction { onCancelTask?.invoke(task.id) }
+                val cancelBtn = Button("取消")
+                cancelBtn.style =
+                    "-fx-font-size: 11px; -fx-padding: 3 8 3 8; -fx-background-color: #f44336; -fx-text-fill: white;"
+                cancelBtn.setOnAction { onCancelTask?.invoke(task.id) }
 
-            val deleteBtn = Button("删除")
-            deleteBtn.style =
-                "-fx-font-size: 11px; -fx-padding: 3 8 3 8; -fx-background-color: #9C27B0; -fx-text-fill: white;"
-            deleteBtn.setOnAction { onDeleteTask?.invoke(task.id) }
+                val deleteBtn = Button("删除")
+                deleteBtn.style =
+                    "-fx-font-size: 11px; -fx-padding: 3 8 3 8; -fx-background-color: #9C27B0; -fx-text-fill: white;"
+                deleteBtn.setOnAction { onDeleteTask?.invoke(task.id) }
 
-            controlBox.children.addAll(pauseBtn, resumeBtn, cancelBtn, deleteBtn)
+                controlBox.children.addAll(pauseBtn, resumeBtn, cancelBtn, deleteBtn)
 
-            // 使用HBox的grow属性让label占据剩余空间
-            HBox.setHgrow(label, Priority.ALWAYS)
-            headerBox.children.addAll(label, controlBox)
+                // 使用HBox的grow属性让label占据剩余空间
+                HBox.setHgrow(label, Priority.ALWAYS)
+                headerBox.children.addAll(label, controlBox)
 
-            val progressBar = ProgressBar(0.0)
-            progressBar.prefWidthProperty().bind(container.widthProperty())
-            progressBar.prefHeight = 11.0
-            progressBar.style = "-fx-accent: #80ce80!important;"
+                val progressBar = ProgressBar(0.0)
+                progressBar.prefWidthProperty().bind(container.widthProperty())
+                progressBar.prefHeight = 11.0
+                progressBar.style = "-fx-accent: #80ce80!important;"
 
-            val statusLabel = Label("等待中")
-            statusLabel.style = "-fx-font-size: 12px; -fx-text-fill: #666666;"
-            statusLabel.contentDisplay = ContentDisplay.RIGHT
+                val statusLabel = Label("等待中")
+                statusLabel.style = "-fx-font-size: 12px; -fx-text-fill: #666666;"
+                statusLabel.contentDisplay = ContentDisplay.RIGHT
 
-            container.children.addAll(headerBox, progressBar, statusLabel)
+                container.children.addAll(headerBox, progressBar, statusLabel)
 
-            taskContainers[task.id] = container
-            taskProgressBars[task.id] = progressBar
-            taskLabels[task.id] = label
-            taskStatuses[task.id] = statusLabel
-            taskControlButtons[task.id] = controlBox
-            subTaskViews[task.id] = mutableMapOf()
+                taskContainers[task.id] = container
+                taskProgressBars[task.id] = progressBar
+                taskLabels[task.id] = label
+                taskStatuses[task.id] = statusLabel
+                taskControlButtons[task.id] = controlBox
+                subTaskViews[task.id] = mutableMapOf()
 
-            taskPane.children.addFirst(container)
+                taskPane.children.addFirst(container)
+            }
         }
     }
 

@@ -2,19 +2,12 @@ package club.xiaojiawei.kt.bean.task
 
 import club.xiaojiawei.kt.config.log
 import club.xiaojiawei.kt.utils.runUI
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
 import java.io.Closeable
-import java.util.Collections
+import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.collections.toList
 
 /**
  * @author 肖嘉威
@@ -44,7 +37,7 @@ class DynamicTaskManager<T : TaskBuilder>(
 
     init {
         startTaskProcessor()
-        startTimer(1000 / 60)
+        startTimer(100)
     }
 
     fun startTimer(mills: Long) {
@@ -161,22 +154,37 @@ class DynamicTaskManager<T : TaskBuilder>(
     fun getCurrentStatistics(): TaskStatistics = currentStatistics
 
     // 添加新任务
-    fun addTask(task: CompositeTask) {
-        tasks[task.id] = task
-        // 立即通知UI显示任务
-        notifyTaskAdded(task)
+    @Synchronized
+    fun addTask(taskList: List<CompositeTask>) {
+        for (task in taskList) {
+            tasks[task.id] = task
+            // 立即通知UI显示任务
+
+            scope.launch {
+                taskQueue.send(task)
+            }
+            println("任务已添加到队列: ${task.name} (支持暂停: ${task.supportsPause()})")
+        }
+
+        notifyTaskAdded(taskList)
         // 更新统计信息
         updateStatistics()
-        scope.launch {
-            taskQueue.send(task)
-        }
-        println("任务已添加到队列: ${task.name} (支持暂停: ${task.supportsPause()})")
+    }
+
+    class TaskParam<T>(
+        val id: String,
+        val name: String,
+        val configure: T.() -> Unit
+    )
+
+    fun addTasks(taskList: List<TaskParam<T>>) {
+        addTask(taskList.map { task(it.id, it.name, taskBuilderProvider(), it.configure) })
     }
 
     // 使用DSL添加任务
     fun addTask(id: String, name: String, configure: T.() -> Unit) {
         val task = task(id, name, taskBuilderProvider(), configure)
-        addTask(task)
+        addTask(listOf(task))
     }
 
     fun deleteTask(taskId: String) {
@@ -191,13 +199,13 @@ class DynamicTaskManager<T : TaskBuilder>(
     }
 
     // 任务添加回调
-    private val taskAddedCallbacks = mutableListOf<(CompositeTask) -> Unit>()
+    private val taskAddedCallbacks = mutableListOf<(List<CompositeTask>) -> Unit>()
 
-    fun addTaskAddedCallback(callback: (CompositeTask) -> Unit) {
+    fun addTaskAddedCallback(callback: (List<CompositeTask>) -> Unit) {
         taskAddedCallbacks.add(callback)
     }
 
-    private fun notifyTaskAdded(task: CompositeTask) {
+    private fun notifyTaskAdded(task: List<CompositeTask>) {
         taskAddedCallbacks.forEach { it(task) }
     }
 
@@ -289,7 +297,7 @@ class DynamicTaskManager<T : TaskBuilder>(
                     task.setJob(job)
 
                 } catch (e: Exception) {
-                    log.error (e){ "处理任务时发生错误" }
+                    log.error(e) { "处理任务时发生错误" }
                 }
             }
         }
