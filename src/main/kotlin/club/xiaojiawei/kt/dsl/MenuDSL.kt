@@ -65,6 +65,8 @@ abstract class MenuItemBaseBuilder<T : MenuItem> : DslBuilder<T>() {
         }
     }
 
+    operator fun String.unaryPlus() = text(this)
+
     open fun ico(ico: AbstractIco, width: Double = 20.0) {
         settings {
             graphic = HBox().apply {
@@ -74,6 +76,8 @@ abstract class MenuItemBaseBuilder<T : MenuItem> : DslBuilder<T>() {
             }
         }
     }
+
+    operator fun AbstractIco.unaryPlus() = ico(this)
 
     open fun onAction(handler: (EventHandler<ActionEvent>)?) {
         settings {

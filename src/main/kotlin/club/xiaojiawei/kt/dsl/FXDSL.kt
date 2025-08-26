@@ -388,6 +388,9 @@ abstract class DslBuilder<T>() {
         builders.add(settings)
     }
 
+    /**
+     * 通过配置构建新的实例
+     */
     open fun build(): T {
         val t = instance().apply {
             builders.forEach { it() }
@@ -395,6 +398,9 @@ abstract class DslBuilder<T>() {
         return t
     }
 
+    /**
+     * 将配置应用到传入的实例中
+     */
     open fun config(t: T) {
         t.apply {
             builders.forEach { it() }
