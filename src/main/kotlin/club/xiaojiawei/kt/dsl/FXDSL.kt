@@ -3,6 +3,7 @@ package club.xiaojiawei.kt.dsl
 import javafx.scene.control.*
 import javafx.scene.image.ImageView
 import javafx.scene.layout.*
+import javafx.scene.text.Text
 
 /**
  * @author 肖嘉威
@@ -88,6 +89,26 @@ inline fun GridPane.config(config: GridPaneBuilder.() -> Unit) {
 }
 
 // ======================== Node 组件 DSL 衍生 ========================
+
+// Text 衍生
+inline fun text(config: TextBuilder.() -> Unit): Text {
+    return textBuilder(config).build()
+}
+
+inline fun text(text: String, config: TextBuilder.() -> Unit = {}): Text {
+    return textBuilder {
+        text(text)
+        config()
+    }.build()
+}
+
+inline fun textBuilder(config: TextBuilder.() -> Unit): TextBuilder {
+    return TextBuilder().apply(config)
+}
+
+inline fun Text.config(config: TextBuilder.() -> Unit) {
+    TextBuilder().apply(config).config(this)
+}
 
 // Label 衍生
 inline fun label(config: LabelBuilder.() -> Unit): Label {
@@ -373,7 +394,7 @@ enum class StyleSize() {
 }
 
 enum class StyleColor() {
-    NORMAL, SUCCESS, WARN, ERROR, DEFAULT
+    MAIN, NORMAL, SUCCESS, WARN, ERROR, DEFAULT
 }
 
 abstract class DslBuilder<T>() {

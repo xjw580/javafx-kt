@@ -7,10 +7,12 @@ package club.xiaojiawei.kt.dsl
 
 import club.xiaojiawei.controls.FilterComboBox
 import javafx.beans.property.Property
+import javafx.beans.value.ChangeListener
 import javafx.collections.ObservableList
 import javafx.event.ActionEvent
 import javafx.event.EventHandler
 import javafx.geometry.Pos
+import javafx.scene.Cursor
 import javafx.scene.Node
 import javafx.scene.control.*
 import javafx.scene.image.Image
@@ -19,11 +21,16 @@ import javafx.scene.input.MouseEvent
 import javafx.scene.layout.Region
 import javafx.scene.text.Font
 import javafx.scene.text.FontWeight
+import javafx.scene.text.Text
 import javafx.util.StringConverter
 
 // 基础 Node 构建器
 @FXMarker
 abstract class NodeBuilder<T : Node> : DslBuilder<T>() {
+
+    fun styleMain(styleSize: StyleSize = StyleSize.DEFAULT) {
+        style(StyleColor.MAIN, styleSize)
+    }
 
     fun styleNormal(styleSize: StyleSize = StyleSize.DEFAULT) {
         style(StyleColor.NORMAL, styleSize)
@@ -37,9 +44,21 @@ abstract class NodeBuilder<T : Node> : DslBuilder<T>() {
         style(StyleColor.WARN, styleSize)
     }
 
-    fun styleError(styleSize: StyleSize = StyleSize.DEFAULT) {
-        style(StyleColor.ERROR, styleSize)
+    fun styleError(styleSize: StyleSize = StyleSize.DEFAULT) = style(StyleColor.ERROR, styleSize)
+
+    fun styleRadius() = settings {
+        styleClass.add("radius-ui")
     }
+
+    fun styleRadiusBig() {
+        settings {
+            styleClass.add("radius-ui-big")
+        }
+    }
+
+    fun styleBg() = settings { styleClass.add("bg-ui") }
+
+    fun styleBgHover() = settings { styleClass.add("bg-hover-ui") }
 
     // 通用 Node 属性
     fun id(id: String) {
@@ -81,6 +100,10 @@ abstract class NodeBuilder<T : Node> : DslBuilder<T>() {
         }
     }
 
+    fun cursor(cursor: Cursor) = settings {
+        this.cursor = cursor
+    }
+
     fun translate(x: Double, y: Double) {
         settings {
             translateX = x
@@ -116,15 +139,15 @@ abstract class NodeBuilder<T : Node> : DslBuilder<T>() {
     }
 
     // 事件处理
-    fun onMouseClicked(handler: EventHandler<MouseEvent>) {
+    fun onMouseClicked(handler: EventHandler<MouseEvent>?) {
         settings { onMouseClicked = handler }
     }
 
-    fun onMouseEntered(handler: EventHandler<MouseEvent>) {
+    fun onMouseEntered(handler: EventHandler<MouseEvent>?) {
         settings { onMouseEntered = handler }
     }
 
-    fun onMouseExited(handler: EventHandler<MouseEvent>) {
+    fun onMouseExited(handler: EventHandler<MouseEvent>?) {
         settings { onMouseExited = handler }
     }
 
@@ -148,15 +171,39 @@ class LabelBuilder : LabeledBuilder<Label>() {
         settings { isWrapText = wrap }
     }
 
-    fun graphic(node: Node) {
-        settings { graphic = node }
-    }
+    fun graphic(node: Node) = settings { graphic = node }
 
     override fun style(styleColor: StyleColor, styleSize: StyleSize) {
         settings {
             styleClass.add("label-ui")
+            when (styleColor) {
+                StyleColor.MAIN -> {}
+                StyleColor.NORMAL -> styleClass.add("label-ui-normal")
+                StyleColor.SUCCESS -> styleClass.add("label-ui-success")
+                StyleColor.WARN -> styleClass.add("label-ui-warn")
+                StyleColor.ERROR -> styleClass.add("label-ui-error")
+                StyleColor.DEFAULT -> {}
+            }
+            when (styleSize) {
+                StyleSize.TINY -> styleClass.add("label-ui-tiny")
+                StyleSize.SMALL -> styleClass.add("label-ui-small")
+                StyleSize.BIG -> styleClass.add("label-ui-big")
+                StyleSize.DEFAULT -> {}
+            }
         }
     }
+}
+
+// Text 构建器
+@FXMarker
+class TextBuilder : NodeBuilder<Text>() {
+
+    override fun instance(): Text = Text()
+
+    fun text(text: String) = settings { this.text = text }
+
+    operator fun String.unaryPlus() = text(this)
+
 }
 
 // Button 构建器
@@ -189,6 +236,7 @@ class ButtonBuilder : LabeledBuilder<Button>() {
         settings {
             styleClass.add("btn-ui")
             when (styleColor) {
+                StyleColor.MAIN -> {}
                 StyleColor.NORMAL -> styleClass.add("btn-ui-normal")
                 StyleColor.SUCCESS -> styleClass.add("btn-ui-success")
                 StyleColor.WARN -> styleClass.add("btn-ui-warn")
@@ -243,13 +291,19 @@ class TextFieldBuilder : NodeBuilder<TextField>() {
     }
 
     // 数据绑定
-    fun bind(property: Property<String>) {
+    fun bindText(property: Property<String>) {
         settings { textProperty().bindBidirectional(property) }
     }
 
     override fun style(styleColor: StyleColor, styleSize: StyleSize) {
         settings {
             styleClass.add("text-field-ui")
+            when (styleSize) {
+                StyleSize.TINY -> {}
+                StyleSize.SMALL -> styleClass.add("text-field-ui-small")
+                StyleSize.BIG -> styleClass.add("text-field-ui-big")
+                StyleSize.DEFAULT -> {}
+            }
         }
     }
 }
@@ -350,10 +404,30 @@ class CheckBoxBuilder : LabeledBuilder<CheckBox>() {
         settings { onAction = EventHandler { handler() } }
     }
 
-    override fun style(styleColor: StyleColor, styleSize: StyleSize) {
-        settings {
-            styleClass.add("check-box-ui")
+    fun addSelectedListener(listener: ChangeListener<Boolean>) = settings {
+        selectedProperty().addListener(listener)
+    }
+
+    fun removeSelectedListener(listener: ChangeListener<Boolean>) = settings {
+        selectedProperty().removeListener(listener)
+    }
+
+    override fun style(styleColor: StyleColor, styleSize: StyleSize) = settings {
+        styleClass.add("check-box-ui")
+        when (styleColor) {
+            StyleColor.MAIN -> styleClass.add("check-box-ui-main")
+            StyleColor.NORMAL -> styleClass.add("check-box-ui-normal")
+            StyleColor.SUCCESS -> styleClass.add("check-box-ui-success")
+            StyleColor.WARN -> styleClass.add("check-box-ui-warn")
+            StyleColor.ERROR -> styleClass.add("check-box-ui-error")
+            StyleColor.DEFAULT -> {}
         }
+//        when (styleSize) {
+//            StyleSize.TINY -> {}
+//            StyleSize.SMALL -> styleClass.add("check-box-ui-small")
+//            StyleSize.BIG -> styleClass.add("check-box-ui-big")
+//            StyleSize.DEFAULT -> {}
+//        }
     }
 }
 
@@ -382,6 +456,20 @@ class RadioButtonBuilder : LabeledBuilder<RadioButton>() {
     override fun style(styleColor: StyleColor, styleSize: StyleSize) {
         settings {
             styleClass.add("radio-button-ui")
+            when (styleColor) {
+                StyleColor.MAIN -> styleClass.add("radio-button-ui-main")
+                StyleColor.NORMAL -> styleClass.add("radio-button-ui-normal")
+                StyleColor.SUCCESS -> styleClass.add("radio-button-ui-success")
+                StyleColor.WARN -> styleClass.add("radio-button-ui-warn")
+                StyleColor.ERROR -> styleClass.add("radio-button-ui-error")
+                StyleColor.DEFAULT -> {}
+            }
+//            when (styleSize) {
+//                StyleSize.TINY -> {}
+//                StyleSize.SMALL -> styleClass.add("radio-button-ui-small")
+//                StyleSize.BIG -> styleClass.add("radio-button-ui-big")
+//                StyleSize.DEFAULT -> {}
+//            }
         }
     }
 }
@@ -445,6 +533,7 @@ abstract class ComboBoxBaseBuilder<S : ComboBox<T>, T> : NodeBuilder<S>() {
         settings {
             styleClass.add("combo-box-ui")
             when (styleColor) {
+                StyleColor.MAIN -> {}
                 StyleColor.NORMAL -> styleClass.add("combo-box-ui-normal")
                 StyleColor.SUCCESS -> styleClass.add("combo-box-ui-success")
                 StyleColor.WARN -> styleClass.add("combo-box-ui-warn")
@@ -480,6 +569,30 @@ class FilterComboBoxBuilder<T> : ComboBoxBaseBuilder<FilterComboBox<T>, T>() {
 open class ComboBoxBuilder<T> : ComboBoxBaseBuilder<ComboBox<T>, T>() {
 
     override fun instance(): ComboBox<T> = ComboBox<T>()
+
+    fun addValueListener(changeListener: ChangeListener<in T>) {
+        settings {
+            valueProperty().addListener(changeListener)
+        }
+    }
+
+    fun removeValueListener(changeListener: ChangeListener<in T>) {
+        settings {
+            valueProperty().removeListener(changeListener)
+        }
+    }
+
+//    fun addItemsListener(changeListener: ChangeListener<in ObservableList<T?>>) {
+//        settings {
+//            itemsProperty().addListener(changeListener)
+//        }
+//    }
+//
+//    fun removeItemsListener(changeListener: ChangeListener<in ObservableList<T?>>) {
+//        settings {
+//            itemsProperty().removeListener(changeListener)
+//        }
+//    }
 
 }
 
@@ -549,6 +662,12 @@ class TableViewBuilder<T> : NodeBuilder<TableView<T>>() {
     override fun style(styleColor: StyleColor, styleSize: StyleSize) {
         settings {
             styleClass.add("table-view-ui")
+            when (styleSize) {
+                StyleSize.TINY -> {}
+                StyleSize.SMALL -> styleClass.add("table-view-ui-small")
+                StyleSize.BIG -> styleClass.add("table-view-ui-big")
+                StyleSize.DEFAULT -> {}
+            }
         }
     }
 }
