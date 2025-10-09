@@ -13,6 +13,7 @@ import javafx.scene.control.TextField
 import javafx.scene.layout.*
 import javafx.scene.paint.Color
 import javafx.scene.paint.Paint
+import javafx.scene.shape.Polygon
 import javafx.scene.text.Text
 
 
@@ -24,15 +25,36 @@ import javafx.scene.text.Text
 @FXMarker
 abstract class LayoutBuilder<T : Pane> : DslBuilder<T>() {
 
-    protected val children: MutableList<Node> = mutableListOf()
-
     // 添加子节点
     fun add(node: Node) {
-        children.add(node)
+        settings {
+            children.add(node)
+        }
+    }
+
+    fun add(node: NodeBuilder<*>) {
+        settings {
+            children.add(node.build())
+        }
+    }
+
+    fun add(node: PaneBaseBuilder<*>) {
+        settings {
+            children.add(node.build())
+        }
     }
 
     fun addAll(vararg nodes: Node) {
-        children.addAll(nodes)
+        settings {
+            children.addAll(nodes)
+        }
+    }
+
+
+    fun addAll(vararg nodes: NodeBuilder<*>) {
+        settings {
+            children.addAll(nodes.map { it.build() })
+        }
     }
 
     fun size(width: Double, height: Double) {
@@ -98,42 +120,55 @@ abstract class LayoutBuilder<T : Pane> : DslBuilder<T>() {
         settings { isManaged = managed }
     }
 
-    override fun build(): T {
-        val pane = super.build()
-        pane.children.addAll(children)
-        return pane
-    }
 }
 
 @FXMarker
 abstract class PaneBaseBuilder<T : Pane> : LayoutBuilder<T>() {
 
+    fun hgrow(priority: Priority) = settings {
+        HBox.setHgrow(this, priority)
+    }
+
+    fun vgrow(priority: Priority) = settings {
+        VBox.setVgrow(this, priority)
+    }
+
     inline fun vbox(config: VBoxBuilder.() -> Unit) {
-        add(VBoxBuilder().apply(config).build())
+        add(VBoxBuilder().apply(config))
     }
 
     inline fun hbox(config: HBoxBuilder.() -> Unit) {
-        add(HBoxBuilder().apply(config).build())
+        add(HBoxBuilder().apply(config))
     }
 
     inline fun pane(config: PaneBuilder.() -> Unit) {
-        add(PaneBuilder().apply(config).build())
+        add(PaneBuilder().apply(config))
     }
 
     fun text(text: String = "") = add(Text(text))
 
-    fun text(config: TextBuilder.() -> Unit = {}) = add(TextBuilder().apply(config).build())
+    fun text(config: TextBuilder.() -> Unit = {}) = add(TextBuilder().apply(config))
 
     fun text(text: String, config: Text.() -> Unit = {}) = add(Text(text).apply(config))
 
     operator fun String.unaryPlus() = text(this)
+
+    inline fun polygon(points: List<Double>, config: (Polygon.() -> Unit) = {}) {
+        add(Polygon().apply {
+            this.points.addAll(points)
+        }.apply(config))
+    }
+
+    inline fun polygon(config: (PolygonBuilder.() -> Unit) = {}) {
+        add(PolygonBuilder().apply(config))
+    }
 
     inline fun label(text: String, config: (Label.() -> Unit) = {}) {
         add(Label(text).apply(config))
     }
 
     inline fun label(config: (LabelBuilder.() -> Unit) = {}) {
-        add(LabelBuilder().apply(config).build())
+        add(LabelBuilder().apply(config))
     }
 
     inline fun title(config: (Title.() -> Unit) = {}) {
@@ -151,27 +186,27 @@ abstract class PaneBaseBuilder<T : Pane> : LayoutBuilder<T>() {
     inline fun checkBox(config: (CheckBoxBuilder.() -> Unit) = {}) {
         add(CheckBoxBuilder().apply {
             this.config()
-        }.build())
+        })
     }
 
     inline fun checkBox(text: String, config: CheckBoxBuilder.() -> Unit = {}) {
         add(CheckBoxBuilder().apply {
             text(text)
             this.config()
-        }.build())
+        })
     }
 
     inline fun radioButton(config: (RadioButtonBuilder.() -> Unit) = {}) {
         add(RadioButtonBuilder().apply {
             this.config()
-        }.build())
+        })
     }
 
     inline fun radioButton(text: String, config: RadioButtonBuilder.() -> Unit = {}) {
         add(RadioButtonBuilder().apply {
             text(text)
             this.config()
-        }.build())
+        })
     }
 
 
@@ -183,7 +218,7 @@ abstract class PaneBaseBuilder<T : Pane> : LayoutBuilder<T>() {
         add(
             ComboBoxBuilder<T>().apply {
                 this.config()
-            }.build()
+            }
         )
     }
 
@@ -195,7 +230,7 @@ abstract class PaneBaseBuilder<T : Pane> : LayoutBuilder<T>() {
         add(
             FilterComboBoxBuilder<T>().apply {
                 this.config()
-            }.build()
+            }
         )
     }
 
@@ -207,7 +242,7 @@ abstract class PaneBaseBuilder<T : Pane> : LayoutBuilder<T>() {
         add(
             ButtonBuilder().apply {
                 this.config()
-            }.build()
+            }
         )
     }
 
@@ -215,9 +250,14 @@ abstract class PaneBaseBuilder<T : Pane> : LayoutBuilder<T>() {
         add(
             TextFieldBuilder().apply {
                 this.config()
-            }.build()
+            }
         )
     }
+
+    fun style(style: String) {
+        settings { this.style = style }
+    }
+
 }
 
 @FXMarker

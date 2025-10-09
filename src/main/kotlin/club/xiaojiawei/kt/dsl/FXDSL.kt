@@ -3,6 +3,7 @@ package club.xiaojiawei.kt.dsl
 import javafx.scene.control.*
 import javafx.scene.image.ImageView
 import javafx.scene.layout.*
+import javafx.scene.shape.Polygon
 import javafx.scene.text.Text
 
 /**
@@ -19,9 +20,9 @@ inline fun paneBuilder(config: PaneBuilder.() -> Unit): PaneBuilder {
     return PaneBuilder().apply(config)
 }
 
-inline fun Pane.config(config: PaneBuilder.() -> Unit) {
-    PaneBuilder().apply(config).config(this)
-}
+//inline fun Pane.config(config: PaneBuilder.() -> Unit) {
+//    PaneBuilder().apply(config).config(this)
+//}
 
 // VBox 衍生
 inline fun vbox(config: VBoxBuilder.() -> Unit): VBox {
@@ -108,6 +109,33 @@ inline fun textBuilder(config: TextBuilder.() -> Unit): TextBuilder {
 
 inline fun Text.config(config: TextBuilder.() -> Unit) {
     TextBuilder().apply(config).config(this)
+}
+
+// Polygon 衍生
+inline fun polygon(config: PolygonBuilder.() -> Unit): Polygon {
+    return polygonBuilder(config).build()
+}
+
+inline fun polygon(points: DoubleArray, config: PolygonBuilder.() -> Unit = {}): Polygon {
+    return polygonBuilder {
+        points(*points)
+        config()
+    }.build()
+}
+
+inline fun polygon(points: List<Double>, config: PolygonBuilder.() -> Unit = {}): Polygon {
+    return polygonBuilder {
+        points(points)
+        config()
+    }.build()
+}
+
+inline fun polygonBuilder(config: PolygonBuilder.() -> Unit): PolygonBuilder {
+    return PolygonBuilder().apply(config)
+}
+
+inline fun Polygon.config(config: PolygonBuilder.() -> Unit) {
+    PolygonBuilder().apply(config).config(this)
 }
 
 // Label 衍生

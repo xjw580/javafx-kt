@@ -18,7 +18,15 @@ import javafx.scene.control.*
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import javafx.scene.input.MouseEvent
+import javafx.scene.layout.HBox
+import javafx.scene.layout.Priority
 import javafx.scene.layout.Region
+import javafx.scene.layout.VBox
+import javafx.scene.paint.Paint
+import javafx.scene.shape.Polygon
+import javafx.scene.shape.StrokeLineCap
+import javafx.scene.shape.StrokeLineJoin
+import javafx.scene.shape.StrokeType
 import javafx.scene.text.Font
 import javafx.scene.text.FontWeight
 import javafx.scene.text.Text
@@ -27,6 +35,14 @@ import javafx.util.StringConverter
 // 基础 Node 构建器
 @FXMarker
 abstract class NodeBuilder<T : Node> : DslBuilder<T>() {
+
+    fun hgrow(priority: Priority) = settings {
+        HBox.setHgrow(this, priority)
+    }
+
+    fun vgrow(priority: Priority) = settings {
+        VBox.setVgrow(this, priority)
+    }
 
     fun styleMain(styleSize: StyleSize = StyleSize.DEFAULT) {
         style(StyleColor.MAIN, styleSize)
@@ -194,6 +210,7 @@ class LabelBuilder : LabeledBuilder<Label>() {
     }
 }
 
+
 // Text 构建器
 @FXMarker
 class TextBuilder : NodeBuilder<Text>() {
@@ -204,6 +221,65 @@ class TextBuilder : NodeBuilder<Text>() {
 
     operator fun String.unaryPlus() = text(this)
 
+}
+
+fun main() {
+    polygon {
+        point(0.0, 0.0)
+    }
+}
+
+@FXMarker
+class PolygonBuilder : NodeBuilder<Polygon>() {
+
+    override fun instance(): Polygon = Polygon()
+
+    fun point(x: Double, y: Double) {
+        settings {
+            points.addAll(x, y)
+        }
+    }
+
+    fun points(vararg points: Double) {
+        settings {
+            this.points.addAll(points.toList())
+        }
+    }
+
+    fun points(points: List<Double>) {
+        settings {
+            this.points.addAll(points)
+        }
+    }
+
+    fun clear() {
+        settings { points.clear() }
+    }
+
+    fun fill(paint: Paint) = settings { fill = paint }
+
+    fun stroke(paint: Paint) = settings { stroke = paint }
+
+    fun strokeWidth(width: Double) = settings { strokeWidth = width }
+
+    fun strokeType(type: StrokeType) = settings { strokeType = type }
+
+    fun strokeLineJoin(join: StrokeLineJoin) = settings { strokeLineJoin = join }
+
+    fun strokeLineCap(cap: StrokeLineCap) = settings { strokeLineCap = cap }
+
+    fun strokeDashArray(vararg dashes: Double) {
+        settings { strokeDashArray.setAll(dashes.toList()) }
+    }
+
+    fun strokeDashOffset(offset: Double) = settings { strokeDashOffset = offset }
+
+    fun strokeMiterLimit(limit: Double) = settings { strokeMiterLimit = limit }
+
+    fun smooth(smooth: Boolean = true) = settings { isSmooth = smooth }
+
+    override fun style(styleColor: StyleColor, styleSize: StyleSize) {
+    }
 }
 
 // Button 构建器
