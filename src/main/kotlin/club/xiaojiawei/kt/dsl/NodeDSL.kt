@@ -701,6 +701,12 @@ class ListViewBuilder<T> : NodeBuilder<ListView<T>>() {
     override fun style(styleColor: StyleColor, styleSize: StyleSize) {
         settings {
             styleClass.add("list-view-ui")
+            when (styleSize) {
+                StyleSize.TINY -> styleClass.add("list-view-ui-tiny")
+                StyleSize.SMALL -> styleClass.add("list-view-ui-small")
+                StyleSize.BIG -> styleClass.add("table-view-ui-big")
+                StyleSize.DEFAULT -> {}
+            }
         }
     }
 }
