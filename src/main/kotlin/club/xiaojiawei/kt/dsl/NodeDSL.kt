@@ -17,16 +17,15 @@ import javafx.scene.Node
 import javafx.scene.control.*
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
+import javafx.scene.input.DragEvent
 import javafx.scene.input.MouseEvent
 import javafx.scene.layout.HBox
 import javafx.scene.layout.Priority
 import javafx.scene.layout.Region
 import javafx.scene.layout.VBox
+import javafx.scene.paint.Color
 import javafx.scene.paint.Paint
-import javafx.scene.shape.Polygon
-import javafx.scene.shape.StrokeLineCap
-import javafx.scene.shape.StrokeLineJoin
-import javafx.scene.shape.StrokeType
+import javafx.scene.shape.*
 import javafx.scene.text.Font
 import javafx.scene.text.FontWeight
 import javafx.scene.text.Text
@@ -69,6 +68,12 @@ abstract class NodeBuilder<T : Node> : DslBuilder<T>() {
     fun styleRadiusBig() {
         settings {
             styleClass.add("radius-ui-big")
+        }
+    }
+
+    fun styled(block: StyleBuilder.() -> Unit){
+        settings {
+            this.styled(block)
         }
     }
 
@@ -127,28 +132,76 @@ abstract class NodeBuilder<T : Node> : DslBuilder<T>() {
         }
     }
 
-    fun prefSize(width: Double, height: Double) {
+    fun size(width: Double = -1.0, height: Double = -1.0) {
         settings {
-            if (this is Region) {
+            if (this is Region){
                 prefWidth = width
                 prefHeight = height
             }
         }
     }
 
-    fun minSize(width: Double, height: Double) {
+    fun minSize(width: Double = -1.0, height: Double = -1.0) {
         settings {
-            if (this is Region) {
+            if (this is Region){
                 minWidth = width
                 minHeight = height
             }
         }
     }
 
-    fun maxSize(width: Double, height: Double) {
+    fun maxSize(width: Double = -1.0, height: Double = -1.0) {
         settings {
-            if (this is Region) {
+            if (this is Region){
                 maxWidth = width
+                maxHeight = height
+            }
+        }
+    }
+
+    fun prefWidth(width: Double) {
+        settings {
+            if (this is Region){
+                prefWidth = width
+            }
+        }
+    }
+
+    fun prefHeight(height: Double) {
+        settings {
+            if (this is Region){
+                prefHeight = height
+            }
+        }
+    }
+
+    fun minWidth(width: Double) {
+        settings {
+            if (this is Region){
+                minWidth = width
+            }
+        }
+    }
+
+    fun minHeight(height: Double) {
+        settings {
+            if (this is Region){
+                minHeight = height
+            }
+        }
+    }
+
+    fun maxWidth(width: Double) {
+        settings {
+            if (this is Region){
+                maxWidth = width
+            }
+        }
+    }
+
+    fun maxHeight(height: Double) {
+        settings {
+            if (this is Region){
                 maxHeight = height
             }
         }
@@ -167,17 +220,38 @@ abstract class NodeBuilder<T : Node> : DslBuilder<T>() {
         settings { onMouseExited = handler }
     }
 
+    fun onDragDetected(handler: EventHandler<MouseEvent>?) {
+        settings { onDragDetected = handler }
+    }
+
+    fun onDragDone(handler: EventHandler<DragEvent>?) {
+        settings { onDragDone = handler }
+    }
+
+    fun onDragOver(handler: EventHandler<DragEvent>?) {
+        settings { onDragOver = handler }
+    }
+
+    fun onDragExited(handler: EventHandler<DragEvent>?) {
+        settings { onDragExited = handler }
+    }
+
+    fun onDragDropped(handler: EventHandler<DragEvent>?) {
+        settings { onDragDropped = handler }
+    }
+
     // 直接配置 Node
     fun configure(block: T.() -> Unit) {
         settings(block)
     }
 }
 
+
 // Label 构建器
 @FXMarker
 class LabelBuilder : LabeledBuilder<Label>() {
 
-    override fun instance(): Label = Label()
+    override fun buildInstance(): Label = Label()
 
     fun alignment(alignment: Pos) {
         settings { this.alignment = alignment }
@@ -210,12 +284,32 @@ class LabelBuilder : LabeledBuilder<Label>() {
     }
 }
 
+// Circle 构建器
+@FXMarker
+class CircleBuilder : NodeBuilder<Circle>() {
+
+    override fun buildInstance(): Circle = Circle()
+
+    fun radius(radius: Double) {
+        settings {
+            this.radius = radius
+        }
+    }
+
+    fun fill(color: Color) {
+        settings {
+            this.fill = color
+        }
+    }
+
+}
+
 
 // Text 构建器
 @FXMarker
 class TextBuilder : NodeBuilder<Text>() {
 
-    override fun instance(): Text = Text()
+    override fun buildInstance(): Text = Text()
 
     fun text(text: String) = settings { this.text = text }
 
@@ -223,16 +317,10 @@ class TextBuilder : NodeBuilder<Text>() {
 
 }
 
-fun main() {
-    polygon {
-        point(0.0, 0.0)
-    }
-}
-
 @FXMarker
 class PolygonBuilder : NodeBuilder<Polygon>() {
 
-    override fun instance(): Polygon = Polygon()
+    override fun buildInstance(): Polygon = Polygon()
 
     fun point(x: Double, y: Double) {
         settings {
@@ -286,7 +374,7 @@ class PolygonBuilder : NodeBuilder<Polygon>() {
 @FXMarker
 class ButtonBuilder : LabeledBuilder<Button>() {
 
-    override fun instance(): Button = Button()
+    override fun buildInstance(): Button = Button()
 
     fun onAction(handler: EventHandler<ActionEvent>) {
         settings { onAction = handler }
@@ -334,7 +422,7 @@ class ButtonBuilder : LabeledBuilder<Button>() {
 @FXMarker
 class TextFieldBuilder : NodeBuilder<TextField>() {
 
-    override fun instance(): TextField = TextField()
+    override fun buildInstance(): TextField = TextField()
 
     fun text(text: String) {
         settings { this.text = text }
@@ -388,7 +476,7 @@ class TextFieldBuilder : NodeBuilder<TextField>() {
 @FXMarker
 class TextAreaBuilder : NodeBuilder<TextArea>() {
 
-    override fun instance(): TextArea = TextArea()
+    override fun buildInstance(): TextArea = TextArea()
 
     fun text(text: String) {
         settings { this.text = text }
@@ -458,7 +546,7 @@ abstract class LabeledBuilder<T : Labeled> : NodeBuilder<T>() {
 @FXMarker
 class CheckBoxBuilder : LabeledBuilder<CheckBox>() {
 
-    override fun instance(): CheckBox = CheckBox()
+    override fun buildInstance(): CheckBox = CheckBox()
 
     fun selected(selected: Boolean = true) {
         settings { isSelected = selected }
@@ -511,7 +599,7 @@ class CheckBoxBuilder : LabeledBuilder<CheckBox>() {
 @FXMarker
 class RadioButtonBuilder : LabeledBuilder<RadioButton>() {
 
-    override fun instance(): RadioButton = RadioButton()
+    override fun buildInstance(): RadioButton = RadioButton()
 
     fun selected(selected: Boolean = true) {
         settings { isSelected = selected }
@@ -540,12 +628,12 @@ class RadioButtonBuilder : LabeledBuilder<RadioButton>() {
                 StyleColor.ERROR -> styleClass.add("radio-button-ui-error")
                 StyleColor.DEFAULT -> {}
             }
-//            when (styleSize) {
-//                StyleSize.TINY -> {}
-//                StyleSize.SMALL -> styleClass.add("radio-button-ui-small")
-//                StyleSize.BIG -> styleClass.add("radio-button-ui-big")
-//                StyleSize.DEFAULT -> {}
-//            }
+            when (styleSize) {
+                StyleSize.TINY -> styleClass.add("radio-button-ui-tiny")
+                StyleSize.SMALL -> styleClass.add("radio-button-ui-small")
+                StyleSize.BIG -> styleClass.add("radio-button-ui-big")
+                StyleSize.DEFAULT -> {}
+            }
         }
     }
 }
@@ -630,7 +718,7 @@ abstract class ComboBoxBaseBuilder<S : ComboBox<T>, T> : NodeBuilder<S>() {
 @FXMarker
 class FilterComboBoxBuilder<T> : ComboBoxBaseBuilder<FilterComboBox<T>, T>() {
 
-    override fun instance(): FilterComboBox<T> = FilterComboBox()
+    override fun buildInstance(): FilterComboBox<T> = FilterComboBox()
 
     fun ignoreCase(ignoreCase: Boolean) {
         settings {
@@ -644,7 +732,7 @@ class FilterComboBoxBuilder<T> : ComboBoxBaseBuilder<FilterComboBox<T>, T>() {
 @FXMarker
 open class ComboBoxBuilder<T> : ComboBoxBaseBuilder<ComboBox<T>, T>() {
 
-    override fun instance(): ComboBox<T> = ComboBox<T>()
+    override fun buildInstance(): ComboBox<T> = ComboBox<T>()
 
     fun addValueListener(changeListener: ChangeListener<in T>) {
         settings {
@@ -676,7 +764,7 @@ open class ComboBoxBuilder<T> : ComboBoxBaseBuilder<ComboBox<T>, T>() {
 @FXMarker
 class ListViewBuilder<T> : NodeBuilder<ListView<T>>() {
 
-    override fun instance(): ListView<T> = ListView<T>()
+    override fun buildInstance(): ListView<T> = ListView<T>()
 
     fun items(vararg items: T) {
         settings { this.items.addAll(items) }
@@ -715,7 +803,7 @@ class ListViewBuilder<T> : NodeBuilder<ListView<T>>() {
 @FXMarker
 class TableViewBuilder<T> : NodeBuilder<TableView<T>>() {
 
-    override fun instance(): TableView<T> = TableView<T>()
+    override fun buildInstance(): TableView<T> = TableView<T>()
 
     fun items(vararg items: T) {
         settings { this.items.addAll(items) }
@@ -758,7 +846,7 @@ class TableViewBuilder<T> : NodeBuilder<TableView<T>>() {
 @FXMarker
 class ProgressBarBuilder : NodeBuilder<ProgressBar>() {
 
-    override fun instance(): ProgressBar = ProgressBar()
+    override fun buildInstance(): ProgressBar = ProgressBar()
 
     fun progress(progress: Double) {
         settings { this.progress = progress }
@@ -779,7 +867,7 @@ class ProgressBarBuilder : NodeBuilder<ProgressBar>() {
 @FXMarker
 class SliderBuilder : NodeBuilder<Slider>() {
 
-    override fun instance(): Slider = Slider()
+    override fun buildInstance(): Slider = Slider()
 
     fun range(min: Double, max: Double) {
         settings {
@@ -823,7 +911,7 @@ class SliderBuilder : NodeBuilder<Slider>() {
 @FXMarker
 class ImageViewBuilder : NodeBuilder<ImageView>() {
 
-    override fun instance(): ImageView = ImageView()
+    override fun buildInstance(): ImageView = ImageView()
 
     fun image(url: String) {
         settings { image = Image(url) }

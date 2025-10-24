@@ -20,8 +20,9 @@ inline fun paneBuilder(config: PaneBuilder.() -> Unit): PaneBuilder {
     return PaneBuilder().apply(config)
 }
 
-//inline fun Pane.config(config: PaneBuilder.() -> Unit) {
+//inline fun Pane.config(config: PaneBuilder.() -> Unit) :Pane{
 //    PaneBuilder().apply(config).config(this)
+//return this
 //}
 
 // VBox 衍生
@@ -33,8 +34,9 @@ inline fun vboxBuilder(config: VBoxBuilder.() -> Unit): VBoxBuilder {
     return VBoxBuilder().apply(config)
 }
 
-inline fun VBox.config(config: VBoxBuilder.() -> Unit) {
+inline fun VBox.config(config: VBoxBuilder.() -> Unit): VBox {
     VBoxBuilder().apply(config).config(this)
+    return this
 }
 
 // HBox 衍生
@@ -46,8 +48,9 @@ inline fun hboxBuilder(config: HBoxBuilder.() -> Unit): HBoxBuilder {
     return HBoxBuilder().apply(config)
 }
 
-inline fun HBox.config(config: HBoxBuilder.() -> Unit) {
+inline fun HBox.config(config: HBoxBuilder.() -> Unit): HBox {
     HBoxBuilder().apply(config).config(this)
+    return this
 }
 
 // StackPane 衍生
@@ -59,8 +62,9 @@ inline fun stackPaneBuilder(config: StackPaneBuilder.() -> Unit): StackPaneBuild
     return StackPaneBuilder().apply(config)
 }
 
-inline fun StackPane.config(config: StackPaneBuilder.() -> Unit) {
+inline fun StackPane.config(config: StackPaneBuilder.() -> Unit): StackPane {
     StackPaneBuilder().apply(config).config(this)
+    return this
 }
 
 // BorderPane 衍生
@@ -72,8 +76,9 @@ inline fun borderPaneBuilder(config: BorderPaneBuilder.() -> Unit): BorderPaneBu
     return BorderPaneBuilder().apply(config)
 }
 
-inline fun BorderPane.config(config: BorderPaneBuilder.() -> Unit) {
+inline fun BorderPane.config(config: BorderPaneBuilder.() -> Unit): BorderPane {
     BorderPaneBuilder().apply(config).config(this)
+    return this
 }
 
 // GridPane 衍生
@@ -85,8 +90,9 @@ inline fun gridPaneBuilder(config: GridPaneBuilder.() -> Unit): GridPaneBuilder 
     return GridPaneBuilder().apply(config)
 }
 
-inline fun GridPane.config(config: GridPaneBuilder.() -> Unit) {
+inline fun GridPane.config(config: GridPaneBuilder.() -> Unit): GridPane {
     GridPaneBuilder().apply(config).config(this)
+    return this
 }
 
 // ======================== Node 组件 DSL 衍生 ========================
@@ -107,8 +113,9 @@ inline fun textBuilder(config: TextBuilder.() -> Unit): TextBuilder {
     return TextBuilder().apply(config)
 }
 
-inline fun Text.config(config: TextBuilder.() -> Unit) {
+inline fun Text.config(config: TextBuilder.() -> Unit): Text {
     TextBuilder().apply(config).config(this)
+    return this
 }
 
 // Polygon 衍生
@@ -134,8 +141,9 @@ inline fun polygonBuilder(config: PolygonBuilder.() -> Unit): PolygonBuilder {
     return PolygonBuilder().apply(config)
 }
 
-inline fun Polygon.config(config: PolygonBuilder.() -> Unit) {
+inline fun Polygon.config(config: PolygonBuilder.() -> Unit): Polygon {
     PolygonBuilder().apply(config).config(this)
+    return this
 }
 
 // Label 衍生
@@ -154,8 +162,9 @@ inline fun labelBuilder(config: LabelBuilder.() -> Unit): LabelBuilder {
     return LabelBuilder().apply(config)
 }
 
-inline fun Label.config(config: LabelBuilder.() -> Unit) {
+inline fun Label.config(config: LabelBuilder.() -> Unit): Label {
     LabelBuilder().apply(config).config(this)
+    return this
 }
 
 // Button 衍生
@@ -174,8 +183,9 @@ inline fun buttonBuilder(config: ButtonBuilder.() -> Unit): ButtonBuilder {
     return ButtonBuilder().apply(config)
 }
 
-inline fun Button.config(config: ButtonBuilder.() -> Unit) {
+inline fun Button.config(config: ButtonBuilder.() -> Unit): Button {
     ButtonBuilder().apply(config).config(this)
+    return this
 }
 
 // TextField 衍生
@@ -194,8 +204,9 @@ inline fun textFieldBuilder(config: TextFieldBuilder.() -> Unit): TextFieldBuild
     return TextFieldBuilder().apply(config)
 }
 
-inline fun TextField.config(config: TextFieldBuilder.() -> Unit) {
+inline fun TextField.config(config: TextFieldBuilder.() -> Unit): TextField {
     TextFieldBuilder().apply(config).config(this)
+    return this
 }
 
 // TextArea 衍生
@@ -214,8 +225,9 @@ inline fun textAreaBuilder(config: TextAreaBuilder.() -> Unit): TextAreaBuilder 
     return TextAreaBuilder().apply(config)
 }
 
-inline fun TextArea.config(config: TextAreaBuilder.() -> Unit) {
+inline fun TextArea.config(config: TextAreaBuilder.() -> Unit): TextArea {
     TextAreaBuilder().apply(config).config(this)
+    return this
 }
 
 // CheckBox 衍生
@@ -234,8 +246,9 @@ inline fun checkBoxBuilder(config: CheckBoxBuilder.() -> Unit): CheckBoxBuilder 
     return CheckBoxBuilder().apply(config)
 }
 
-inline fun CheckBox.config(config: CheckBoxBuilder.() -> Unit) {
+inline fun CheckBox.config(config: CheckBoxBuilder.() -> Unit): CheckBox {
     CheckBoxBuilder().apply(config).config(this)
+    return this
 }
 
 // RadioButton 衍生
@@ -254,8 +267,9 @@ inline fun radioButtonBuilder(config: RadioButtonBuilder.() -> Unit): RadioButto
     return RadioButtonBuilder().apply(config)
 }
 
-inline fun RadioButton.config(config: RadioButtonBuilder.() -> Unit) {
+inline fun RadioButton.config(config: RadioButtonBuilder.() -> Unit): RadioButton {
     RadioButtonBuilder().apply(config).config(this)
+    return this
 }
 
 // ComboBox 衍生
@@ -274,8 +288,9 @@ inline fun <T> comboBoxBuilder(config: ComboBoxBuilder<T>.() -> Unit): ComboBoxB
     return ComboBoxBuilder<T>().apply(config)
 }
 
-inline fun <T> ComboBox<T>.config(config: ComboBoxBuilder<T>.() -> Unit) {
+inline fun <T> ComboBox<T>.config(config: ComboBoxBuilder<T>.() -> Unit): ComboBox<T> {
     ComboBoxBuilder<T>().apply(config).config(this)
+    return this
 }
 
 // ListView 衍生
@@ -294,8 +309,9 @@ inline fun <T> listViewBuilder(config: ListViewBuilder<T>.() -> Unit): ListViewB
     return ListViewBuilder<T>().apply(config)
 }
 
-inline fun <T> ListView<T>.config(config: ListViewBuilder<T>.() -> Unit) {
+inline fun <T> ListView<T>.config(config: ListViewBuilder<T>.() -> Unit): ListView<T> {
     ListViewBuilder<T>().apply(config).config(this)
+    return this
 }
 
 // TableView 衍生
@@ -314,8 +330,9 @@ inline fun <T> tableViewBuilder(config: TableViewBuilder<T>.() -> Unit): TableVi
     return TableViewBuilder<T>().apply(config)
 }
 
-inline fun <T> TableView<T>.config(config: TableViewBuilder<T>.() -> Unit) {
+inline fun <T> TableView<T>.config(config: TableViewBuilder<T>.() -> Unit): TableView<T> {
     TableViewBuilder<T>().apply(config).config(this)
+    return this
 }
 
 // ProgressBar 衍生
@@ -327,8 +344,9 @@ inline fun progressBarBuilder(config: ProgressBarBuilder.() -> Unit): ProgressBa
     return ProgressBarBuilder().apply(config)
 }
 
-inline fun ProgressBar.config(config: ProgressBarBuilder.() -> Unit) {
+inline fun ProgressBar.config(config: ProgressBarBuilder.() -> Unit): ProgressBar {
     ProgressBarBuilder().apply(config).config(this)
+    return this
 }
 
 // Slider 衍生
@@ -340,8 +358,9 @@ inline fun sliderBuilder(config: SliderBuilder.() -> Unit): SliderBuilder {
     return SliderBuilder().apply(config)
 }
 
-inline fun Slider.config(config: SliderBuilder.() -> Unit) {
+inline fun Slider.config(config: SliderBuilder.() -> Unit): Slider {
     SliderBuilder().apply(config).config(this)
+    return this
 }
 
 // ImageView 衍生
@@ -360,8 +379,9 @@ inline fun imageViewBuilder(config: ImageViewBuilder.() -> Unit): ImageViewBuild
     return ImageViewBuilder().apply(config)
 }
 
-inline fun ImageView.config(config: ImageViewBuilder.() -> Unit) {
+inline fun ImageView.config(config: ImageViewBuilder.() -> Unit): ImageView {
     ImageViewBuilder().apply(config).config(this)
+    return this
 }
 
 // ContextMenu 衍生
@@ -373,8 +393,9 @@ inline fun contextMenuBuilder(config: ContextMenuBuilder.() -> Unit): ContextMen
     return ContextMenuBuilder().apply(config)
 }
 
-inline fun ContextMenu.config(config: ContextMenuBuilder.() -> Unit) {
+inline fun ContextMenu.config(config: ContextMenuBuilder.() -> Unit): ContextMenu {
     ContextMenuBuilder().apply(config).config(this)
+    return this
 }
 
 // MenuItem 衍生
@@ -393,8 +414,30 @@ inline fun menuItemBuilder(config: MenuItemBuilder.() -> Unit): MenuItemBuilder 
     return MenuItemBuilder().apply(config)
 }
 
-inline fun MenuItem.config(config: MenuItemBuilder.() -> Unit) {
+inline fun MenuItem.config(config: MenuItemBuilder.() -> Unit): MenuItem {
     MenuItemBuilder().apply(config).config(this)
+    return this
+}
+
+// RadioMenuItem 衍生
+inline fun radioMenuItem(config: RadioMenuItemBuilder.() -> Unit): RadioMenuItem {
+    return radioMenuItemBuilder(config).build()
+}
+
+inline fun radioMenuItem(text: String, config: RadioMenuItemBuilder.() -> Unit = {}): RadioMenuItem {
+    return radioMenuItemBuilder {
+        text(text)
+        config()
+    }.build()
+}
+
+inline fun radioMenuItemBuilder(config: RadioMenuItemBuilder.() -> Unit): RadioMenuItemBuilder {
+    return RadioMenuItemBuilder().apply(config)
+}
+
+inline fun RadioMenuItem.config(config: RadioMenuItemBuilder.() -> Unit): RadioMenuItem {
+    RadioMenuItemBuilder().apply(config).config(this)
+    return this
 }
 
 // Menu 衍生
@@ -413,8 +456,9 @@ inline fun menuBuilder(config: MenuBuilder.() -> Unit): MenuBuilder {
     return MenuBuilder().apply(config)
 }
 
-inline fun Menu.config(config: MenuBuilder.() -> Unit) {
+inline fun Menu.config(config: MenuBuilder.() -> Unit): Menu {
     MenuBuilder().apply(config).config(this)
+    return this
 }
 
 enum class StyleSize() {
@@ -431,7 +475,13 @@ abstract class DslBuilder<T>() {
 
     open fun style(styleColor: StyleColor = StyleColor.DEFAULT, styleSize: StyleSize = StyleSize.DEFAULT) {}
 
-    abstract fun instance(): T
+    abstract fun buildInstance(): T
+
+    private var instanceInner: T? = null
+
+    fun instance(): T {
+        return instanceInner ?: buildInstance().apply { instanceInner = this }
+    }
 
     open fun settings(settings: T.() -> Unit) {
         builders.add(settings)
@@ -441,9 +491,10 @@ abstract class DslBuilder<T>() {
      * 通过配置构建新的实例
      */
     open fun build(): T {
-        val t = instance().apply {
+        val t = (instanceInner ?: buildInstance()).apply {
             builders.forEach { it() }
         }
+        instanceInner = null
         return t
     }
 
