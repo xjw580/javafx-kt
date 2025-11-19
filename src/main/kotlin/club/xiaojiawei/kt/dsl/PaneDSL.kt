@@ -1,16 +1,15 @@
 package club.xiaojiawei.kt.dsl
 
 import club.xiaojiawei.controls.FilterComboBox
+import club.xiaojiawei.controls.NotificationManager
 import club.xiaojiawei.controls.Title
 import javafx.collections.FXCollections
 import javafx.event.EventHandler
 import javafx.geometry.Insets
+import javafx.geometry.Orientation
 import javafx.geometry.Pos
 import javafx.scene.Node
-import javafx.scene.control.Button
-import javafx.scene.control.ComboBox
-import javafx.scene.control.Label
-import javafx.scene.control.TextField
+import javafx.scene.control.*
 import javafx.scene.input.DragEvent
 import javafx.scene.input.MouseEvent
 import javafx.scene.layout.*
@@ -162,7 +161,7 @@ abstract class LayoutBuilder<T : Pane> : DslBuilder<T>() {
         settings { isManaged = managed }
     }
 
-    fun styled(block: StyleBuilder.() -> Unit){
+    fun styled(block: StyleBuilder.() -> Unit) {
         settings {
             this.styled(block)
         }
@@ -192,6 +191,11 @@ abstract class PaneBaseBuilder<T : Pane> : LayoutBuilder<T>() {
     inline fun addPane(config: PaneBuilder.() -> Unit) {
         add(PaneBuilder().apply(config))
     }
+
+    inline fun addStackPane(config: StackPaneBuilder.() -> Unit) {
+        add(StackPaneBuilder().apply(config))
+    }
+
 
     fun addText(text: String = "") = add(Text(text))
 
@@ -263,6 +267,23 @@ abstract class PaneBaseBuilder<T : Pane> : LayoutBuilder<T>() {
         })
     }
 
+    fun addRadioButtons(toggleGroup: ToggleGroup, vararg configs: RadioButtonBuilder.() -> Unit) {
+        for (config in configs) {
+            add(RadioButtonBuilder().apply {
+                toggleGroup(toggleGroup)
+                this.config()
+            })
+        }
+    }
+
+    inline fun addRadioButton(text: String, toggleGroup: ToggleGroup, config: RadioButtonBuilder.() -> Unit = {}) {
+        add(RadioButtonBuilder().apply {
+            text(text)
+            toggleGroup(toggleGroup)
+            this.config()
+        })
+    }
+
 
     inline fun <T> addComboBox(item: List<T>, config: (ComboBox<T>.() -> Unit) = {}) {
         add(ComboBox<T>(FXCollections.observableArrayList(item)).apply(config))
@@ -292,7 +313,7 @@ abstract class PaneBaseBuilder<T : Pane> : LayoutBuilder<T>() {
         add(Button(text).apply(config))
     }
 
-    fun addButton(config: (ButtonBuilder.() -> Unit) = {}) {
+    inline fun addButton(config: (ButtonBuilder.() -> Unit) = {}) {
         add(
             ButtonBuilder().apply {
                 this.config()
@@ -515,5 +536,236 @@ class GridPaneBuilder : PaneBaseBuilder<GridPane>() {
         fun custom(node: Node) {
             this.node = node
         }
+    }
+}
+
+// ======================== AnchorPane ========================
+
+@FXMarker
+class AnchorPaneBuilder : PaneBaseBuilder<AnchorPane>() {
+    override fun buildInstance(): AnchorPane = AnchorPane()
+
+    inline fun anchor(node: Node, block: AnchorConstraints.() -> Unit) {
+        add(node)
+        node.anchorConstraints(block)
+    }
+
+    inline fun anchorVBox(block: VBoxBuilder.() -> Unit, anchorBlock: AnchorConstraints.() -> Unit) {
+        val vbox = VBoxBuilder().apply(block).build()
+        anchor(vbox, anchorBlock)
+    }
+
+    inline fun anchorHBox(block: HBoxBuilder.() -> Unit, anchorBlock: AnchorConstraints.() -> Unit) {
+        val hbox = HBoxBuilder().apply(block).build()
+        anchor(hbox, anchorBlock)
+    }
+}
+
+// ======================== FlowPane ========================
+
+@FXMarker
+class FlowPaneBuilder : PaneBaseBuilder<FlowPane>() {
+    override fun buildInstance(): FlowPane = FlowPane()
+
+    fun orientation(orientation: Orientation) = settings {
+        this.orientation = orientation
+    }
+
+    fun hgap(gap: Double) = settings {
+        hgap = gap
+    }
+
+    fun vgap(gap: Double) = settings {
+        vgap = gap
+    }
+
+    fun gap(gap: Double) {
+        hgap(gap)
+        vgap(gap)
+    }
+
+    fun alignment(pos: javafx.geometry.Pos) = settings {
+        alignment = pos
+    }
+
+    fun columnHalignment(halignment: javafx.geometry.HPos) = settings {
+        columnHalignment = halignment
+    }
+
+    fun rowValignment(valignment: javafx.geometry.VPos) = settings {
+        rowValignment = valignment
+    }
+
+    fun prefWrapLength(length: Double) = settings {
+        prefWrapLength = length
+    }
+}
+
+// ======================== TilePane ========================
+
+@FXMarker
+class TilePaneBuilder : PaneBaseBuilder<TilePane>() {
+    override fun buildInstance(): TilePane = TilePane()
+
+    fun orientation(orientation: Orientation) = settings {
+        this.orientation = orientation
+    }
+
+    fun hgap(gap: Double) = settings {
+        hgap = gap
+    }
+
+    fun vgap(gap: Double) = settings {
+        vgap = gap
+    }
+
+    fun gap(gap: Double) {
+        hgap(gap)
+        vgap(gap)
+    }
+
+    fun alignment(pos: javafx.geometry.Pos) = settings {
+        alignment = pos
+    }
+
+    fun tileAlignment(pos: javafx.geometry.Pos) = settings {
+        tileAlignment = pos
+    }
+
+    fun prefRows(rows: Int) = settings {
+        prefRows = rows
+    }
+
+    fun prefColumns(columns: Int) = settings {
+        prefColumns = columns
+    }
+
+    fun prefTileWidth(width: Double) = settings {
+        prefTileWidth = width
+    }
+
+    fun prefTileHeight(height: Double) = settings {
+        prefTileHeight = height
+    }
+}
+
+// ======================== ScrollPane ========================
+
+@FXMarker
+class ScrollPaneBuilder : DslBuilder<ScrollPane>() {
+    override fun buildInstance(): ScrollPane = ScrollPane()
+
+    fun content(node: Node) = settings {
+        content = node
+    }
+
+    fun content(builder: NodeBuilder<*>) = settings {
+        content = builder.build()
+    }
+
+    fun fitToWidth(fit: Boolean = true) = settings {
+        isFitToWidth = fit
+    }
+
+    fun fitToHeight(fit: Boolean = true) = settings {
+        isFitToHeight = fit
+    }
+
+    fun hbarPolicy(policy: ScrollPane.ScrollBarPolicy) = settings {
+        hbarPolicy = policy
+    }
+
+    fun vbarPolicy(policy: ScrollPane.ScrollBarPolicy) = settings {
+        vbarPolicy = policy
+    }
+
+    fun pannable(pannable: Boolean = true) = settings {
+        isPannable = pannable
+    }
+
+    fun hvalue(value: Double) = settings {
+        hvalue = value
+    }
+
+    fun vvalue(value: Double) = settings {
+        vvalue = value
+    }
+
+    fun hmin(min: Double) = settings {
+        hmin = min
+    }
+
+    fun hmax(max: Double) = settings {
+        hmax = max
+    }
+
+    fun vmin(min: Double) = settings {
+        vmin = min
+    }
+
+    fun vmax(max: Double) = settings {
+        vmax = max
+    }
+}
+
+// ======================== SplitPane ========================
+
+@FXMarker
+class SplitPaneBuilder : DslBuilder<SplitPane>() {
+    override fun buildInstance(): SplitPane = SplitPane()
+
+    fun orientation(orientation: Orientation) = settings {
+        this.orientation = orientation
+    }
+
+    fun items(vararg nodes: Node) = settings {
+        items.addAll(nodes)
+    }
+
+    fun dividerPosition(index: Int, position: Double) = settings {
+        setDividerPosition(index, position)
+    }
+
+    fun dividerPositions(vararg positions: Double) = settings {
+        setDividerPositions(*positions)
+    }
+
+    operator fun Node.unaryPlus() {
+        settings { items.add(this@unaryPlus) }
+    }
+}
+
+// ======================== TitledPane ========================
+
+@FXMarker
+class TitledPaneBuilder : DslBuilder<TitledPane>() {
+    override fun buildInstance(): TitledPane = TitledPane()
+
+    fun text(text: String) = settings {
+        this.text = text
+    }
+
+    fun content(node: Node) = settings {
+        content = node
+    }
+
+    fun content(builder: NodeBuilder<*>) = settings {
+        content = builder.build()
+    }
+
+    fun expanded(expanded: Boolean = true) = settings {
+        isExpanded = expanded
+    }
+
+    fun collapsible(collapsible: Boolean = true) = settings {
+        isCollapsible = collapsible
+    }
+
+    fun animated(animated: Boolean = true) = settings {
+        isAnimated = animated
+    }
+
+    fun graphic(node: Node) = settings {
+        graphic = node
     }
 }

@@ -57,6 +57,11 @@ class ContextMenuBuilder : DslBuilder<ContextMenu>() {
             menuItemBuilders.map { it() }.toList()
         )
     }
+
+    override fun clear() {
+        super.clear()
+        menuItemBuilders.clear()
+    }
 }
 
 @FXMarker
@@ -138,6 +143,10 @@ class MenuBuilder() : MenuItemBaseBuilder<Menu>() {
         )
     }
 
+    override fun clear() {
+        super.clear()
+        menuItemProviders.clear()
+    }
 }
 
 @FXMarker

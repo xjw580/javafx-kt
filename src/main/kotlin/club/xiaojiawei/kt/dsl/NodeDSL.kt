@@ -6,7 +6,9 @@ package club.xiaojiawei.kt.dsl
  */
 
 import club.xiaojiawei.controls.FilterComboBox
+import javafx.beans.property.BooleanProperty
 import javafx.beans.property.Property
+import javafx.beans.property.StringProperty
 import javafx.beans.value.ChangeListener
 import javafx.collections.ObservableList
 import javafx.event.ActionEvent
@@ -71,7 +73,7 @@ abstract class NodeBuilder<T : Node> : DslBuilder<T>() {
         }
     }
 
-    fun styled(block: StyleBuilder.() -> Unit){
+    fun styled(block: StyleBuilder.() -> Unit) {
         settings {
             this.styled(block)
         }
@@ -134,7 +136,7 @@ abstract class NodeBuilder<T : Node> : DslBuilder<T>() {
 
     fun size(width: Double = -1.0, height: Double = -1.0) {
         settings {
-            if (this is Region){
+            if (this is Region) {
                 prefWidth = width
                 prefHeight = height
             }
@@ -143,7 +145,7 @@ abstract class NodeBuilder<T : Node> : DslBuilder<T>() {
 
     fun minSize(width: Double = -1.0, height: Double = -1.0) {
         settings {
-            if (this is Region){
+            if (this is Region) {
                 minWidth = width
                 minHeight = height
             }
@@ -152,7 +154,7 @@ abstract class NodeBuilder<T : Node> : DslBuilder<T>() {
 
     fun maxSize(width: Double = -1.0, height: Double = -1.0) {
         settings {
-            if (this is Region){
+            if (this is Region) {
                 maxWidth = width
                 maxHeight = height
             }
@@ -161,7 +163,7 @@ abstract class NodeBuilder<T : Node> : DslBuilder<T>() {
 
     fun prefWidth(width: Double) {
         settings {
-            if (this is Region){
+            if (this is Region) {
                 prefWidth = width
             }
         }
@@ -169,7 +171,7 @@ abstract class NodeBuilder<T : Node> : DslBuilder<T>() {
 
     fun prefHeight(height: Double) {
         settings {
-            if (this is Region){
+            if (this is Region) {
                 prefHeight = height
             }
         }
@@ -177,7 +179,7 @@ abstract class NodeBuilder<T : Node> : DslBuilder<T>() {
 
     fun minWidth(width: Double) {
         settings {
-            if (this is Region){
+            if (this is Region) {
                 minWidth = width
             }
         }
@@ -185,7 +187,7 @@ abstract class NodeBuilder<T : Node> : DslBuilder<T>() {
 
     fun minHeight(height: Double) {
         settings {
-            if (this is Region){
+            if (this is Region) {
                 minHeight = height
             }
         }
@@ -193,7 +195,7 @@ abstract class NodeBuilder<T : Node> : DslBuilder<T>() {
 
     fun maxWidth(width: Double) {
         settings {
-            if (this is Region){
+            if (this is Region) {
                 maxWidth = width
             }
         }
@@ -201,7 +203,7 @@ abstract class NodeBuilder<T : Node> : DslBuilder<T>() {
 
     fun maxHeight(height: Double) {
         settings {
-            if (this is Region){
+            if (this is Region) {
                 maxHeight = height
             }
         }
@@ -340,7 +342,7 @@ class PolygonBuilder : NodeBuilder<Polygon>() {
         }
     }
 
-    fun clear() {
+    fun clearPoint() {
         settings { points.clear() }
     }
 
@@ -455,8 +457,20 @@ class TextFieldBuilder : NodeBuilder<TextField>() {
     }
 
     // 数据绑定
-    fun bindText(property: Property<String>) {
+    fun byBindText(property: StringProperty) {
+        settings { property.bind(textProperty()) }
+    }
+
+    fun bindText(property: StringProperty){
+        settings { textProperty().bind(property) }
+    }
+
+    fun bindBidirectionalText(property: StringProperty){
         settings { textProperty().bindBidirectional(property) }
+    }
+
+    fun byBindBidirectionalText(property: StringProperty){
+        settings { property.bindBidirectional(textProperty()) }
     }
 
     override fun style(styleColor: StyleColor, styleSize: StyleSize) {
@@ -568,6 +582,22 @@ class CheckBoxBuilder : LabeledBuilder<CheckBox>() {
         settings { onAction = EventHandler { handler() } }
     }
 
+    fun byBindSelected(property: BooleanProperty) {
+        settings { property.bind(selectedProperty()) }
+    }
+
+    fun bindSelected(property: BooleanProperty){
+        settings { selectedProperty().bind(property) }
+    }
+
+    fun bindBidirectionalSelected(property: BooleanProperty){
+        settings { selectedProperty().bindBidirectional(property) }
+    }
+
+    fun byBindBidirectionalSelected(property: BooleanProperty){
+        settings { property.bindBidirectional(selectedProperty()) }
+    }
+
     fun addSelectedListener(listener: ChangeListener<Boolean>) = settings {
         selectedProperty().addListener(listener)
     }
@@ -607,6 +637,16 @@ class RadioButtonBuilder : LabeledBuilder<RadioButton>() {
 
     fun toggleGroup(group: ToggleGroup) {
         settings { this.toggleGroup = group }
+    }
+
+    fun listenSelected(selectedCallback: () -> Unit) {
+        settings {
+            selectedProperty().addListener { p0, p1, p2 ->
+                if (p2) {
+                    selectedCallback()
+                }
+            }
+        }
     }
 
     fun onAction(handler: EventHandler<ActionEvent>) {

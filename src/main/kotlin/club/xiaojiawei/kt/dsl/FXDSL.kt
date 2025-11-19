@@ -95,6 +95,73 @@ inline fun GridPane.config(config: GridPaneBuilder.() -> Unit): GridPane {
     return this
 }
 
+// AnchorPane 衍生
+inline fun anchorPane(config: AnchorPaneBuilder.() -> Unit): AnchorPane {
+    return AnchorPaneBuilder().apply(config).build()
+}
+
+inline fun AnchorPane.config(config: AnchorPaneBuilder.() -> Unit): AnchorPane {
+    AnchorPaneBuilder().apply(config).config(this)
+    return this
+}
+
+// FlowPane 衍生
+inline fun flowPane(config: FlowPaneBuilder.() -> Unit): FlowPane {
+    return FlowPaneBuilder().apply(config).build()
+}
+
+inline fun FlowPane.config(config: FlowPaneBuilder.() -> Unit): FlowPane {
+    FlowPaneBuilder().apply(config).config(this)
+    return this
+}
+
+// TilePane 衍生
+inline fun tilePane(config: TilePaneBuilder.() -> Unit): TilePane {
+    return TilePaneBuilder().apply(config).build()
+}
+
+inline fun TilePane.config(config: TilePaneBuilder.() -> Unit): TilePane {
+    TilePaneBuilder().apply(config).config(this)
+    return this
+}
+
+// ScrollPane 衍生
+inline fun scrollPane(config: ScrollPaneBuilder.() -> Unit): ScrollPane {
+    return ScrollPaneBuilder().apply(config).build()
+}
+
+inline fun ScrollPane.config(config: ScrollPaneBuilder.() -> Unit): ScrollPane {
+    ScrollPaneBuilder().apply(config).config(this)
+    return this
+}
+
+// SplitPane 衍生
+inline fun splitPane(config: SplitPaneBuilder.() -> Unit): SplitPane {
+    return SplitPaneBuilder().apply(config).build()
+}
+
+inline fun SplitPane.config(config: SplitPaneBuilder.() -> Unit): SplitPane {
+    SplitPaneBuilder().apply(config).config(this)
+    return this
+}
+
+// TitledPane 衍生
+inline fun titledPane(config: TitledPaneBuilder.() -> Unit): TitledPane {
+    return TitledPaneBuilder().apply(config).build()
+}
+
+inline fun titledPane(title: String, config: TitledPaneBuilder.() -> Unit = {}): TitledPane {
+    return TitledPaneBuilder().apply {
+        text(title)
+        config()
+    }.build()
+}
+
+inline fun TitledPane.config(config: TitledPaneBuilder.() -> Unit): TitledPane {
+    TitledPaneBuilder().apply(config).config(this)
+    return this
+}
+
 // ======================== Node 组件 DSL 衍生 ========================
 
 // Text 衍生
@@ -259,6 +326,14 @@ inline fun radioButton(config: RadioButtonBuilder.() -> Unit): RadioButton {
 inline fun radioButton(text: String, config: RadioButtonBuilder.() -> Unit = {}): RadioButton {
     return radioButtonBuilder {
         text(text)
+        config()
+    }.build()
+}
+
+inline fun radioButton(text: String, toggleGroup: ToggleGroup, config: RadioButtonBuilder.() -> Unit = {}): RadioButton {
+    return radioButtonBuilder {
+        text(text)
+        toggleGroup(toggleGroup)
         config()
     }.build()
 }
@@ -504,6 +579,17 @@ abstract class DslBuilder<T>() {
     open fun config(t: T) {
         t.apply {
             builders.forEach { it() }
+        }
+    }
+
+    open fun clear() {
+        builders.clear()
+        instanceInner = null
+    }
+
+    fun settingsIf(condition: Boolean, settings: T.() -> Unit) {
+        if (condition) {
+            builders.add(settings)
         }
     }
 
