@@ -1,7 +1,6 @@
 package club.xiaojiawei.kt.dsl
 
 import club.xiaojiawei.controls.FilterComboBox
-import club.xiaojiawei.controls.NotificationManager
 import club.xiaojiawei.controls.Title
 import javafx.collections.FXCollections
 import javafx.event.EventHandler
@@ -328,6 +327,8 @@ abstract class PaneBaseBuilder<T : Pane> : LayoutBuilder<T>() {
             }
         )
     }
+
+    inline fun addSeparator(config: (SeparatorBuilder.() -> Unit) = {}) = add(SeparatorBuilder().apply(config))
 
     fun onMouseClicked(handler: EventHandler<MouseEvent>?) {
         settings { onMouseClicked = handler }

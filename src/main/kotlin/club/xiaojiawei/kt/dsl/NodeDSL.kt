@@ -7,12 +7,12 @@ package club.xiaojiawei.kt.dsl
 
 import club.xiaojiawei.controls.FilterComboBox
 import javafx.beans.property.BooleanProperty
-import javafx.beans.property.Property
 import javafx.beans.property.StringProperty
 import javafx.beans.value.ChangeListener
 import javafx.collections.ObservableList
 import javafx.event.ActionEvent
 import javafx.event.EventHandler
+import javafx.geometry.Orientation
 import javafx.geometry.Pos
 import javafx.scene.Cursor
 import javafx.scene.Node
@@ -255,10 +255,6 @@ class LabelBuilder : LabeledBuilder<Label>() {
 
     override fun buildInstance(): Label = Label()
 
-    fun alignment(alignment: Pos) {
-        settings { this.alignment = alignment }
-    }
-
     fun wrapText(wrap: Boolean = true) {
         settings { isWrapText = wrap }
     }
@@ -461,15 +457,15 @@ class TextFieldBuilder : NodeBuilder<TextField>() {
         settings { property.bind(textProperty()) }
     }
 
-    fun bindText(property: StringProperty){
+    fun bindText(property: StringProperty) {
         settings { textProperty().bind(property) }
     }
 
-    fun bindBidirectionalText(property: StringProperty){
+    fun bindBidirectionalText(property: StringProperty) {
         settings { textProperty().bindBidirectional(property) }
     }
 
-    fun byBindBidirectionalText(property: StringProperty){
+    fun byBindBidirectionalText(property: StringProperty) {
         settings { property.bindBidirectional(textProperty()) }
     }
 
@@ -554,6 +550,19 @@ abstract class LabeledBuilder<T : Labeled> : NodeBuilder<T>() {
         settings { font = Font.font(size) }
     }
 
+    fun alignment(alignment: Pos) = settings { this.alignment = alignment }
+    fun alignCenter() = alignment(Pos.CENTER)
+    fun alignTop() = alignment(Pos.TOP_CENTER)
+    fun alignBottom() = alignment(Pos.BOTTOM_CENTER)
+    fun alignLeft() = alignment(Pos.CENTER_LEFT)
+    fun alignRight() = alignment(Pos.CENTER_RIGHT)
+    fun alignTopLeft() = alignment(Pos.TOP_LEFT)
+    fun alignTopRight() = alignment(Pos.TOP_RIGHT)
+    fun alignBottomLeft() = alignment(Pos.BOTTOM_LEFT)
+    fun alignBottomRight() = alignment(Pos.BOTTOM_RIGHT)
+    fun alignBaseLeft() = alignment(Pos.BASELINE_LEFT)
+    fun alignBaseCenter() = alignment(Pos.BASELINE_CENTER)
+    fun alignBaseRight() = alignment(Pos.BASELINE_RIGHT)
 }
 
 // CheckBox 构建器
@@ -586,15 +595,15 @@ class CheckBoxBuilder : LabeledBuilder<CheckBox>() {
         settings { property.bind(selectedProperty()) }
     }
 
-    fun bindSelected(property: BooleanProperty){
+    fun bindSelected(property: BooleanProperty) {
         settings { selectedProperty().bind(property) }
     }
 
-    fun bindBidirectionalSelected(property: BooleanProperty){
+    fun bindBidirectionalSelected(property: BooleanProperty) {
         settings { selectedProperty().bindBidirectional(property) }
     }
 
-    fun byBindBidirectionalSelected(property: BooleanProperty){
+    fun byBindBidirectionalSelected(property: BooleanProperty) {
         settings { property.bindBidirectional(selectedProperty()) }
     }
 
@@ -981,4 +990,18 @@ class ImageViewBuilder : NodeBuilder<ImageView>() {
             styleClass.add("image-view-ui")
         }
     }
+}
+
+class SeparatorBuilder : NodeBuilder<Separator>() {
+    override fun buildInstance() = Separator()
+
+
+    fun orientation(orientation: Orientation) = settings {
+        this.orientation = orientation
+    }
+
+    fun vertical() = orientation(Orientation.VERTICAL)
+
+    fun horizontal() = orientation(Orientation.HORIZONTAL)
+
 }

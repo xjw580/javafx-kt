@@ -330,7 +330,11 @@ inline fun radioButton(text: String, config: RadioButtonBuilder.() -> Unit = {})
     }.build()
 }
 
-inline fun radioButton(text: String, toggleGroup: ToggleGroup, config: RadioButtonBuilder.() -> Unit = {}): RadioButton {
+inline fun radioButton(
+    text: String,
+    toggleGroup: ToggleGroup,
+    config: RadioButtonBuilder.() -> Unit = {}
+): RadioButton {
     return radioButtonBuilder {
         text(text)
         toggleGroup(toggleGroup)
@@ -459,6 +463,20 @@ inline fun ImageView.config(config: ImageViewBuilder.() -> Unit): ImageView {
     return this
 }
 
+// Separator 衍生
+inline fun separator(config: SeparatorBuilder.() -> Unit = {}): Separator {
+    return separatorBuilder(config).build()
+}
+
+inline fun separatorBuilder(config: SeparatorBuilder.() -> Unit): SeparatorBuilder {
+    return SeparatorBuilder().apply(config)
+}
+
+inline fun Separator.config(config: SeparatorBuilder.() -> Unit): Separator {
+    SeparatorBuilder().apply(config).config(this)
+    return this
+}
+
 // ContextMenu 衍生
 inline fun contextMenu(config: ContextMenuBuilder.() -> Unit): ContextMenu {
     return contextMenuBuilder(config).build()
@@ -544,9 +562,14 @@ enum class StyleColor() {
     MAIN, NORMAL, SUCCESS, WARN, ERROR, DEFAULT
 }
 
-abstract class DslBuilder<T>() {
+abstract class DslBuilder<T>(
+    buildMode: BuildMode = BuildMode.DELAY
+) {
 
-    private val builders: MutableList<T.() -> Unit> = mutableListOf()
+    var buildMode: BuildMode = buildMode
+        private set
+
+    private val builders: ArrayList<T.() -> Unit> = ArrayList()
 
     open fun style(styleColor: StyleColor = StyleColor.DEFAULT, styleSize: StyleSize = StyleSize.DEFAULT) {}
 
@@ -558,18 +581,43 @@ abstract class DslBuilder<T>() {
         return instanceInner ?: buildInstance().apply { instanceInner = this }
     }
 
+    fun immediateMode() {
+        buildMode = BuildMode.IMMEDIATE
+    }
+
+    fun delayMode() {
+        buildMode = BuildMode.DELAY
+    }
+
+    fun reserveSetting(minCapacity: Int) {
+        builders.ensureCapacity(minCapacity)
+    }
+
     open fun settings(settings: T.() -> Unit) {
-        builders.add(settings)
+        when (buildMode) {
+            BuildMode.IMMEDIATE -> {
+                instance().settings()
+            }
+
+            BuildMode.DELAY -> {
+                builders.add(settings)
+            }
+        }
     }
 
     /**
      * 通过配置构建新的实例
      */
     open fun build(): T {
-        val t = (instanceInner ?: buildInstance()).apply {
-            builders.forEach { it() }
+        val t = if (buildMode == BuildMode.IMMEDIATE) {
+            instance()
+        } else {
+            instance().apply {
+                builders.forEach { it() }
+            }
         }
         instanceInner = null
+        builders.clear()
         return t
     }
 
@@ -577,8 +625,10 @@ abstract class DslBuilder<T>() {
      * 将配置应用到传入的实例中
      */
     open fun config(t: T) {
-        t.apply {
-            builders.forEach { it() }
+        if (buildMode == BuildMode.DELAY) {
+            t.apply {
+                builders.forEach { it() }
+            }
         }
     }
 
@@ -589,8 +639,12 @@ abstract class DslBuilder<T>() {
 
     fun settingsIf(condition: Boolean, settings: T.() -> Unit) {
         if (condition) {
-            builders.add(settings)
+            settings(settings)
         }
     }
 
+    enum class BuildMode {
+        IMMEDIATE,  // 立即模式
+        DELAY       // 延迟模式
+    }
 }
