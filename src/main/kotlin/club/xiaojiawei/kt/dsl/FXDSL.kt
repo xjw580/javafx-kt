@@ -589,6 +589,10 @@ abstract class DslBuilder<T>(
         buildMode = BuildMode.DELAY
     }
 
+    fun setMode(mode: BuildMode) {
+        buildMode = mode
+    }
+
     fun reserveSetting(minCapacity: Int) {
         builders.ensureCapacity(minCapacity)
     }

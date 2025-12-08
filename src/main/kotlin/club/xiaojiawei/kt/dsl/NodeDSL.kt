@@ -37,6 +37,12 @@ import javafx.util.StringConverter
 @FXMarker
 abstract class NodeBuilder<T : Node> : DslBuilder<T>() {
 
+    fun userData(data: Any) {
+        settings {
+            userData = data
+        }
+    }
+
     fun hgrow(priority: Priority) = settings {
         HBox.setHgrow(this, priority)
     }

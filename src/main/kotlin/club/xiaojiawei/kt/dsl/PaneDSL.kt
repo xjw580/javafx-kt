@@ -29,6 +29,12 @@ abstract class LayoutBuilder<T : Pane> : DslBuilder<T>() {
 
     operator fun Node.unaryPlus() = add(this)
 
+    fun userData(data: Any) {
+        settings {
+            userData = data
+        }
+    }
+
     // 添加子节点
     fun add(node: Node) {
         settings {
@@ -166,6 +172,12 @@ abstract class LayoutBuilder<T : Pane> : DslBuilder<T>() {
         }
     }
 
+    fun styled(styleBuilder: StyleBuilder) {
+        settings {
+            style = styleBuilder.build()
+        }
+    }
+
 }
 
 @FXMarker
@@ -175,57 +187,115 @@ abstract class PaneBaseBuilder<T : Pane> : LayoutBuilder<T>() {
         HBox.setHgrow(this, priority)
     }
 
+    fun hgrowAlways() = settings {
+        HBox.setHgrow(this, Priority.ALWAYS)
+    }
+
+    fun hgrowSometimes() = settings {
+        HBox.setHgrow(this, Priority.SOMETIMES)
+    }
+
+    fun hgrowNever() = settings {
+        HBox.setHgrow(this, Priority.NEVER)
+    }
+
     fun vgrow(priority: Priority) = settings {
         VBox.setVgrow(this, priority)
     }
 
+    fun vgrowAlways() = settings {
+        VBox.setVgrow(this, Priority.ALWAYS)
+    }
+
+    fun vgrowSometimes() = settings {
+        VBox.setVgrow(this, Priority.SOMETIMES)
+    }
+
+    fun vgrowNever() = settings {
+        VBox.setVgrow(this, Priority.NEVER)
+    }
+
     inline fun addVBox(config: VBoxBuilder.() -> Unit) {
-        add(VBoxBuilder().apply(config))
+        add(VBoxBuilder().apply {
+            setMode(this@PaneBaseBuilder.buildMode)
+            config()
+        })
     }
 
     inline fun addHBox(config: HBoxBuilder.() -> Unit) {
-        add(HBoxBuilder().apply(config))
+        add(HBoxBuilder().apply {
+            setMode(this@PaneBaseBuilder.buildMode)
+            config()
+        })
     }
 
     inline fun addPane(config: PaneBuilder.() -> Unit) {
-        add(PaneBuilder().apply(config))
+        add(PaneBuilder().apply {
+            setMode(this@PaneBaseBuilder.buildMode)
+            config()
+        })
     }
 
     inline fun addStackPane(config: StackPaneBuilder.() -> Unit) {
-        add(StackPaneBuilder().apply(config))
+        add(StackPaneBuilder().apply {
+            setMode(this@PaneBaseBuilder.buildMode)
+            config()
+        })
     }
 
 
     fun addText(text: String = "") = add(Text(text))
 
-    fun addText(config: TextBuilder.() -> Unit = {}) = add(TextBuilder().apply(config))
+    fun addText(config: TextBuilder.() -> Unit = {}) = add(TextBuilder().apply {
+        setMode(this@PaneBaseBuilder.buildMode)
+        config()
+    })
 
-    fun addText(text: String, config: Text.() -> Unit = {}) = add(Text(text).apply(config))
+    fun addText(text: String, config: Text.() -> Unit = {}) = add(Text(text).apply {
+        setMode(this@PaneBaseBuilder.buildMode)
+        config()
+    })
 
     inline fun addPolygon(points: List<Double>, config: (Polygon.() -> Unit) = {}) {
         add(Polygon().apply {
+            setMode(this@PaneBaseBuilder.buildMode)
             this.points.addAll(points)
         }.apply(config))
     }
 
     inline fun addPolygon(config: (PolygonBuilder.() -> Unit) = {}) {
-        add(PolygonBuilder().apply(config))
+        add(PolygonBuilder().apply {
+            setMode(this@PaneBaseBuilder.buildMode)
+            config()
+        })
     }
 
     inline fun addLabel(text: String, config: (Label.() -> Unit) = {}) {
-        add(Label(text).apply(config))
+        add(Label(text).apply {
+            setMode(this@PaneBaseBuilder.buildMode)
+            config()
+        })
     }
 
     inline fun addLabel(config: (LabelBuilder.() -> Unit) = {}) {
-        add(LabelBuilder().apply(config))
+        add(LabelBuilder().apply {
+            setMode(this@PaneBaseBuilder.buildMode)
+            config()
+        })
     }
 
     inline fun addCircle(config: (CircleBuilder.() -> Unit) = {}) {
-        add(CircleBuilder().apply(config))
+        add(CircleBuilder().apply {
+            setMode(this@PaneBaseBuilder.buildMode)
+            config()
+        })
     }
 
     inline fun addCircle(radius: Double, fill: Color, config: (Circle.() -> Unit) = {}) {
-        add(Circle(radius, fill).apply(config))
+        add(Circle(radius, fill).apply {
+            setMode(this@PaneBaseBuilder.buildMode)
+            config()
+        })
     }
 
     inline fun addTitle(config: (Title.() -> Unit) = {}) {
@@ -242,12 +312,14 @@ abstract class PaneBaseBuilder<T : Pane> : LayoutBuilder<T>() {
 
     inline fun addCheckBox(config: (CheckBoxBuilder.() -> Unit) = {}) {
         add(CheckBoxBuilder().apply {
+            setMode(this@PaneBaseBuilder.buildMode)
             this.config()
         })
     }
 
     inline fun addCheckBox(text: String, config: CheckBoxBuilder.() -> Unit = {}) {
         add(CheckBoxBuilder().apply {
+            setMode(this@PaneBaseBuilder.buildMode)
             text(text)
             this.config()
         })
@@ -255,12 +327,14 @@ abstract class PaneBaseBuilder<T : Pane> : LayoutBuilder<T>() {
 
     inline fun addRadioButton(config: (RadioButtonBuilder.() -> Unit) = {}) {
         add(RadioButtonBuilder().apply {
+            setMode(this@PaneBaseBuilder.buildMode)
             this.config()
         })
     }
 
     inline fun addRadioButton(text: String, config: RadioButtonBuilder.() -> Unit = {}) {
         add(RadioButtonBuilder().apply {
+            setMode(this@PaneBaseBuilder.buildMode)
             text(text)
             this.config()
         })
@@ -269,6 +343,7 @@ abstract class PaneBaseBuilder<T : Pane> : LayoutBuilder<T>() {
     fun addRadioButtons(toggleGroup: ToggleGroup, vararg configs: RadioButtonBuilder.() -> Unit) {
         for (config in configs) {
             add(RadioButtonBuilder().apply {
+                setMode(this@PaneBaseBuilder.buildMode)
                 toggleGroup(toggleGroup)
                 this.config()
             })
@@ -277,6 +352,7 @@ abstract class PaneBaseBuilder<T : Pane> : LayoutBuilder<T>() {
 
     inline fun addRadioButton(text: String, toggleGroup: ToggleGroup, config: RadioButtonBuilder.() -> Unit = {}) {
         add(RadioButtonBuilder().apply {
+            setMode(this@PaneBaseBuilder.buildMode)
             text(text)
             toggleGroup(toggleGroup)
             this.config()
@@ -285,36 +361,48 @@ abstract class PaneBaseBuilder<T : Pane> : LayoutBuilder<T>() {
 
 
     inline fun <T> addComboBox(item: List<T>, config: (ComboBox<T>.() -> Unit) = {}) {
-        add(ComboBox<T>(FXCollections.observableArrayList(item)).apply(config))
+        add(ComboBox<T>(FXCollections.observableArrayList(item)).apply {
+            setMode(this@PaneBaseBuilder.buildMode)
+            config()
+        })
     }
 
     inline fun <T> addComboBox(config: (ComboBoxBuilder<T>.() -> Unit) = {}) {
         add(
             ComboBoxBuilder<T>().apply {
+                setMode(this@PaneBaseBuilder.buildMode)
                 this.config()
             }
         )
     }
 
     inline fun <T> addFilterComboBox(item: List<T>, config: (ComboBox<T>.() -> Unit) = {}) {
-        add(FilterComboBox<T>(FXCollections.observableArrayList(item)).apply(config))
+        add(FilterComboBox<T>(FXCollections.observableArrayList(item)).apply {
+            setMode(this@PaneBaseBuilder.buildMode)
+            config()
+        })
     }
 
     inline fun <T> addFilterComboBox(config: (FilterComboBoxBuilder<T>.() -> Unit) = {}) {
         add(
             FilterComboBoxBuilder<T>().apply {
+                setMode(this@PaneBaseBuilder.buildMode)
                 this.config()
             }
         )
     }
 
     inline fun addButton(text: String, config: (Button.() -> Unit) = {}) {
-        add(Button(text).apply(config))
+        add(Button(text).apply {
+            setMode(this@PaneBaseBuilder.buildMode)
+            config()
+        })
     }
 
     inline fun addButton(config: (ButtonBuilder.() -> Unit) = {}) {
         add(
             ButtonBuilder().apply {
+                setMode(this@PaneBaseBuilder.buildMode)
                 this.config()
             }
         )
@@ -323,12 +411,16 @@ abstract class PaneBaseBuilder<T : Pane> : LayoutBuilder<T>() {
     inline fun addTextField(config: (TextFieldBuilder.() -> Unit) = {}) {
         add(
             TextFieldBuilder().apply {
+                setMode(this@PaneBaseBuilder.buildMode)
                 this.config()
             }
         )
     }
 
-    inline fun addSeparator(config: (SeparatorBuilder.() -> Unit) = {}) = add(SeparatorBuilder().apply(config))
+    inline fun addSeparator(config: (SeparatorBuilder.() -> Unit) = {}) = add(SeparatorBuilder().apply {
+        setMode(this@PaneBaseBuilder.buildMode)
+        config()
+    })
 
     fun onMouseClicked(handler: EventHandler<MouseEvent>?) {
         settings { onMouseClicked = handler }
@@ -552,12 +644,18 @@ class AnchorPaneBuilder : PaneBaseBuilder<AnchorPane>() {
     }
 
     inline fun anchorVBox(block: VBoxBuilder.() -> Unit, anchorBlock: AnchorConstraints.() -> Unit) {
-        val vbox = VBoxBuilder().apply(block).build()
+        val vbox = VBoxBuilder().apply {
+            setMode(this@AnchorPaneBuilder.buildMode)
+            block(this)
+        }.build()
         anchor(vbox, anchorBlock)
     }
 
     inline fun anchorHBox(block: HBoxBuilder.() -> Unit, anchorBlock: AnchorConstraints.() -> Unit) {
-        val hbox = HBoxBuilder().apply(block).build()
+        val hbox = HBoxBuilder().apply {
+            setMode(this@AnchorPaneBuilder.buildMode)
+            block(this)
+        }.build()
         anchor(hbox, anchorBlock)
     }
 }

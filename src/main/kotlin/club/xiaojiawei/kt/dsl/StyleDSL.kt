@@ -1,5 +1,6 @@
 package club.xiaojiawei.kt.dsl
 
+import javafx.geometry.Pos
 import javafx.scene.Node
 
 /**
@@ -129,6 +130,19 @@ class StyleBuilder {
     fun alignment(value: String) {
         styles["-fx-alignment"] = value
     }
+
+    fun alignCenter() = alignment("CENTER")
+    fun alignTop() = alignment("TOP_CENTER")
+    fun alignBottom() = alignment("BOTTOM_CENTER")
+    fun alignLeft() = alignment("CENTER_LEFT")
+    fun alignRight() = alignment("CENTER_RIGHT")
+    fun alignTopLeft() = alignment("TOP_LEFT")
+    fun alignTopRight() = alignment("TOP_RIGHT")
+    fun alignBottomLeft() = alignment("BOTTOM_LEFT")
+    fun alignBottomRight() = alignment("BOTTOM_RIGHT")
+    fun alignBaseLeft() = alignment("BASELINE_LEFT")
+    fun alignBaseCenter() = alignment("BASELINE_CENTER")
+    fun alignBaseRight() = alignment("BASELINE_RIGHT")
 
     // 形状相关
     fun shape(value: String) {
