@@ -96,4 +96,20 @@ class TaskController<T : TaskBuilder>(taskBuilderProvider: (() -> T)) {
     fun getProgressView(): DynamicTaskProgressView<T> = progressView
 
     fun getTaskManager(): DynamicTaskManager<T> = taskManager
+
+    /**
+     * 添加批量完成回调监听器
+     * 当多个任务在短时间内完成时，会批量通知，减少UI线程切换次数
+     * @param callback 批量完成回调，参数为完成的任务列表
+     */
+    fun addBatchCompletionCallback(callback: (List<TaskCompletionInfo>) -> Unit) {
+        taskManager.addBatchCompletionCallback(callback)
+    }
+
+    /**
+     * 移除批量完成回调监听器
+     */
+    fun removeBatchCompletionCallback(callback: (List<TaskCompletionInfo>) -> Unit) {
+        taskManager.removeBatchCompletionCallback(callback)
+    }
 }

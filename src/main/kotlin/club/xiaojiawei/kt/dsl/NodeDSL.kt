@@ -43,6 +43,10 @@ abstract class NodeBuilder<T : Node> : DslBuilder<T>() {
         }
     }
 
+    fun pickOnBounds(pickOnBounds: Boolean = true) = settings {
+        isPickOnBounds = pickOnBounds
+    }
+
     fun hgrow(priority: Priority) = settings {
         HBox.setHgrow(this, priority)
     }
@@ -267,6 +271,8 @@ class LabelBuilder : LabeledBuilder<Label>() {
 
     fun graphic(node: Node) = settings { graphic = node }
 
+    fun graphic(builder: () -> Node) = settings { graphic = builder() }
+
     override fun style(styleColor: StyleColor, styleSize: StyleSize) {
         settings {
             styleClass.add("label-ui")
@@ -391,6 +397,8 @@ class ButtonBuilder : LabeledBuilder<Button>() {
     fun graphic(node: Node) {
         settings { graphic = node }
     }
+
+    fun graphic(builder: () -> Node) = settings { graphic = builder() }
 
     fun defaultButton(default: Boolean = true) {
         settings { isDefaultButton = default }
@@ -976,7 +984,7 @@ class ImageViewBuilder : NodeBuilder<ImageView>() {
         settings { this.image = image }
     }
 
-    fun fitSize(width: Double, height: Double) {
+    fun fitSize(width: Double = -1.0, height: Double = -1.0) {
         settings {
             fitWidth = width
             fitHeight = height

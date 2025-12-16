@@ -1,6 +1,6 @@
 package club.xiaojiawei.kt.bean.task
 
-import club.xiaojiawei.kt.utils.runUI
+import club.xiaojiawei.kt.ext.runUI
 
 /**
  * @author 肖嘉威

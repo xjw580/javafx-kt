@@ -4,9 +4,7 @@ import club.xiaojiawei.controls.FilterComboBox
 import club.xiaojiawei.controls.Title
 import javafx.collections.FXCollections
 import javafx.event.EventHandler
-import javafx.geometry.Insets
-import javafx.geometry.Orientation
-import javafx.geometry.Pos
+import javafx.geometry.*
 import javafx.scene.Node
 import javafx.scene.control.*
 import javafx.scene.input.DragEvent
@@ -17,6 +15,8 @@ import javafx.scene.paint.Paint
 import javafx.scene.shape.Circle
 import javafx.scene.shape.Polygon
 import javafx.scene.text.Text
+import kotlin.properties.ReadWriteProperty
+import kotlin.reflect.KProperty
 
 
 /**
@@ -40,6 +40,10 @@ abstract class LayoutBuilder<T : Pane> : DslBuilder<T>() {
         settings {
             children.add(node)
         }
+    }
+
+    fun add(builder: () -> Node) = settings {
+        children.add(builder())
     }
 
     fun add(node: NodeBuilder<*>) {
@@ -71,6 +75,15 @@ abstract class LayoutBuilder<T : Pane> : DslBuilder<T>() {
         settings {
             prefWidth = width
             prefHeight = height
+        }
+    }
+
+    fun fixedSize(width: Double = -1.0, height: Double = -1.0) {
+        settings {
+            minWidth = width
+            minHeight = height
+            maxWidth = width
+            maxHeight = height
         }
     }
 
@@ -180,6 +193,8 @@ abstract class LayoutBuilder<T : Pane> : DslBuilder<T>() {
 
 }
 
+// ======================== Pane ========================
+
 @FXMarker
 abstract class PaneBaseBuilder<T : Pane> : LayoutBuilder<T>() {
 
@@ -238,6 +253,20 @@ abstract class PaneBaseBuilder<T : Pane> : LayoutBuilder<T>() {
 
     inline fun addStackPane(config: StackPaneBuilder.() -> Unit) {
         add(StackPaneBuilder().apply {
+            setMode(this@PaneBaseBuilder.buildMode)
+            config()
+        })
+    }
+
+    inline fun addGridPane(config: GridPaneBuilder.() -> Unit) {
+        add(GridPaneBuilder().apply {
+            setMode(this@PaneBaseBuilder.buildMode)
+            config()
+        })
+    }
+
+    inline fun addImageView(config: ImageViewBuilder.() -> Unit) {
+        add(ImageViewBuilder().apply {
             setMode(this@PaneBaseBuilder.buildMode)
             config()
         })
@@ -422,6 +451,18 @@ abstract class PaneBaseBuilder<T : Pane> : LayoutBuilder<T>() {
         config()
     })
 
+    fun onMouseReleased(handler: EventHandler<MouseEvent>?) {
+        settings { onMouseReleased = handler }
+    }
+
+    fun onMousePressed(handler: EventHandler<MouseEvent>?) {
+        settings { onMousePressed = handler }
+    }
+
+    fun onMouseDragged(handler: EventHandler<MouseEvent>?) {
+        settings { onMouseDragged = handler }
+    }
+
     fun onMouseClicked(handler: EventHandler<MouseEvent>?) {
         settings { onMouseClicked = handler }
     }
@@ -487,6 +528,7 @@ sealed class BoxBuilder<T : Pane> : PaneBaseBuilder<T>() {
     fun alignBaseRight() = alignment(Pos.BASELINE_RIGHT)
 }
 
+// ======================== VBox ========================
 
 @FXMarker
 class VBoxBuilder : BoxBuilder<VBox>() {
@@ -503,6 +545,8 @@ class VBoxBuilder : BoxBuilder<VBox>() {
     }
 }
 
+// ======================== HBox ========================
+
 @FXMarker
 class HBoxBuilder : BoxBuilder<HBox>() {
     override fun buildInstance(): HBox = HBox()
@@ -518,6 +562,7 @@ class HBoxBuilder : BoxBuilder<HBox>() {
     }
 }
 
+// ======================== StackPane ========================
 
 @FXMarker
 class StackPaneBuilder : PaneBaseBuilder<StackPane>() {
@@ -533,6 +578,8 @@ class StackPaneBuilder : PaneBaseBuilder<StackPane>() {
     fun alignBottom() = alignment(Pos.BOTTOM_CENTER)
 
 }
+
+// ======================== BorderPane ========================
 
 @FXMarker
 class BorderPaneBuilder : PaneBaseBuilder<BorderPane>() {
@@ -561,76 +608,264 @@ class BorderPaneBuilder : PaneBaseBuilder<BorderPane>() {
 
 }
 
+// ======================== GridPane ========================
+
 @FXMarker
 class GridPaneBuilder : PaneBaseBuilder<GridPane>() {
-
     override fun buildInstance(): GridPane = GridPane()
 
-    fun hgap(gap: Double) {
-        settings { hgap = gap }
+    // 用于追踪当前行号
+    private var rowCounter = 0
+
+    // --- 基础属性 ---
+//    var hgap: Double by settingsProperty(0.0) { hgap = it }
+//    var vgap: Double by settingsProperty(0.0) { vgap = it }
+
+    fun hgap(gap: Double) = settings { hgap = gap }
+
+    fun vgap(gap: Double) = settings { vgap = gap }
+
+
+    fun gap(value: Double) = settings {
+        hgap = value
+        vgap = value
     }
 
-    fun vgap(gap: Double) {
-        settings { vgap = gap }
+    fun alignment(pos: Pos) = settings { alignment = pos }
+
+    // --- 约束配置 ---
+    fun columnConstraints(config: ColumnConstraintsBuilder.() -> Unit) {
+        settings { columnConstraints.setAll(ColumnConstraintsBuilder().apply(config).constraints) }
     }
 
-    fun gap(gap: Double) {
-        hgap(gap)
-        vgap(gap)
+    fun rowConstraints(config: RowConstraintsBuilder.() -> Unit) {
+        settings { rowConstraints.setAll(RowConstraintsBuilder().apply(config).constraints) }
     }
 
-    fun alignment(alignment: Pos) {
-        settings { this.alignment = alignment }
+    // --- 行作用域 ---
+    fun row(config: GridPaneRowScope.() -> Unit) {
+        GridPaneRowScope(rowCounter++).apply(config)
     }
 
-    fun add(node: Node, col: Int = 0, row: Int = 0, colspan: Int = 1, rowspan: Int = 1) {
-        settings {
-            add(node, col, row, colspan, rowspan)
+    fun <T : Node> add(
+        node: T,
+        col: Int = 0,
+        row: Int = 0,
+        colSpan: Int = 1,
+        rowSpan: Int = 1,
+        block: (GridPaneCellScope.() -> Unit)? = null
+    ): T {
+        settings { add(node, col, row, colSpan, rowSpan) }
+        block?.let { GridPaneCellScope(node).apply(it) }
+        return node
+    }
+
+    // --- 内部作用域类 ---
+
+    /**
+     * 行内作用域，自动管理列索引
+     */
+    inner class GridPaneRowScope(val rowIndex: Int) {
+        var colCounter = 0
+
+        inline fun cell(
+            colSpan: Int = 1,
+            rowSpan: Int = 1,
+            builder: () -> Node
+        ) {
+            // 使用当前列计数器，并自动递增
+            add(builder(), colCounter, rowIndex, colSpan, rowSpan)
+            colCounter += colSpan
+        }
+
+        inline fun cellBuilder(
+            colSpan: Int = 1,
+            rowSpan: Int = 1,
+            config: CellBuilder.() -> Unit
+        ) {
+            val cellBuilder = CellBuilder()
+            cellBuilder.config()
+            val node = cellBuilder.node ?: return
+
+            // 使用当前列计数器，并自动递增
+            add(node, colCounter, rowIndex, colSpan, rowSpan) {
+                hgrow = cellBuilder.hgrow
+                vgrow = cellBuilder.vgrow
+                margin = cellBuilder.margin
+                halignment = cellBuilder.halignment
+                valignment = cellBuilder.valignment
+            }
+            colCounter += colSpan
+        }
+
+        // 跳过指定列数（占位）
+        fun skip(count: Int = 1) {
+            colCounter += count
         }
     }
 
-    inline fun cell(col: Int = 0, row: Int = 0, colspan: Int = 1, rowspan: Int = 1, config: CellBuilder.() -> Unit) {
-        val cellBuilder = CellBuilder(col, row, colspan, rowspan)
-        cellBuilder.config()
-        settings {
-            add(cellBuilder.node, col, row, colspan, rowspan)
-        }
+    // 静态约束配置
+    class GridPaneCellScope(private val node: Node) {
+        var hgrow: Priority? by staticProperty(GridPane::setHgrow, node)
+        var vgrow: Priority? by staticProperty(GridPane::setVgrow, node)
+        var margin: Insets? by staticProperty(GridPane::setMargin, node)
+        var halignment: HPos? by staticProperty(GridPane::setHalignment, node)
+        var valignment: VPos? by staticProperty(GridPane::setValignment, node)
     }
 
-    @FXMarker
-    class CellBuilder(
-        private val col: Int,
-        private val row: Int,
-        private val colspan: Int,
-        private val rowspan: Int
-    ) {
-        lateinit var node: Node
+    class CellBuilder {
+        var node: Node? = null
+        var hgrow: Priority? = null
+        var vgrow: Priority? = null
+        var margin: Insets? = null
+        var halignment: HPos? = null
+        var valignment: VPos? = null
 
-        inline fun vbox(config: VBoxBuilder.() -> Unit) {
-            node = VBoxBuilder().apply(config).build()
+        fun hgrow(hgrow: Priority?) {
+            this.hgrow = hgrow
         }
 
-        inline fun hbox(config: HBoxBuilder.() -> Unit) {
-            node = HBoxBuilder().apply(config).build()
+        fun vgrow(vgrow: Priority?) {
+            this.vgrow = vgrow
         }
 
-        inline fun label(text: String, config: (Label.() -> Unit) = {}) {
-            node = Label(text).apply(config)
+        fun margin(margin: Insets?) {
+            this.margin = margin
         }
 
-        inline fun button(text: String, config: (Button.() -> Unit) = {}) {
-            node = Button(text).apply(config)
+        fun halignment(halignment: HPos?) {
+            this.halignment = halignment
         }
 
-        inline fun textField(config: (TextField.() -> Unit) = {}) {
-            node = TextField().apply(config)
+        fun valignment(valignment: VPos?) {
+            this.valignment = valignment
         }
 
-        fun custom(node: Node) {
+        inline fun item(builder: () -> Node): Node {
+            val node = builder()
             this.node = node
+            return node
+        }
+
+        inline fun <T : Node> item(node: T, block: (T.() -> Unit) = {}): T {
+            this.node = node
+            node.block()
+            return node
+        }
+
+        inline fun <T : NodeBuilder<*>> item(builder: T, block: (T.() -> Unit) = {}): Node {
+            builder.block()
+            val node = builder.build()
+            this.node = node
+            return node
+        }
+
+        inline fun itemLabel(text: String = "", block: LabelBuilder.() -> Unit = {}) {
+            val item = LabelBuilder().apply {
+                if (text.isNotEmpty()) {
+                    +text
+                }
+                block()
+            }.build()
+            item(item)
+        }
+
+        inline fun itemButton(text: String = "", block: ButtonBuilder.() -> Unit = {}) {
+            val item = ButtonBuilder().apply {
+                if (text.isNotEmpty()) {
+                    +text
+                }
+                block()
+            }.build()
+            item(item)
+        }
+
+        inline fun itemTextField(text: String = "", block: TextFieldBuilder.() -> Unit = {}) {
+            val item = TextFieldBuilder().apply {
+                if (text.isNotEmpty()) {
+                    +text
+                }
+                block()
+            }.build()
+            item(item)
         }
     }
 }
+
+// --- 约束构建器实现 ---
+@FXMarker
+class ColumnConstraintsBuilder {
+    val constraints = mutableListOf<ColumnConstraints>()
+
+    inline fun column(config: ColumnConstraints.() -> Unit) {
+        constraints.add(ColumnConstraints().apply { config() })
+    }
+
+    fun column(
+        width: Double? = null,
+        percent: Double? = null,
+        hgrow: Priority? = null,
+        halignment: HPos? = null,
+        fillWidth: Boolean = true
+    ) {
+        val c = ColumnConstraints().apply {
+            width?.let { prefWidth = it }
+            percent?.let { percentWidth = it }
+            hgrow?.let { this.hgrow = it }
+            halignment?.let { this.halignment = it }
+            isFillWidth = fillWidth
+        }
+        constraints.add(c)
+    }
+}
+
+@FXMarker
+class RowConstraintsBuilder {
+    val constraints = mutableListOf<RowConstraints>()
+
+    inline fun row(config: RowConstraints.() -> Unit) {
+        constraints.add(RowConstraints().apply { config() })
+    }
+
+    fun row(
+        height: Double? = null,
+        percent: Double? = null,
+        vgrow: Priority? = null,
+        valignment: VPos? = null,
+        fillHeight: Boolean = true
+    ) {
+        val r = RowConstraints().apply {
+            height?.let { prefHeight = it }
+            percent?.let { percentHeight = it }
+            vgrow?.let { this.vgrow = it }
+            valignment?.let { this.valignment = it }
+            isFillHeight = fillHeight
+        }
+        constraints.add(r)
+    }
+}
+
+// 用于处理组件自身的属性（如 hgap, vgap）
+//fun <T> settingsProperty(initialValue: T, setter: GridPane.(T) -> Unit) =
+//    object : ReadWriteProperty<GridPaneBuilder, T> {
+//        private var field = initialValue
+//        override fun getValue(thisRef: GridPaneBuilder, property: KProperty<*>): T = field
+//        override fun setValue(thisRef: GridPaneBuilder, property: KProperty<*>, value: T) {
+//            field = value
+//            thisRef.settings { setter(this, value) }
+//        }
+//    }
+
+// 用于处理 GridPane 的静态约束属性（如 hgrow, margin）
+fun <T> staticProperty(setter: (Node, T?) -> Unit, node: Node) =
+    object : ReadWriteProperty<Any, T?> {
+        private var field: T? = null
+        override fun getValue(thisRef: Any, property: KProperty<*>): T? = field
+        override fun setValue(thisRef: Any, property: KProperty<*>, value: T?) {
+            field = value
+            setter(node, value)
+        }
+    }
 
 // ======================== AnchorPane ========================
 
@@ -867,4 +1102,6 @@ class TitledPaneBuilder : DslBuilder<TitledPane>() {
     fun graphic(node: Node) = settings {
         graphic = node
     }
+
+    fun graphic(builder: () -> Node) = settings { graphic = builder() }
 }

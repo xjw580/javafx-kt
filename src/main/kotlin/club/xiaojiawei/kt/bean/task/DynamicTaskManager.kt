@@ -1,12 +1,12 @@
 package club.xiaojiawei.kt.bean.task
 
 import club.xiaojiawei.kt.config.log
-import club.xiaojiawei.kt.utils.runUI
+import club.xiaojiawei.kt.ext.runUI
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import java.io.Closeable
-import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
@@ -22,18 +22,25 @@ class DynamicTaskManager<T : TaskBuilder>(
     private val taskQueue = Channel<CompositeTask>(Channel.UNLIMITED)
     val context = TaskContext() // 改为 public 以便外部访问
     private val isRunning = AtomicBoolean(false)
-    private val progressCallbacks = mutableListOf<(TaskProgress) -> Unit>()
 
-    // 状态监听回调
-    private val statisticsCallbacks = mutableListOf<(TaskStatistics) -> Unit>()
-    private val runningCountCallbacks = mutableListOf<(Int) -> Unit>()
-    private val pendingCountCallbacks = mutableListOf<(Int) -> Unit>()
+    // 使用线程安全的列表
+    private val progressCallbacks = CopyOnWriteArrayList<(TaskProgress) -> Unit>()
+
+    // 状态监听回调 - 使用线程安全的列表
+    private val statisticsCallbacks = CopyOnWriteArrayList<(TaskStatistics) -> Unit>()
+    private val runningCountCallbacks = CopyOnWriteArrayList<(Int) -> Unit>()
+    private val pendingCountCallbacks = CopyOnWriteArrayList<(Int) -> Unit>()
 
     // 当前统计数据
     @Volatile
     private var currentStatistics = TaskStatistics(0, 0, 0, 0, 0, 0, 0)
 
     private var processingJob: Job? = null
+
+    // 完成回调批处理 - 收集完成的任务结果
+    private val completionLock = Any()
+    private val pendingCompletions = mutableListOf<TaskCompletionInfo>()
+    private val batchCompletionCallbacks = CopyOnWriteArrayList<(List<TaskCompletionInfo>) -> Unit>()
 
     init {
         startTaskProcessor()
@@ -43,12 +50,36 @@ class DynamicTaskManager<T : TaskBuilder>(
     fun startTimer(mills: Long) {
         scope.launch {
             while (isActive) {
-                val progresses = latestProgress.toList()
-                latestProgress.clear()
-                runUI {
-                    for (progress in progresses) {
-                        progressCallbacks.forEach { it(progress) }
-                        updateStatistics()
+                // 使用同步块原子地获取并清空进度列表
+                val progresses: List<TaskProgress>
+                synchronized(latestProgressLock) {
+                    progresses = latestProgress.toList()
+                    latestProgress.clear()
+                }
+
+                // 获取并清空待处理的完成通知
+                val completions: List<TaskCompletionInfo>
+                synchronized(completionLock) {
+                    completions = pendingCompletions.toList()
+                    pendingCompletions.clear()
+                }
+
+                if (progresses.isNotEmpty() || completions.isNotEmpty()) {
+                    runUI {
+                        // 处理进度更新
+                        for (progress in progresses) {
+                            progressCallbacks.forEach { it(progress) }
+                        }
+                        // 只在有进度更新时更新统计信息，避免不必要的计算
+                        if (progresses.isNotEmpty()) {
+                            updateStatistics()
+                        }
+                        // 批量处理完成回调
+                        if (completions.isNotEmpty()) {
+                            for (function in batchCompletionCallbacks) {
+                                function(completions)
+                            }
+                        }
                     }
                 }
                 delay(mills)
@@ -107,10 +138,39 @@ class DynamicTaskManager<T : TaskBuilder>(
         }
     }
 
-    private var latestProgress = Collections.synchronizedList(mutableListOf<TaskProgress>())
+    // 进度更新锁和列表
+    private val latestProgressLock = Any()
+    private val latestProgress = mutableListOf<TaskProgress>()
 
     private fun notifyProgress(progress: TaskProgress) {
-        latestProgress.add(progress)
+        synchronized(latestProgressLock) {
+            latestProgress.add(progress)
+        }
+    }
+
+    // 通知任务完成（批处理）
+    private fun notifyCompletion(taskId: String, taskName: String, result: TaskResult) {
+        synchronized(completionLock) {
+            pendingCompletions.add(
+                TaskCompletionInfo(
+                    taskId = taskId,
+                    taskName = taskName,
+                    success = result.success,
+                    subTaskResults = result.subTaskResults,
+                    error = result.error
+                )
+            )
+        }
+    }
+
+    // 添加批量完成回调监听
+    fun addBatchCompletionCallback(callback: (List<TaskCompletionInfo>) -> Unit) {
+        batchCompletionCallbacks.add(callback)
+    }
+
+    // 移除批量完成回调监听
+    fun removeBatchCompletionCallback(callback: (List<TaskCompletionInfo>) -> Unit) {
+        batchCompletionCallbacks.remove(callback)
     }
 
     // 更新并通知统计信息
@@ -198,8 +258,8 @@ class DynamicTaskManager<T : TaskBuilder>(
         }
     }
 
-    // 任务添加回调
-    private val taskAddedCallbacks = mutableListOf<(List<CompositeTask>) -> Unit>()
+    // 任务添加回调 - 使用线程安全的列表
+    private val taskAddedCallbacks = CopyOnWriteArrayList<(List<CompositeTask>) -> Unit>()
 
     fun addTaskAddedCallback(callback: (List<CompositeTask>) -> Unit) {
         taskAddedCallbacks.add(callback)
@@ -290,8 +350,9 @@ class DynamicTaskManager<T : TaskBuilder>(
                             notifyProgress(progress)
                         }
                         context.results[task.id] = result
+                        // 通知任务完成（批处理）
+                        notifyCompletion(task.id, task.name, result)
                         task.completeCallback?.invoke(result.success)
-                        println("任务完成: ${task.name}, 结果: ${if (result.success) "成功" else "失败"}")
                     }
 
                     task.setJob(job)

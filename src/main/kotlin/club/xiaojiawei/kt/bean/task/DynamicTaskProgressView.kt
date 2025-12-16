@@ -2,7 +2,7 @@ package club.xiaojiawei.kt.bean.task
 
 import club.xiaojiawei.controls.ico.FailIco
 import club.xiaojiawei.controls.ico.OKIco
-import club.xiaojiawei.kt.utils.runUI
+import club.xiaojiawei.kt.ext.runUI
 import javafx.scene.control.*
 import javafx.scene.layout.HBox
 import javafx.scene.layout.Priority
@@ -123,9 +123,12 @@ class DynamicTaskProgressView<T : TaskBuilder> : VBox() {
 
     fun addTask(taskList: List<CompositeTask>) {
         runUI {
+            // 批量收集新增的容器，减少UI更新次数
+            val newContainers = mutableListOf<VBox>()
+
             for (task in taskList) {
-                // 如果任务已存在，不重复添加
-                if (taskContainers.containsKey(task.id)) return@runUI
+                // 如果任务已存在，跳过继续处理下一个（修复：使用 continue 而不是 return）
+                if (taskContainers.containsKey(task.id)) continue
 
                 val container = VBox(8.0)
                 container.style =
@@ -185,7 +188,12 @@ class DynamicTaskProgressView<T : TaskBuilder> : VBox() {
                 taskControlButtons[task.id] = controlBox
                 subTaskViews[task.id] = mutableMapOf()
 
-                taskPane.children.addFirst(container)
+                newContainers.add(container)
+            }
+
+            // 批量添加到 UI，减少布局计算次数
+            if (newContainers.isNotEmpty()) {
+                taskPane.children.addAll(0, newContainers)
             }
         }
     }

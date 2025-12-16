@@ -4,10 +4,9 @@ import club.xiaojiawei.controls.ico.AbstractIco
 import club.xiaojiawei.kt.bean.task.TaskBuilder
 import club.xiaojiawei.kt.bean.task.TaskController
 import club.xiaojiawei.kt.bean.task.TaskStatistics
-import club.xiaojiawei.kt.utils.runUI
+import club.xiaojiawei.kt.ext.runUI
 import javafx.animation.*
 import javafx.beans.property.ObjectProperty
-import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.event.EventHandler
 import javafx.geometry.Insets
@@ -25,6 +24,8 @@ import javafx.scene.shape.Circle
 import javafx.stage.Popup
 import javafx.util.Duration
 import java.util.*
+import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * @author 肖嘉威
@@ -40,11 +41,20 @@ open class TaskNode<T : TaskBuilder> : StackPane() {
             this.icoProperty.set(value)
         }
 
-    private val taskCount = SimpleIntegerProperty()
+    // 使用原子变量确保线程安全
+    private val taskCountAtomic = AtomicInteger(0)
+    // 动画节流控制
+    private val isAnimating = AtomicBoolean(false)
+    private var pendingAnimationCount = AtomicInteger(0)
+    private var currentAnimation: Transition? = null
 
     private val statisticsCallback: (TaskStatistics) -> Unit = { statistics ->
-        runUI {
-            taskCount.set(statistics.running + statistics.pending)
+        val newCount = statistics.running + statistics.pending
+        val oldCount = taskCountAtomic.getAndSet(newCount)
+        if (oldCount != newCount) {
+            runUI {
+                updateTaskCountUI(newCount)
+            }
         }
     }
 
@@ -124,29 +134,29 @@ open class TaskNode<T : TaskBuilder> : StackPane() {
             tooltipHideTransition = null
             tooltip?.hide()
         }
+    }
 
-        taskCount.addListener { _, oldValue, newValue ->
-            runUI {
-                taskCountLabel.text = newValue.toInt().toString()
-                taskCountLabel.translateX = 4.0 - (taskCountLabel.text.length - 1) * 3
-                if (newValue.toInt() > 0) {
-                    taskCountPane.isVisible = true
-                    taskCountPane.isManaged = true
-                    val icoNode = icoProperty.get()
-                    if (icoNode is AbstractIco) {
-                        icoNode.color = "green"
-                    }
-                } else {
-                    taskCountPane.isVisible = false
-                    taskCountPane.isManaged = false
-                    val icoNode = icoProperty.get()
-                    if (icoNode is AbstractIco) {
-                        icoNode.color = "black"
-                    }
-                }
+    /**
+     * 更新任务数量UI显示
+     */
+    private fun updateTaskCountUI(count: Int) {
+        taskCountLabel.text = count.toString()
+        taskCountLabel.translateX = 4.0 - (taskCountLabel.text.length - 1) * 3
+        if (count > 0) {
+            taskCountPane.isVisible = true
+            taskCountPane.isManaged = true
+            val icoNode = icoProperty.get()
+            if (icoNode is AbstractIco) {
+                icoNode.color = "green"
+            }
+        } else {
+            taskCountPane.isVisible = false
+            taskCountPane.isManaged = false
+            val icoNode = icoProperty.get()
+            if (icoNode is AbstractIco) {
+                icoNode.color = "black"
             }
         }
-
     }
 
     fun addTask(name: String, configures: List<T.() -> Unit>) =
@@ -162,9 +172,18 @@ open class TaskNode<T : TaskBuilder> : StackPane() {
         taskController?.getTaskManager()?.addTask(id, name, configure)
     }
 
+    /**
+     * 播放添加任务动画 - 带节流机制
+     * 避免大量任务同时添加时动画卡顿
+     */
     private fun playAddTaskTransition() {
+        // 如果正在播放动画，累计待处理动画数量，但不立即播放新动画
+        if (!isAnimating.compareAndSet(false, true)) {
+            pendingAnimationCount.incrementAndGet()
+            return
+        }
+
         runUI {
-            taskCount.set(taskCount.get() + 1)
             val icoNode = icoProperty.get()
             if (icoNode is AbstractIco) {
                 icoNode.isCache = true
@@ -189,11 +208,23 @@ open class TaskNode<T : TaskBuilder> : StackPane() {
                     scaleTransition,
                 )
 
+                currentAnimation = parallelTransition
+
                 parallelTransition.onFinished = EventHandler {
                     icoNode.cacheHint = CacheHint.DEFAULT
                     icoNode.isCache = false
+                    currentAnimation = null
+                    isAnimating.set(false)
+
+                    // 如果有待处理的动画请求，播放一次合并动画
+                    val pending = pendingAnimationCount.getAndSet(0)
+                    if (pending > 0) {
+                        playAddTaskTransition()
+                    }
                 }
                 parallelTransition.play()
+            } else {
+                isAnimating.set(false)
             }
         }
     }
@@ -228,6 +259,23 @@ open class TaskNode<T : TaskBuilder> : StackPane() {
         }
         popup.x = localBounds.maxX - popupOffsetX - popupPane.width
         popup.y = localBounds.maxY - popupOffsetY
+    }
+
+    /**
+     * 添加批量完成回调监听器
+     * 当多个任务在短时间内完成时，会批量通知，减少UI线程切换次数
+     * 回调会在UI线程中执行
+     * @param callback 批量完成回调，参数为完成的任务列表
+     */
+    fun addBatchCompletionCallback(callback: (List<club.xiaojiawei.kt.bean.task.TaskCompletionInfo>) -> Unit) {
+        taskController?.addBatchCompletionCallback(callback)
+    }
+
+    /**
+     * 移除批量完成回调监听器
+     */
+    fun removeBatchCompletionCallback(callback: (List<club.xiaojiawei.kt.bean.task.TaskCompletionInfo>) -> Unit) {
+        taskController?.removeBatchCompletionCallback(callback)
     }
 
 }

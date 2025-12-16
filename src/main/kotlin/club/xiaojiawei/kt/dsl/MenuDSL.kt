@@ -9,7 +9,6 @@ import javafx.scene.control.Menu
 import javafx.scene.control.MenuItem
 import javafx.scene.control.RadioMenuItem
 import javafx.scene.layout.HBox
-import java.beans.PropertyChangeEvent
 
 /**
  * @author 肖嘉威
@@ -35,7 +34,7 @@ class ContextMenuBuilder : DslBuilder<ContextMenu>() {
         }
     }
 
-    override fun style(styleColor: StyleColor , styleSize: StyleSize) {
+    override fun style(styleColor: StyleColor, styleSize: StyleSize) {
         settings {
             styleClass.add("context-menu-ui")
         }
@@ -87,6 +86,10 @@ abstract class MenuItemBaseBuilder<T : MenuItem> : DslBuilder<T>() {
 
     operator fun AbstractIco.unaryPlus() = ico(this)
 
+    fun mnemonicParsing(mnemonicParsing: Boolean) = settings {
+        isMnemonicParsing = mnemonicParsing
+    }
+
     open fun onAction(handler: (EventHandler<ActionEvent>)?) {
         settings {
             onAction = handler
@@ -120,7 +123,7 @@ class MenuBuilder() : MenuItemBaseBuilder<Menu>() {
         }
     }
 
-    override fun style(styleColor: StyleColor , styleSize: StyleSize) {
+    override fun style(styleColor: StyleColor, styleSize: StyleSize) {
         settings {
             styleClass.add("menu-ui")
         }
@@ -154,7 +157,7 @@ class MenuItemBuilder : MenuItemBaseBuilder<MenuItem>() {
 
     override fun buildInstance(): MenuItem = MenuItem()
 
-    override fun style(styleColor: StyleColor , styleSize: StyleSize) {
+    override fun style(styleColor: StyleColor, styleSize: StyleSize) {
         settings {
             styleClass.add("context-menu-ui")
         }
@@ -163,12 +166,12 @@ class MenuItemBuilder : MenuItemBaseBuilder<MenuItem>() {
 
 
 @FXMarker
-class RadioMenuItemBuilder() : MenuItemBaseBuilder<RadioMenuItem>(){
+class RadioMenuItemBuilder() : MenuItemBaseBuilder<RadioMenuItem>() {
 
     override fun buildInstance(): RadioMenuItem = RadioMenuItem()
 
     init {
-        RadioMenuItem().selectedProperty().addListener { observable, oldValue, newValue ->}
+        RadioMenuItem().selectedProperty().addListener { observable, oldValue, newValue -> }
     }
 
     fun addSelectedListener(listener: ChangeListener<Boolean>) {
@@ -183,7 +186,7 @@ class RadioMenuItemBuilder() : MenuItemBaseBuilder<RadioMenuItem>(){
         }
     }
 
-    override fun style(styleColor: StyleColor , styleSize: StyleSize) {
+    override fun style(styleColor: StyleColor, styleSize: StyleSize) {
         settings {
             styleClass.add("menu-item-ui")
 //            when (styleColor) {

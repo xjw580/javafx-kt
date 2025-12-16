@@ -1,6 +1,5 @@
 package club.xiaojiawei.kt.dsl
 
-import javafx.geometry.Pos
 import javafx.scene.Node
 
 /**
@@ -296,4 +295,74 @@ enum class Cursor {
 
 fun Node.styled(block: StyleBuilder.() -> Unit) {
     style = StyleBuilder().apply(block).build()
+}
+
+
+@FXMarker
+class StylesheetBuilder : DslBuilder<String>() {
+
+    val ruleMap = mutableMapOf<String, StyleBuilder>()
+
+    /**
+     * 通用选择器
+     * 示例: select(".my-button") { ... }
+     */
+    inline fun select(selector: String, block: StyleBuilder.() -> Unit) {
+        val builder = StyleBuilder()
+        builder.block()
+        ruleMap[selector] = builder
+    }
+
+    /**
+     * 类选择器 (自动补 .)
+     */
+    inline fun styleClass(className: String, block: StyleBuilder.() -> Unit) =
+        select(".$className", block)
+
+    /**
+     * ID 选择器 (自动补 #)
+     */
+    inline fun id(idName: String, block: StyleBuilder.() -> Unit) =
+        select("#$idName", block)
+
+    inline fun id(node: Node, block: StyleBuilder.() -> Unit) =
+        select("#${node.id}", block)
+
+    /**
+     * 类型选择器 (如 Label, Button)
+     */
+    inline fun type(typeName: String, block: StyleBuilder.() -> Unit) =
+        select(typeName, block)
+
+    inline fun type(clazz: Class<*>, block: StyleBuilder.() -> Unit) =
+        select(clazz.simpleName, block)
+
+    inline fun type(node: Node, block: StyleBuilder.() -> Unit) =
+        select(node::class.java.simpleName, block)
+
+    override fun buildInstance(): String = ""
+
+    /**
+     * 构建最终的 CSS 字符串
+     */
+    override fun build(): String {
+        val sb = StringBuilder()
+        ruleMap.forEach { (selector, style) ->
+            sb.append(selector).append(" {\n")
+            // 这里的 style.build() 会返回 "key: value; key: value"
+            // 我们稍微格式化一下美化输出
+            style.build().split("; ").forEach {
+                if (it.isNotBlank()) sb.append("    ").append(it).append(";\n")
+            }
+            sb.append("}\n\n")
+        }
+        return sb.toString()
+    }
+
+    fun toDataUri(): String {
+        val css = build()
+        val encoder = java.util.Base64.getEncoder()
+        val base64 = encoder.encodeToString(css.toByteArray())
+        return "data:text/css;base64,$base64"
+    }
 }

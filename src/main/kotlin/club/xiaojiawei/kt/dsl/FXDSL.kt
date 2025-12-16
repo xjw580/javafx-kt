@@ -1,10 +1,12 @@
 package club.xiaojiawei.kt.dsl
 
+import javafx.scene.Scene
 import javafx.scene.control.*
 import javafx.scene.image.ImageView
 import javafx.scene.layout.*
 import javafx.scene.shape.Polygon
 import javafx.scene.text.Text
+import javafx.stage.Stage
 
 /**
  * @author 肖嘉威
@@ -554,12 +556,46 @@ inline fun Menu.config(config: MenuBuilder.() -> Unit): Menu {
     return this
 }
 
-enum class StyleSize() {
+// Style 衍生
+inline fun stylesheetBuilder(config: StylesheetBuilder.() -> Unit): StylesheetBuilder {
+    return StylesheetBuilder().apply(config)
+}
+
+inline fun Scene.configStylesheet(config: StylesheetBuilder.() -> Unit): Scene {
+    this.stylesheets.add(StylesheetBuilder().apply(config).toDataUri())
+    return this
+}
+
+inline fun styleBuilder(config: StyleBuilder.() -> Unit): StyleBuilder {
+    return StyleBuilder().apply(config)
+}
+
+enum class StyleSize {
     TINY, SMALL, BIG, DEFAULT
 }
 
-enum class StyleColor() {
+enum class StyleColor {
     MAIN, NORMAL, SUCCESS, WARN, ERROR, DEFAULT
+}
+
+// Scene 衍生
+inline fun scene(config: SceneBuilder.() -> Unit) = SceneBuilder().apply(config).build()
+
+inline fun sceneBuilder(config: SceneBuilder.() -> Unit) = SceneBuilder().apply(config)
+
+inline fun Scene.config(config: SceneBuilder.() -> Unit): Scene {
+    SceneBuilder().apply(config).config(this)
+    return this
+}
+
+// Stage 衍生
+inline fun stage(config: StageBuilder.() -> Unit) = StageBuilder().apply(config).build()
+
+inline fun stageBuilder(config: StageBuilder.() -> Unit) = StageBuilder().apply(config)
+
+inline fun Stage.config(config: StageBuilder.() -> Unit): Stage {
+    StageBuilder().apply(config).config(this)
+    return this
 }
 
 abstract class DslBuilder<T>(
