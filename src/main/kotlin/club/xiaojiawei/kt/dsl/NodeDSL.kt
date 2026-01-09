@@ -73,6 +73,7 @@ abstract class NodeBuilder<T : Node> : DslBuilder<T>() {
     fun rotate(a: Double) = settings { rotate = a }
     fun scale(x: Double, y: Double = x) = settings { scaleX = x; scaleY = y }
     fun translate(x: Double, y: Double) = settings { translateX = x; translateY = y }
+    fun mouseTransparent(mouseTransparent: Boolean) = settings { isMouseTransparent = mouseTransparent }
 
     // --- 光标控制 ---
     fun cursor(c: Cursor = Cursor.DEFAULT) = settings { cursor = c }

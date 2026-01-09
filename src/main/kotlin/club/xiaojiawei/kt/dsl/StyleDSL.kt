@@ -16,6 +16,10 @@ class StyleBuilder {
         styles["-fx-background-color"] = color
     }
 
+    fun backgroundColor(r: Int, g: Int, b: Int, a: Double = 1.0) {
+        styles["-fx-background-color"] = "rgba(${r}, ${g}, ${b}, ${a})"
+    }
+
     fun backgroundImage(url: String) {
         styles["-fx-background-image"] = "url('$url')"
     }
