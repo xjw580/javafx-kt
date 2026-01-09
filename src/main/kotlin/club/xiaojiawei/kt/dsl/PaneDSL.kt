@@ -3,12 +3,9 @@ package club.xiaojiawei.kt.dsl
 import club.xiaojiawei.controls.FilterComboBox
 import club.xiaojiawei.controls.Title
 import javafx.collections.FXCollections
-import javafx.event.EventHandler
 import javafx.geometry.*
 import javafx.scene.Node
 import javafx.scene.control.*
-import javafx.scene.input.DragEvent
-import javafx.scene.input.MouseEvent
 import javafx.scene.layout.*
 import javafx.scene.paint.Color
 import javafx.scene.paint.Paint
@@ -24,16 +21,12 @@ import kotlin.reflect.KProperty
  * @date 2025/8/14 14:52
  */
 
+// ======================== Pane ========================
+
 @FXMarker
-abstract class LayoutBuilder<T : Pane> : DslBuilder<T>() {
+abstract class PaneBaseBuilder<T : Pane> : RegionBaseBuilder<T>() {
 
     operator fun Node.unaryPlus() = add(this)
-
-    fun userData(data: Any) {
-        settings {
-            userData = data
-        }
-    }
 
     // 添加子节点
     fun add(node: Node) {
@@ -71,72 +64,6 @@ abstract class LayoutBuilder<T : Pane> : DslBuilder<T>() {
         }
     }
 
-    fun size(width: Double = -1.0, height: Double = -1.0) {
-        settings {
-            prefWidth = width
-            prefHeight = height
-        }
-    }
-
-    fun fixedSize(width: Double = -1.0, height: Double = -1.0) {
-        settings {
-            minWidth = width
-            minHeight = height
-            maxWidth = width
-            maxHeight = height
-        }
-    }
-
-    fun minSize(width: Double = -1.0, height: Double = -1.0) {
-        settings {
-            minWidth = width
-            minHeight = height
-        }
-    }
-
-    fun maxSize(width: Double = -1.0, height: Double = -1.0) {
-        settings {
-            maxWidth = width
-            maxHeight = height
-        }
-    }
-
-    fun prefWidth(width: Double) {
-        settings {
-            prefWidth = width
-        }
-    }
-
-    fun prefHeight(height: Double) {
-        settings {
-            prefHeight = height
-        }
-    }
-
-    fun minWidth(width: Double) {
-        settings {
-            minWidth = width
-        }
-    }
-
-    fun minHeight(height: Double) {
-        settings {
-            minHeight = height
-        }
-    }
-
-    fun maxWidth(width: Double) {
-        settings {
-            maxWidth = width
-        }
-    }
-
-    fun maxHeight(height: Double) {
-        settings {
-            maxHeight = height
-        }
-    }
-
     fun padding(value: Double) {
         settings { padding = Insets(value) }
     }
@@ -163,71 +90,35 @@ abstract class LayoutBuilder<T : Pane> : DslBuilder<T>() {
         }
     }
 
-    fun id(id: String) {
-        settings { this.id = id }
-    }
-
-    fun styleClass(vararg classes: String) {
-        settings { styleClass.addAll(classes) }
-    }
-
-    fun visible(visible: Boolean = true) {
-        settings { isVisible = visible }
-    }
-
-    fun managed(managed: Boolean = true) {
-        settings { isManaged = managed }
-    }
-
-    fun styled(block: StyleBuilder.() -> Unit) {
-        settings {
-            this.styled(block)
-        }
-    }
-
     fun styled(styleBuilder: StyleBuilder) {
         settings {
             style = styleBuilder.build()
         }
     }
 
-}
-
-// ======================== Pane ========================
-
-@FXMarker
-abstract class PaneBaseBuilder<T : Pane> : LayoutBuilder<T>() {
-
-    fun hgrow(priority: Priority) = settings {
-        HBox.setHgrow(this, priority)
+    fun addRegion() {
+        add {
+            Region()
+        }
     }
 
-    fun hgrowAlways() = settings {
-        HBox.setHgrow(this, Priority.ALWAYS)
+    fun addVSpacer(priority: Priority = Priority.ALWAYS) {
+        add {
+            vSpacer(priority)
+        }
     }
 
-    fun hgrowSometimes() = settings {
-        HBox.setHgrow(this, Priority.SOMETIMES)
+    fun addHSpacer(priority: Priority = Priority.ALWAYS) {
+        add {
+            hSpacer(priority)
+        }
     }
 
-    fun hgrowNever() = settings {
-        HBox.setHgrow(this, Priority.NEVER)
-    }
-
-    fun vgrow(priority: Priority) = settings {
-        VBox.setVgrow(this, priority)
-    }
-
-    fun vgrowAlways() = settings {
-        VBox.setVgrow(this, Priority.ALWAYS)
-    }
-
-    fun vgrowSometimes() = settings {
-        VBox.setVgrow(this, Priority.SOMETIMES)
-    }
-
-    fun vgrowNever() = settings {
-        VBox.setVgrow(this, Priority.NEVER)
+    inline fun addProgressBar(config: ProgressBarBuilder.() -> Unit) {
+        add(ProgressBarBuilder().apply {
+            setMode(this@PaneBaseBuilder.buildMode)
+            config()
+        })
     }
 
     inline fun addVBox(config: VBoxBuilder.() -> Unit) {
@@ -239,6 +130,13 @@ abstract class PaneBaseBuilder<T : Pane> : LayoutBuilder<T>() {
 
     inline fun addHBox(config: HBoxBuilder.() -> Unit) {
         add(HBoxBuilder().apply {
+            setMode(this@PaneBaseBuilder.buildMode)
+            config()
+        })
+    }
+
+    inline fun addTilePane(config: TilePaneBuilder.() -> Unit) {
+        add(TilePaneBuilder().apply {
             setMode(this@PaneBaseBuilder.buildMode)
             config()
         })
@@ -451,54 +349,6 @@ abstract class PaneBaseBuilder<T : Pane> : LayoutBuilder<T>() {
         config()
     })
 
-    fun onMouseReleased(handler: EventHandler<MouseEvent>?) {
-        settings { onMouseReleased = handler }
-    }
-
-    fun onMousePressed(handler: EventHandler<MouseEvent>?) {
-        settings { onMousePressed = handler }
-    }
-
-    fun onMouseDragged(handler: EventHandler<MouseEvent>?) {
-        settings { onMouseDragged = handler }
-    }
-
-    fun onMouseClicked(handler: EventHandler<MouseEvent>?) {
-        settings { onMouseClicked = handler }
-    }
-
-    fun onMouseEntered(handler: EventHandler<MouseEvent>?) {
-        settings { onMouseEntered = handler }
-    }
-
-    fun onMouseExited(handler: EventHandler<MouseEvent>?) {
-        settings { onMouseExited = handler }
-    }
-
-    fun onDragDetected(handler: EventHandler<MouseEvent>?) {
-        settings { onDragDetected = handler }
-    }
-
-    fun onDragDone(handler: EventHandler<DragEvent>?) {
-        settings { onDragDone = handler }
-    }
-
-    fun onDragOver(handler: EventHandler<DragEvent>?) {
-        settings { onDragOver = handler }
-    }
-
-    fun onDragExited(handler: EventHandler<DragEvent>?) {
-        settings { onDragExited = handler }
-    }
-
-    fun onDragDropped(handler: EventHandler<DragEvent>?) {
-        settings { onDragDropped = handler }
-    }
-
-    fun style(style: String) {
-        settings { this.style = style }
-    }
-
 }
 
 @FXMarker
@@ -647,6 +497,10 @@ class GridPaneBuilder : PaneBaseBuilder<GridPane>() {
         GridPaneRowScope(rowCounter++).apply(config)
     }
 
+    fun skipRow(skipRow: Int = 1) {
+        rowCounter += skipRow
+    }
+
     fun <T : Node> add(
         node: T,
         col: Int = 0,
@@ -699,7 +553,7 @@ class GridPaneBuilder : PaneBaseBuilder<GridPane>() {
         }
 
         // 跳过指定列数（占位）
-        fun skip(count: Int = 1) {
+        fun skipCell(count: Int = 1) {
             colCounter += count
         }
     }

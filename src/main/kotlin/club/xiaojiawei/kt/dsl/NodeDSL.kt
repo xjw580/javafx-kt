@@ -7,8 +7,10 @@ package club.xiaojiawei.kt.dsl
 
 import club.xiaojiawei.controls.FilterComboBox
 import javafx.beans.property.BooleanProperty
+import javafx.beans.property.DoubleProperty
 import javafx.beans.property.StringProperty
 import javafx.beans.value.ChangeListener
+import javafx.beans.value.ObservableValue
 import javafx.collections.ObservableList
 import javafx.event.ActionEvent
 import javafx.event.EventHandler
@@ -36,226 +38,158 @@ import javafx.util.StringConverter
 // 基础 Node 构建器
 @FXMarker
 abstract class NodeBuilder<T : Node> : DslBuilder<T>() {
+    // --- 布局约束 & 元数据 ---
+    fun userData(d: Any) = settings { userData = d }
+    fun hgrow(p: Priority) = settings { HBox.setHgrow(this, p) }
+    fun hgrowAlways() = hgrow(Priority.ALWAYS)
+    fun hgrowSometimes() = hgrow(Priority.SOMETIMES)
+    fun hgrowNever() = hgrow(Priority.NEVER)
+    fun vgrow(p: Priority) = settings { VBox.setVgrow(this, p) }
+    fun vgrowAlways() = vgrow(Priority.ALWAYS)
+    fun vgrowSometimes() = vgrow(Priority.SOMETIMES)
+    fun vgrowNever() = vgrow(Priority.NEVER)
+    fun pickOnBounds(b: Boolean = true) = settings { isPickOnBounds = b }
 
-    fun userData(data: Any) {
-        settings {
-            userData = data
-        }
-    }
-
-    fun pickOnBounds(pickOnBounds: Boolean = true) = settings {
-        isPickOnBounds = pickOnBounds
-    }
-
-    fun hgrow(priority: Priority) = settings {
-        HBox.setHgrow(this, priority)
-    }
-
-    fun vgrow(priority: Priority) = settings {
-        VBox.setVgrow(this, priority)
-    }
-
-    fun styleMain(styleSize: StyleSize = StyleSize.DEFAULT) {
-        style(StyleColor.MAIN, styleSize)
-    }
-
-    fun styleNormal(styleSize: StyleSize = StyleSize.DEFAULT) {
-        style(StyleColor.NORMAL, styleSize)
-    }
-
-    fun styleSuccess(styleSize: StyleSize = StyleSize.DEFAULT) {
-        style(StyleColor.SUCCESS, styleSize)
-    }
-
-    fun styleWarn(styleSize: StyleSize = StyleSize.DEFAULT) {
-        style(StyleColor.WARN, styleSize)
-    }
-
-    fun styleError(styleSize: StyleSize = StyleSize.DEFAULT) = style(StyleColor.ERROR, styleSize)
-
-    fun styleRadius() = settings {
-        styleClass.add("radius-ui")
-    }
-
-    fun styleRadiusBig() {
-        settings {
-            styleClass.add("radius-ui-big")
-        }
-    }
-
-    fun styled(block: StyleBuilder.() -> Unit) {
-        settings {
-            this.styled(block)
-        }
-    }
-
+    // --- 样式系统 (StyleColor & StyleSize) ---
+    fun styleMain(s: StyleSize = StyleSize.DEFAULT) = style(StyleColor.MAIN, s)
+    fun styleNormal(s: StyleSize = StyleSize.DEFAULT) = style(StyleColor.NORMAL, s)
+    fun styleSuccess(s: StyleSize = StyleSize.DEFAULT) = style(StyleColor.SUCCESS, s)
+    fun styleWarn(s: StyleSize = StyleSize.DEFAULT) = style(StyleColor.WARN, s)
+    fun styleError(s: StyleSize = StyleSize.DEFAULT) = style(StyleColor.ERROR, s)
+    fun styleRadius() = settings { styleClass.add("radius-ui") }
+    fun styleRadiusBig() = settings { styleClass.add("radius-ui-big") }
     fun styleBg() = settings { styleClass.add("bg-ui") }
-
     fun styleBgHover() = settings { styleClass.add("bg-hover-ui") }
+    fun styled(block: StyleBuilder.() -> Unit) = settings { this.styled(block) }
 
-    // 通用 Node 属性
-    fun id(id: String) {
-        settings { this.id = id }
+    // --- 基础 Node 属性 ---
+    fun id(v: String) = settings { id = v }
+    fun styleClass(vararg c: String) = settings { styleClass.addAll(c) }
+    fun style(v: String) = settings { style = v }
+    fun visible(v: Boolean = true) = settings { isVisible = v }
+    fun managed(v: Boolean = true) = settings { isManaged = v }
+    fun disable(v: Boolean = true) = settings { isDisable = v }
+    fun opacity(v: Double) = settings { opacity = v }
+    fun rotate(a: Double) = settings { rotate = a }
+    fun scale(x: Double, y: Double = x) = settings { scaleX = x; scaleY = y }
+    fun translate(x: Double, y: Double) = settings { translateX = x; translateY = y }
+
+    // --- 光标控制 ---
+    fun cursor(c: Cursor = Cursor.DEFAULT) = settings { cursor = c }
+    fun cursorHand() = cursor(Cursor.HAND)
+    fun cursorCrosshair() = cursor(Cursor.CROSSHAIR)
+    fun cursorWait() = cursor(Cursor.WAIT)
+    fun cursorMove() = cursor(Cursor.MOVE)
+
+    // --- 鼠标 & 拖拽事件 ---
+    fun onMouseClicked(h: EventHandler<MouseEvent>?) = settings { onMouseClicked = h }
+    fun onMouseEntered(h: EventHandler<MouseEvent>?) = settings { onMouseEntered = h }
+    fun onMouseExited(h: EventHandler<MouseEvent>?) = settings { onMouseExited = h }
+    fun onMouseReleased(h: EventHandler<MouseEvent>?) = settings { onMouseReleased = h }
+    fun onMousePressed(h: EventHandler<MouseEvent>?) = settings { onMousePressed = h }
+    fun onMouseDragged(h: EventHandler<MouseEvent>?) = settings { onMouseDragged = h }
+    fun onDragDetected(h: EventHandler<MouseEvent>?) = settings { onDragDetected = h }
+    fun onDragDone(h: EventHandler<DragEvent>?) = settings { onDragDone = h }
+    fun onDragOver(h: EventHandler<DragEvent>?) = settings { onDragOver = h }
+    fun onDragExited(h: EventHandler<DragEvent>?) = settings { onDragExited = h }
+    fun onDragDropped(h: EventHandler<DragEvent>?) = settings { onDragDropped = h }
+
+    // --- 自由配置 ---
+    fun configure(block: T.() -> Unit) = settings(block)
+}
+
+@FXMarker
+abstract class RegionBaseBuilder<T : Region> : NodeBuilder<T>() {
+    // --- 综合尺寸设定 ---
+    fun size(w: Double = -1.0, h: Double = -1.0) = settings { prefWidth = w; prefHeight = h }
+    fun minSize(w: Double = -1.0, h: Double = -1.0) = settings { minWidth = w; minHeight = h }
+    fun maxSize(w: Double = -1.0, h: Double = -1.0) = settings { maxWidth = w; maxHeight = h }
+    fun fixedSize(w: Double = -1.0, h: Double = -1.0) =
+        settings { minWidth = w; minHeight = h; prefWidth = w; prefHeight = h; maxWidth = w; maxHeight = h }
+
+    // --- 宽高独立设定 ---
+    fun prefWidth(v: Double) = settings { prefWidth = v }
+    fun minWidth(v: Double) = settings { minWidth = v }
+    fun maxWidth(v: Double) = settings { maxWidth = v }
+    fun fixedWidth(v: Double) = settings { prefWidth = v; maxWidth = v; minWidth = v }
+    fun prefHeight(v: Double) = settings { prefHeight = v }
+    fun minHeight(v: Double) = settings { minHeight = v }
+    fun maxHeight(v: Double) = settings { maxHeight = v }
+    fun fixedHeigh(v: Double) = settings { prefHeight = v; maxHeight = v; minHeight = v }
+
+    // --- 基础宽高 (只读属性) 绑定与监听 ---
+    fun byBindWidth(p: DoubleProperty) = settings { p.bind(widthProperty()) }
+    fun byBindHeight(p: DoubleProperty) = settings { p.bind(heightProperty()) }
+    fun addWidthListener(l: ChangeListener<Number>) = settings { widthProperty().addListener(l) }
+    fun addHeightListener(l: ChangeListener<Number>) = settings { heightProperty().addListener(l) }
+    fun removeWidthListener(l: ChangeListener<Number>) = settings { widthProperty().removeListener(l) }
+    fun removeHeightListener(l: ChangeListener<Number>) = settings { heightProperty().removeListener(l) }
+
+    // --- Pref 宽高绑定与监听 ---
+    fun bindPrefWidth(p: ObservableValue<out Number>) = settings { prefWidthProperty().bind(p) }
+    fun bindPrefHeight(p: ObservableValue<out Number>) = settings { prefHeightProperty().bind(p) }
+    fun byBindPrefWidth(p: DoubleProperty) = settings { p.bind(prefWidthProperty()) }
+    fun byBindPrefHeight(p: DoubleProperty) = settings { p.bind(prefHeightProperty()) }
+    fun addPrefWidthListener(l: ChangeListener<Number>) = settings { prefWidthProperty().addListener(l) }
+    fun addPrefHeightListener(l: ChangeListener<Number>) = settings { prefHeightProperty().addListener(l) }
+    fun removePrefWidthListener(l: ChangeListener<Number>) = settings { prefWidthProperty().removeListener(l) }
+    fun removePrefHeightListener(l: ChangeListener<Number>) = settings { prefHeightProperty().removeListener(l) }
+
+    // --- Min 宽高绑定与监听 ---
+    fun bindMinWidth(p: ObservableValue<out Number>) = settings { minWidthProperty().bind(p) }
+    fun bindMinHeight(p: ObservableValue<out Number>) = settings { minHeightProperty().bind(p) }
+    fun byBindMinWidth(p: DoubleProperty) = settings { p.bind(minWidthProperty()) }
+    fun byBindMinHeight(p: DoubleProperty) = settings { p.bind(minHeightProperty()) }
+    fun addMinWidthListener(l: ChangeListener<Number>) = settings { minWidthProperty().addListener(l) }
+    fun addMinHeightListener(l: ChangeListener<Number>) = settings { minHeightProperty().addListener(l) }
+    fun removeMinWidthListener(l: ChangeListener<Number>) = settings { minWidthProperty().removeListener(l) }
+    fun removeMinHeightListener(l: ChangeListener<Number>) = settings { minHeightProperty().removeListener(l) }
+
+    // --- Max 宽高绑定与监听 ---
+    fun bindMaxWidth(p: ObservableValue<out Number>) = settings { maxWidthProperty().bind(p) }
+    fun bindMaxHeight(p: ObservableValue<out Number>) = settings { maxHeightProperty().bind(p) }
+    fun byBindMaxWidth(p: DoubleProperty) = settings { p.bind(maxWidthProperty()) }
+    fun byBindMaxHeight(p: DoubleProperty) = settings { p.bind(maxHeightProperty()) }
+    fun addMaxWidthListener(l: ChangeListener<Number>) = settings { maxWidthProperty().addListener(l) }
+    fun addMaxHeightListener(l: ChangeListener<Number>) = settings { maxHeightProperty().addListener(l) }
+    fun removeMaxWidthListener(l: ChangeListener<Number>) = settings { maxWidthProperty().removeListener(l) }
+    fun removeMaxHeightListener(l: ChangeListener<Number>) = settings { maxHeightProperty().removeListener(l) }
+}
+
+@FXMarker
+abstract class LabeledBuilder<T : Labeled> : RegionBaseBuilder<T>() {
+
+    fun text(text: String) = settings { this.text = text }
+
+    operator fun String.unaryPlus() = text(this)
+
+    fun font(font: Font) = settings { this.font = font }
+
+    fun font(family: String, size: Double) {
+        settings { font = Font.font(family, size) }
     }
 
-    fun styleClass(vararg classes: String) {
-        settings { styleClass.addAll(classes) }
+    fun font(family: String, weight: FontWeight, size: Double) {
+        settings { font = Font.font(family, weight, size) }
     }
 
-    fun style(style: String) {
-        settings { this.style = style }
+    fun fontSize(size: Double) {
+        settings { font = Font.font(size) }
     }
 
-    fun visible(visible: Boolean = true) {
-        settings { isVisible = visible }
-    }
-
-    fun managed(managed: Boolean = true) {
-        settings { isManaged = managed }
-    }
-
-    fun disable(disabled: Boolean = true) {
-        settings { isDisable = disabled }
-    }
-
-    fun opacity(opacity: Double) {
-        settings { this.opacity = opacity }
-    }
-
-    fun rotate(angle: Double) {
-        settings { rotate = angle }
-    }
-
-    fun scale(x: Double, y: Double = x) {
-        settings {
-            scaleX = x
-            scaleY = y
-        }
-    }
-
-    fun cursor(cursor: Cursor) = settings {
-        this.cursor = cursor
-    }
-
-    fun translate(x: Double, y: Double) {
-        settings {
-            translateX = x
-            translateY = y
-        }
-    }
-
-    fun size(width: Double = -1.0, height: Double = -1.0) {
-        settings {
-            if (this is Region) {
-                prefWidth = width
-                prefHeight = height
-            }
-        }
-    }
-
-    fun minSize(width: Double = -1.0, height: Double = -1.0) {
-        settings {
-            if (this is Region) {
-                minWidth = width
-                minHeight = height
-            }
-        }
-    }
-
-    fun maxSize(width: Double = -1.0, height: Double = -1.0) {
-        settings {
-            if (this is Region) {
-                maxWidth = width
-                maxHeight = height
-            }
-        }
-    }
-
-    fun prefWidth(width: Double) {
-        settings {
-            if (this is Region) {
-                prefWidth = width
-            }
-        }
-    }
-
-    fun prefHeight(height: Double) {
-        settings {
-            if (this is Region) {
-                prefHeight = height
-            }
-        }
-    }
-
-    fun minWidth(width: Double) {
-        settings {
-            if (this is Region) {
-                minWidth = width
-            }
-        }
-    }
-
-    fun minHeight(height: Double) {
-        settings {
-            if (this is Region) {
-                minHeight = height
-            }
-        }
-    }
-
-    fun maxWidth(width: Double) {
-        settings {
-            if (this is Region) {
-                maxWidth = width
-            }
-        }
-    }
-
-    fun maxHeight(height: Double) {
-        settings {
-            if (this is Region) {
-                maxHeight = height
-            }
-        }
-    }
-
-    // 事件处理
-    fun onMouseClicked(handler: EventHandler<MouseEvent>?) {
-        settings { onMouseClicked = handler }
-    }
-
-    fun onMouseEntered(handler: EventHandler<MouseEvent>?) {
-        settings { onMouseEntered = handler }
-    }
-
-    fun onMouseExited(handler: EventHandler<MouseEvent>?) {
-        settings { onMouseExited = handler }
-    }
-
-    fun onDragDetected(handler: EventHandler<MouseEvent>?) {
-        settings { onDragDetected = handler }
-    }
-
-    fun onDragDone(handler: EventHandler<DragEvent>?) {
-        settings { onDragDone = handler }
-    }
-
-    fun onDragOver(handler: EventHandler<DragEvent>?) {
-        settings { onDragOver = handler }
-    }
-
-    fun onDragExited(handler: EventHandler<DragEvent>?) {
-        settings { onDragExited = handler }
-    }
-
-    fun onDragDropped(handler: EventHandler<DragEvent>?) {
-        settings { onDragDropped = handler }
-    }
-
-    // 直接配置 Node
-    fun configure(block: T.() -> Unit) {
-        settings(block)
-    }
+    fun alignment(alignment: Pos) = settings { this.alignment = alignment }
+    fun alignCenter() = alignment(Pos.CENTER)
+    fun alignTop() = alignment(Pos.TOP_CENTER)
+    fun alignBottom() = alignment(Pos.BOTTOM_CENTER)
+    fun alignLeft() = alignment(Pos.CENTER_LEFT)
+    fun alignRight() = alignment(Pos.CENTER_RIGHT)
+    fun alignTopLeft() = alignment(Pos.TOP_LEFT)
+    fun alignTopRight() = alignment(Pos.TOP_RIGHT)
+    fun alignBottomLeft() = alignment(Pos.BOTTOM_LEFT)
+    fun alignBottomRight() = alignment(Pos.BOTTOM_RIGHT)
+    fun alignBaseLeft() = alignment(Pos.BASELINE_LEFT)
+    fun alignBaseCenter() = alignment(Pos.BASELINE_CENTER)
+    fun alignBaseRight() = alignment(Pos.BASELINE_RIGHT)
 }
 
 
@@ -376,8 +310,6 @@ class PolygonBuilder : NodeBuilder<Polygon>() {
 
     fun smooth(smooth: Boolean = true) = settings { isSmooth = smooth }
 
-    override fun style(styleColor: StyleColor, styleSize: StyleSize) {
-    }
 }
 
 // Button 构建器
@@ -432,7 +364,7 @@ class ButtonBuilder : LabeledBuilder<Button>() {
 
 // TextField 构建器
 @FXMarker
-class TextFieldBuilder : NodeBuilder<TextField>() {
+class TextFieldBuilder : RegionBaseBuilder<TextField>() {
 
     override fun buildInstance(): TextField = TextField()
 
@@ -498,7 +430,7 @@ class TextFieldBuilder : NodeBuilder<TextField>() {
 
 // TextArea 构建器
 @FXMarker
-class TextAreaBuilder : NodeBuilder<TextArea>() {
+class TextAreaBuilder : RegionBaseBuilder<TextArea>() {
 
     override fun buildInstance(): TextArea = TextArea()
 
@@ -541,42 +473,6 @@ class TextAreaBuilder : NodeBuilder<TextArea>() {
             styleClass.add("text-area-ui")
         }
     }
-}
-
-@FXMarker
-abstract class LabeledBuilder<T : Labeled> : NodeBuilder<T>() {
-
-    fun text(text: String) = settings { this.text = text }
-
-    operator fun String.unaryPlus() = text(this)
-
-    fun font(font: Font) = settings { this.font = font }
-
-    fun font(family: String, size: Double) {
-        settings { font = Font.font(family, size) }
-    }
-
-    fun font(family: String, weight: FontWeight, size: Double) {
-        settings { font = Font.font(family, weight, size) }
-    }
-
-    fun fontSize(size: Double) {
-        settings { font = Font.font(size) }
-    }
-
-    fun alignment(alignment: Pos) = settings { this.alignment = alignment }
-    fun alignCenter() = alignment(Pos.CENTER)
-    fun alignTop() = alignment(Pos.TOP_CENTER)
-    fun alignBottom() = alignment(Pos.BOTTOM_CENTER)
-    fun alignLeft() = alignment(Pos.CENTER_LEFT)
-    fun alignRight() = alignment(Pos.CENTER_RIGHT)
-    fun alignTopLeft() = alignment(Pos.TOP_LEFT)
-    fun alignTopRight() = alignment(Pos.TOP_RIGHT)
-    fun alignBottomLeft() = alignment(Pos.BOTTOM_LEFT)
-    fun alignBottomRight() = alignment(Pos.BOTTOM_RIGHT)
-    fun alignBaseLeft() = alignment(Pos.BASELINE_LEFT)
-    fun alignBaseCenter() = alignment(Pos.BASELINE_CENTER)
-    fun alignBaseRight() = alignment(Pos.BASELINE_RIGHT)
 }
 
 // CheckBox 构建器
@@ -702,7 +598,7 @@ class RadioButtonBuilder : LabeledBuilder<RadioButton>() {
 }
 
 @FXMarker
-abstract class ComboBoxBaseBuilder<S : ComboBox<T>, T> : NodeBuilder<S>() {
+abstract class ComboBoxBaseBuilder<S : ComboBox<T>, T> : RegionBaseBuilder<S>() {
 
     fun items(vararg items: T) {
         settings { this.items.addAll(items) }
@@ -825,7 +721,7 @@ open class ComboBoxBuilder<T> : ComboBoxBaseBuilder<ComboBox<T>, T>() {
 
 // ListView 构建器
 @FXMarker
-class ListViewBuilder<T> : NodeBuilder<ListView<T>>() {
+class ListViewBuilder<T> : RegionBaseBuilder<ListView<T>>() {
 
     override fun buildInstance(): ListView<T> = ListView<T>()
 
@@ -864,7 +760,7 @@ class ListViewBuilder<T> : NodeBuilder<ListView<T>>() {
 
 // TableView 构建器
 @FXMarker
-class TableViewBuilder<T> : NodeBuilder<TableView<T>>() {
+class TableViewBuilder<T> : RegionBaseBuilder<TableView<T>>() {
 
     override fun buildInstance(): TableView<T> = TableView<T>()
 
@@ -907,11 +803,11 @@ class TableViewBuilder<T> : NodeBuilder<TableView<T>>() {
 
 // ProgressBar 构建器
 @FXMarker
-class ProgressBarBuilder : NodeBuilder<ProgressBar>() {
+class ProgressBarBuilder : RegionBaseBuilder<ProgressBar>() {
 
     override fun buildInstance(): ProgressBar = ProgressBar()
 
-    fun progress(progress: Double) {
+    fun progress(progress: Double = 0.0) {
         settings { this.progress = progress }
     }
 
@@ -928,7 +824,7 @@ class ProgressBarBuilder : NodeBuilder<ProgressBar>() {
 
 // Slider 构建器
 @FXMarker
-class SliderBuilder : NodeBuilder<Slider>() {
+class SliderBuilder : RegionBaseBuilder<Slider>() {
 
     override fun buildInstance(): Slider = Slider()
 
@@ -1006,7 +902,8 @@ class ImageViewBuilder : NodeBuilder<ImageView>() {
     }
 }
 
-class SeparatorBuilder : NodeBuilder<Separator>() {
+@FXMarker
+class SeparatorBuilder : RegionBaseBuilder<Separator>() {
     override fun buildInstance() = Separator()
 
 

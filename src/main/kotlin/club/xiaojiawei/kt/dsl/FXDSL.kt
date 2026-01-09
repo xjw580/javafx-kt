@@ -598,6 +598,21 @@ inline fun Stage.config(config: StageBuilder.() -> Unit): Stage {
     return this
 }
 
+// Spacer 衍生
+inline fun hSpacer(priority: Priority = Priority.ALWAYS, config: Region.() -> Unit = {}): Region {
+    val region = Region()
+    region.config()
+    HBox.setHgrow(region, priority)
+    return region
+}
+
+inline fun vSpacer(priority: Priority = Priority.ALWAYS, config: Region.() -> Unit = {}): Region {
+    val region = Region()
+    region.config()
+    VBox.setVgrow(region, priority)
+    return region
+}
+
 abstract class DslBuilder<T>(
     buildMode: BuildMode = BuildMode.DELAY
 ) {

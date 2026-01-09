@@ -11,8 +11,7 @@ import javafx.scene.Parent
 import javafx.scene.Scene
 import javafx.scene.layout.Priority
 import javafx.scene.paint.Paint
-import javafx.stage.Stage
-import javafx.stage.WindowEvent
+import javafx.stage.*
 
 // 全局变量，用于在 launch 和 start 之间传递配置块
 private var primaryStageConfig: (StageBuilder.() -> Unit) = {}
@@ -117,6 +116,21 @@ class StageBuilder(private val existingStage: Stage? = null) : DslBuilder<Stage>
         }
     }
 
+    fun initOwner(window: Window?) {
+        window ?: return
+        settings {
+            initOwner(window)
+        }
+    }
+
+    fun initStyle(stageStyle: StageStyle) = settings {
+        initStyle(stageStyle)
+    }
+
+    fun initModality(modality: Modality) = settings {
+        initModality(modality)
+    }
+
     fun pos(x: Double? = null, y: Double? = null) = settings {
         x?.let {
             this.x = it
@@ -169,6 +183,10 @@ class StageBuilder(private val existingStage: Stage? = null) : DslBuilder<Stage>
 
     fun onShowing(action: EventHandler<WindowEvent>) = settings {
         onShowing = action
+    }
+
+    fun onCloseRequest(action: EventHandler<WindowEvent>) = settings {
+        onCloseRequest = action
     }
 
     fun alwaysOnTop(value: Boolean = true) = settings { isAlwaysOnTop = value }
