@@ -101,18 +101,23 @@ data class CompositeTask(
                 subTaskResults[subTask.id] = result
 
                 if (!result.success) {
+                    status = if (job?.isCancelled == true) {
+                        TaskStatus.CANCELLED
+                    } else TaskStatus.FAILED
                     subTaskProgresses[subTask.id] = SubTaskProgress(
                         id,
                         subTask.id,
                         subTaskProgresses[subTask.id]?.subTaskName ?: "",
-                        TaskStatus.FAILED,
+                        status,
                         0.0
                     )
-                    status = TaskStatus.FAILED
                     progressCallback(
                         TaskProgress(
-                            id, TaskStatus.FAILED, progress,
-                            "子任务失败: ${subTask.name}", subTaskProgresses.toMap()
+                            id,
+                            status,
+                            progress,
+                            "子任务${if (status === TaskStatus.CANCELLED) "被取消" else "失败"}: ${subTask.name}",
+                            subTaskProgresses.toMap()
                         )
                     )
                     return TaskResult(false, emptyMap(), result.error, subTaskResults)
@@ -130,9 +135,15 @@ data class CompositeTask(
             progressCallback(TaskProgress(id, TaskStatus.CANCELLED, progress, "任务已取消"))
             return TaskResult(false, emptyMap(), "任务已取消", subTaskResults)
         } catch (e: Exception) {
-            status = TaskStatus.FAILED
-            progressCallback(TaskProgress(id, TaskStatus.FAILED, progress, "任务执行异常: ${e.message}"))
-            return TaskResult(false, emptyMap(), e.message, subTaskResults)
+            if (job?.isCancelled == true) {
+                status = TaskStatus.CANCELLED
+                progressCallback(TaskProgress(id, TaskStatus.CANCELLED, progress, "任务已取消"))
+                return TaskResult(false, emptyMap(), "任务已取消", subTaskResults)
+            } else {
+                status = TaskStatus.FAILED
+                progressCallback(TaskProgress(id, TaskStatus.FAILED, progress, "任务执行异常: ${e.message}"))
+                return TaskResult(false, emptyMap(), e.message, subTaskResults)
+            }
         }
     }
 
@@ -154,7 +165,7 @@ data class CompositeTask(
     fun resume() {
         if (status == TaskStatus.PAUSED) {
             status = TaskStatus.RUNNING
-        } else if (status == TaskStatus.FAILED) {
+        } else if (status == TaskStatus.FAILED || status == TaskStatus.CANCELLED) {
             status = TaskStatus.PENDING
         }
     }

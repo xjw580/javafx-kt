@@ -32,12 +32,14 @@ class DynamicTaskProgressView<T : TaskBuilder> : VBox() {
     // 任务控制回调
     var onPauseTask: ((String) -> Unit)? = null
     var onResumeTask: ((String) -> Unit)? = null
+    var onRetryTask: ((String) -> Unit)? = null
     var onCancelTask: ((String) -> Unit)? = null
     var onDeleteTask: ((String) -> Unit)? = null
 
     // 全局控制回调
     var onPauseAll: (() -> Unit)? = null
     var onResumeAll: (() -> Unit)? = null
+    var onRetryAll: (() -> Unit)? = null
     var onCancelAll: (() -> Unit)? = null
     var onDeleteAll: (() -> Unit)? = null
 
@@ -151,7 +153,13 @@ class DynamicTaskProgressView<T : TaskBuilder> : VBox() {
 
                 val resumeBtn = Button("继续")
                 resumeBtn.style = "-fx-font-size: 11px; -fx-padding: 3 8 3 8;"
-                resumeBtn.setOnAction { onResumeTask?.invoke(task.id) }
+                resumeBtn.setOnAction {
+                    if (resumeBtn.text == "继续"){
+                        onResumeTask?.invoke(task.id)
+                    }else{
+                        onRetryTask?.invoke(task.id)
+                    }
+                }
                 resumeBtn.isDisable = true // 初始状态禁用
 
                 val cancelBtn = Button("取消")

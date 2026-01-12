@@ -1,6 +1,6 @@
 package club.xiaojiawei.kt.bean.task
 
-import java.util.UUID
+import java.util.*
 
 /**
  * @author 肖嘉威
@@ -47,6 +47,11 @@ class TaskController<T : TaskBuilder>(taskBuilderProvider: (() -> T)) {
             println("用户恢复任务: $taskId")
         }
 
+        progressView.onRetryTask = { taskId ->
+            taskManager.retryTask(taskId)
+            println("用户重试任务: $taskId")
+        }
+
         progressView.onCancelTask = { taskId ->
             taskManager.cancelTask(taskId)
             println("用户取消任务: $taskId")
@@ -67,6 +72,11 @@ class TaskController<T : TaskBuilder>(taskBuilderProvider: (() -> T)) {
         progressView.onResumeAll = {
             taskManager.resumeAllTasks()
             println("用户恢复所有任务")
+        }
+
+        progressView.onRetryAll = {
+            taskManager.retryAllTasks()
+            println("用户重试所有任务")
         }
 
         progressView.onCancelAll = {

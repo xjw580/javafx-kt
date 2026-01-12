@@ -20,13 +20,12 @@ class DynamicTaskManager<T : TaskBuilder>(
 ) : Closeable {
     private val tasks = ConcurrentHashMap<String, CompositeTask>()
     private val taskQueue = Channel<CompositeTask>(Channel.UNLIMITED)
-    val context = TaskContext() // 改为 public 以便外部访问
+    val context = TaskContext()
     private val isRunning = AtomicBoolean(false)
 
-    // 使用线程安全的列表
     private val progressCallbacks = CopyOnWriteArrayList<(TaskProgress) -> Unit>()
 
-    // 状态监听回调 - 使用线程安全的列表
+    // 状态监听回调
     private val statisticsCallbacks = CopyOnWriteArrayList<(TaskStatistics) -> Unit>()
     private val runningCountCallbacks = CopyOnWriteArrayList<(Int) -> Unit>()
     private val pendingCountCallbacks = CopyOnWriteArrayList<(Int) -> Unit>()
@@ -289,14 +288,21 @@ class DynamicTaskManager<T : TaskBuilder>(
         }
     }
 
-    // 恢复任务
+    // 继续任务
     fun resumeTask(taskId: String) {
         tasks[taskId]?.let { task ->
             if (task.status == TaskStatus.PAUSED) {
                 task.resume()
                 // 立即通知UI更新状态
                 notifyProgress(TaskProgress(taskId, task.status, task.progress, "用户恢复任务"))
-            } else if (task.status == TaskStatus.FAILED) {
+            }
+        }
+    }
+
+    //    重试任务
+    fun retryTask(taskId: String) {
+        tasks[taskId]?.let { task ->
+            if (task.status == TaskStatus.FAILED || task.status == TaskStatus.CANCELLED) {
                 task.resume()
                 // 立即通知UI更新状态
                 notifyProgress(TaskProgress(taskId, task.status, task.progress, "用户重试任务"))
@@ -405,6 +411,14 @@ class DynamicTaskManager<T : TaskBuilder>(
         tasks.values.forEach { task ->
             if (task.status == TaskStatus.PAUSED || task.status == TaskStatus.FAILED) {
                 resumeTask(task.id)
+            }
+        }
+    }
+
+    fun retryAllTasks() {
+        tasks.values.forEach { task ->
+            if (task.status == TaskStatus.PAUSED || task.status == TaskStatus.FAILED) {
+                retryTask(task.id)
             }
         }
     }
