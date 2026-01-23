@@ -116,6 +116,12 @@ class StageBuilder(private val existingStage: Stage? = null) : DslBuilder<Stage>
         }
     }
 
+    fun root(provider: () -> Parent) {
+        scene {
+            root(provider)
+        }
+    }
+
     fun initOwner(window: Window?) {
         window ?: return
         settings {

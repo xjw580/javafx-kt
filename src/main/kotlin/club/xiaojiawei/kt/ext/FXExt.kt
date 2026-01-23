@@ -8,7 +8,7 @@ import javafx.beans.property.IntegerProperty
 import javafx.beans.property.LongProperty
 import javafx.beans.value.WritableValue
 import javafx.scene.Node
-import javafx.scene.layout.Pane
+import javafx.scene.layout.*
 import kotlin.reflect.KProperty
 
 
@@ -79,3 +79,12 @@ operator fun BooleanProperty.getValue(thisRef: Any?, property: KProperty<*>): Bo
 operator fun BooleanProperty.setValue(thisRef: Any?, property: KProperty<*>, value: Boolean) {
     this.value = value
 }
+
+fun Node.setLeftAnchor(v: Double) = AnchorPane.setLeftAnchor(this, v)
+fun Node.setRightAnchor(v: Double) = AnchorPane.setRightAnchor(this, v)
+fun Node.setTopAnchor(v: Double) = AnchorPane.setTopAnchor(this, v)
+fun Node.setBottomAnchor(v: Double) = AnchorPane.setBottomAnchor(this, v)
+fun Node.setHgrow(priority: Priority) = HBox.setHgrow(this, priority)
+fun Node.setHgrowAlways() = HBox.setHgrow(this, Priority.ALWAYS)
+fun Node.setVgrow(priority: Priority) = VBox.setVgrow(this, priority)
+fun Node.setVgrowAlways(priority: Priority) = VBox.setVgrow(this, Priority.ALWAYS)

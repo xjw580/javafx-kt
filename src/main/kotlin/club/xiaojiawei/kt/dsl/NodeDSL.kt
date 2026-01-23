@@ -23,6 +23,7 @@ import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import javafx.scene.input.DragEvent
 import javafx.scene.input.MouseEvent
+import javafx.scene.input.ScrollEvent
 import javafx.scene.layout.HBox
 import javafx.scene.layout.Priority
 import javafx.scene.layout.Region
@@ -94,6 +95,7 @@ abstract class NodeBuilder<T : Node> : DslBuilder<T>() {
     fun onDragOver(h: EventHandler<DragEvent>?) = settings { onDragOver = h }
     fun onDragExited(h: EventHandler<DragEvent>?) = settings { onDragExited = h }
     fun onDragDropped(h: EventHandler<DragEvent>?) = settings { onDragDropped = h }
+    fun onScroll(h: EventHandler<ScrollEvent>?) = settings { onScroll = h }
 
     // --- 自由配置 ---
     fun configure(block: T.() -> Unit) = settings(block)
