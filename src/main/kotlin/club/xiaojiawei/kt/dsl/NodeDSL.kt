@@ -14,6 +14,7 @@ import javafx.beans.value.ObservableValue
 import javafx.collections.ObservableList
 import javafx.event.ActionEvent
 import javafx.event.EventHandler
+import javafx.geometry.NodeOrientation
 import javafx.geometry.Orientation
 import javafx.geometry.Pos
 import javafx.scene.Cursor
@@ -50,6 +51,7 @@ abstract class NodeBuilder<T : Node> : DslBuilder<T>() {
     fun vgrowSometimes() = vgrow(Priority.SOMETIMES)
     fun vgrowNever() = vgrow(Priority.NEVER)
     fun pickOnBounds(b: Boolean = true) = settings { isPickOnBounds = b }
+    fun nodeOrientation(nodeOrientation: NodeOrientation) = settings { this.nodeOrientation = nodeOrientation }
 
     // --- 样式系统 (StyleColor & StyleSize) ---
     fun styleMain(s: StyleSize = StyleSize.DEFAULT) = style(StyleColor.MAIN, s)
@@ -162,6 +164,12 @@ abstract class RegionBaseBuilder<T : Region> : NodeBuilder<T>() {
 @FXMarker
 abstract class LabeledBuilder<T : Labeled> : RegionBaseBuilder<T>() {
 
+    fun contentDisplay(contentDisplay: ContentDisplay) = settings { this.contentDisplay = contentDisplay }
+
+    fun graphic(node: Node) = settings { graphic = node }
+
+    fun graphic(builder: () -> Node) = settings { graphic = builder() }
+
     fun text(text: String) = settings { this.text = text }
 
     operator fun String.unaryPlus() = text(this)
@@ -206,9 +214,6 @@ class LabelBuilder : LabeledBuilder<Label>() {
         settings { isWrapText = wrap }
     }
 
-    fun graphic(node: Node) = settings { graphic = node }
-
-    fun graphic(builder: () -> Node) = settings { graphic = builder() }
 
     override fun style(styleColor: StyleColor, styleSize: StyleSize) {
         settings {
