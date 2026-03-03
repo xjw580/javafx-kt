@@ -6,8 +6,11 @@ package club.xiaojiawei.kt.dsl
  */
 
 import club.xiaojiawei.controls.FilterComboBox
+import club.xiaojiawei.controls.Switch
+import club.xiaojiawei.enums.BaseTransitionEnum
 import javafx.beans.property.BooleanProperty
 import javafx.beans.property.DoubleProperty
+import javafx.beans.property.ObjectProperty
 import javafx.beans.property.StringProperty
 import javafx.beans.value.ChangeListener
 import javafx.beans.value.ObservableValue
@@ -35,6 +38,7 @@ import javafx.scene.shape.*
 import javafx.scene.text.Font
 import javafx.scene.text.FontWeight
 import javafx.scene.text.Text
+import javafx.util.Duration
 import javafx.util.StringConverter
 
 // 基础 Node 构建器
@@ -333,12 +337,6 @@ class ButtonBuilder : LabeledBuilder<Button>() {
     fun onAction(handler: () -> Unit) {
         settings { onAction = EventHandler { handler() } }
     }
-
-    fun graphic(node: Node) {
-        settings { graphic = node }
-    }
-
-    fun graphic(builder: () -> Node) = settings { graphic = builder() }
 
     fun defaultButton(default: Boolean = true) {
         settings { isDefaultButton = default }
@@ -725,6 +723,22 @@ open class ComboBoxBuilder<T> : ComboBoxBaseBuilder<ComboBox<T>, T>() {
 //        }
 //    }
 
+    // 数据绑定
+    fun byBindValue(property: ObjectProperty<T>) {
+        settings { property.bind(valueProperty()) }
+    }
+
+    fun bindText(property: ObjectProperty<T>) {
+        settings { valueProperty().bind(property) }
+    }
+
+    fun bindBidirectionalValue(property: ObjectProperty<T>) {
+        settings { valueProperty().bindBidirectional(property) }
+    }
+
+    fun byBindBidirectionalValue(property: ObjectProperty<T>) {
+        settings { property.bindBidirectional(valueProperty()) }
+    }
 }
 
 // ListView 构建器
@@ -923,4 +937,50 @@ class SeparatorBuilder : RegionBaseBuilder<Separator>() {
 
     fun horizontal() = orientation(Orientation.HORIZONTAL)
 
+}
+
+// Switch 构建器
+@FXMarker
+open class SwitchBuilder : RegionBaseBuilder<Switch>() {
+
+    override fun buildInstance(): Switch = Switch()
+
+    fun addStatusListener(changeListener: ChangeListener<Boolean>) {
+        settings {
+            statusProperty().addListener(changeListener)
+        }
+    }
+
+    fun removeStatusListener(changeListener: ChangeListener<Boolean>) {
+        settings {
+            statusProperty().removeListener(changeListener)
+        }
+    }
+
+    fun status(status: Boolean) = settings { this.status = status }
+
+    fun transitionDuration(transitionDuration: Duration) = settings { this.transitionDuration = transitionDuration }
+
+    fun transitionType(transitionType: BaseTransitionEnum) = settings { this.transitionType = transitionType }
+
+    fun size(size: Double) = settings { this.size = size }
+
+    fun loading(loading: Boolean) = settings { this.isLoading = loading }
+
+    // 数据绑定
+    fun byBindStatus(property: BooleanProperty) {
+        settings { property.bind(statusProperty()) }
+    }
+
+    fun bindStatus(property: BooleanProperty) {
+        settings { statusProperty().bind(property) }
+    }
+
+    fun bindBidirectionalStatus(property: BooleanProperty) {
+        settings { statusProperty().bindBidirectional(property) }
+    }
+
+    fun byBindBidirectionalStatus(property: BooleanProperty) {
+        settings { property.bindBidirectional(statusProperty()) }
+    }
 }

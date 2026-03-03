@@ -349,6 +349,11 @@ abstract class PaneBaseBuilder<T : Pane> : RegionBaseBuilder<T>() {
         config()
     })
 
+    inline fun addSwitch(config: (SwitchBuilder.() -> Unit) = {}) = add(SwitchBuilder().apply {
+        setMode(this@PaneBaseBuilder.buildMode)
+        config()
+    })
+
 }
 
 @FXMarker

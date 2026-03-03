@@ -613,6 +613,11 @@ inline fun vSpacer(priority: Priority = Priority.ALWAYS, config: Region.() -> Un
     return region
 }
 
+// Switch衍生
+inline fun switch(config: SwitchBuilder.() -> Unit) = SwitchBuilder().apply(config).build()
+
+inline fun switchBuilder(config: SwitchBuilder.() -> Unit) = SwitchBuilder().apply(config)
+
 abstract class DslBuilder<T>(
     buildMode: BuildMode = BuildMode.DELAY
 ) {
