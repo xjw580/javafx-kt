@@ -316,7 +316,7 @@ fun <T> TextInputControl.observe(state: FxState<T>, block: (T) -> String) {
 
 // --- 多个 State 观察，block 通过闭包捕获值 ---
 
-fun Labeled.observe(vararg states: FxStateBase<*>, block: () -> String) {
+fun Labeled.observes(vararg states: FxStateBase<*>, block: () -> String) {
     val binding = Bindings.createStringBinding(
         { block() },
         *states.map { it.observableValue() }.toTypedArray()
@@ -324,7 +324,7 @@ fun Labeled.observe(vararg states: FxStateBase<*>, block: () -> String) {
     textProperty().bind(binding)
 }
 
-fun Text.observe(vararg states: FxStateBase<*>, block: () -> String) {
+fun Text.observes(vararg states: FxStateBase<*>, block: () -> String) {
     val binding = Bindings.createStringBinding(
         { block() },
         *states.map { it.observableValue() }.toTypedArray()
@@ -332,7 +332,7 @@ fun Text.observe(vararg states: FxStateBase<*>, block: () -> String) {
     textProperty().bind(binding)
 }
 
-fun TextInputControl.observe(vararg states: FxStateBase<*>, block: () -> String) {
+fun TextInputControl.observes(vararg states: FxStateBase<*>, block: () -> String) {
     val binding = Bindings.createStringBinding(
         { block() },
         *states.map { it.observableValue() }.toTypedArray()

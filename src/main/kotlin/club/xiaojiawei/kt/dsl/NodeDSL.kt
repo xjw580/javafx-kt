@@ -181,7 +181,7 @@ abstract class LabeledBuilder<T : Labeled> : RegionBaseBuilder<T>() {
     /**
      * 观察单个 FxState，state 值变化时自动更新 text
      */
-    fun <S> observe(state: FxState<S>, block: (S) -> String) = settings {
+    fun <S> observe(state: FxState<S>, block: (S) -> String = { it.toString() }) = settings {
         observe(state, block)
     }
 
@@ -189,7 +189,7 @@ abstract class LabeledBuilder<T : Labeled> : RegionBaseBuilder<T>() {
      * 观察多个 FxState，任一 state 值变化时自动更新 text
      */
     fun observes(vararg states: FxStateBase<*>, block: () -> String) = settings {
-        observe(*states, block = block)
+        observes(*states, block = block)
     }
 
     fun font(font: Font) = settings { this.font = font }
@@ -289,8 +289,8 @@ class TextBuilder : NodeBuilder<Text>() {
         observe(state, block)
     }
 
-    fun observe(vararg states: FxStateBase<*>, block: () -> String) = settings {
-        observe(*states, block = block)
+    fun observes(vararg states: FxStateBase<*>, block: () -> String) = settings {
+        observes(*states, block = block)
     }
 
 }
@@ -406,8 +406,8 @@ class TextFieldBuilder : RegionBaseBuilder<TextField>() {
         observe(state, block)
     }
 
-    fun observe(vararg states: FxStateBase<*>, block: () -> String) = settings {
-        observe(*states, block = block)
+    fun observes(vararg states: FxStateBase<*>, block: () -> String) = settings {
+        observes(*states, block = block)
     }
 
     fun promptText(prompt: String) {
