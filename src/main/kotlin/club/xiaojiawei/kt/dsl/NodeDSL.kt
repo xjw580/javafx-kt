@@ -8,6 +8,7 @@ package club.xiaojiawei.kt.dsl
 import club.xiaojiawei.controls.FilterComboBox
 import club.xiaojiawei.controls.Switch
 import club.xiaojiawei.enums.BaseTransitionEnum
+import javafx.beans.binding.Bindings
 import javafx.beans.property.BooleanProperty
 import javafx.beans.property.DoubleProperty
 import javafx.beans.property.ObjectProperty
@@ -179,17 +180,19 @@ abstract class LabeledBuilder<T : Labeled> : RegionBaseBuilder<T>() {
     operator fun String.unaryPlus() = text(this)
 
     /**
-     * 观察单个 FxState，state 值变化时自动更新 text
+     * 观察单个 Property，值变化时自动更新 text
      */
-    fun <S> observe(state: FxState<S>, block: (S) -> String = { it.toString() }) = settings {
-        observe(state, block)
+    fun observe(state: ObservableValue<*>, block: () -> String) = settings {
+        val binding = Bindings.createStringBinding({ block() }, state)
+        textProperty().bind(binding)
     }
 
     /**
-     * 观察多个 FxState，任一 state 值变化时自动更新 text
+     * 观察多个 Property，任一值变化时自动更新 text
      */
-    fun observes(vararg states: FxStateBase<*>, block: () -> String) = settings {
-        observes(*states, block = block)
+    fun observes(vararg states: ObservableValue<*>, block: () -> String) = settings {
+        val binding = Bindings.createStringBinding({ block() }, *states)
+        textProperty().bind(binding)
     }
 
     fun font(font: Font) = settings { this.font = font }
@@ -285,12 +288,14 @@ class TextBuilder : NodeBuilder<Text>() {
 
     operator fun String.unaryPlus() = text(this)
 
-    fun <S> observe(state: FxState<S>, block: (S) -> String) = settings {
-        observe(state, block)
+    fun observe(state: ObservableValue<*>, block: () -> String) = settings {
+        val binding = Bindings.createStringBinding({ block() }, state)
+        textProperty().bind(binding)
     }
 
-    fun observes(vararg states: FxStateBase<*>, block: () -> String) = settings {
-        observes(*states, block = block)
+    fun observes(vararg states: ObservableValue<*>, block: () -> String) = settings {
+        val binding = Bindings.createStringBinding({ block() }, *states)
+        textProperty().bind(binding)
     }
 
 }
@@ -402,12 +407,14 @@ class TextFieldBuilder : RegionBaseBuilder<TextField>() {
 
     operator fun String.unaryPlus() = text(this)
 
-    fun <S> observe(state: FxState<S>, block: (S) -> String) = settings {
-        observe(state, block)
+    fun observe(state: ObservableValue<*>, block: () -> String) = settings {
+        val binding = Bindings.createStringBinding({ block() }, state)
+        textProperty().bind(binding)
     }
 
-    fun observes(vararg states: FxStateBase<*>, block: () -> String) = settings {
-        observes(*states, block = block)
+    fun observes(vararg states: ObservableValue<*>, block: () -> String) = settings {
+        val binding = Bindings.createStringBinding({ block() }, *states)
+        textProperty().bind(binding)
     }
 
     fun promptText(prompt: String) {

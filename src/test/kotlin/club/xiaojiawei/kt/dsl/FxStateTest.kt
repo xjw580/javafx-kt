@@ -1,27 +1,31 @@
 package club.xiaojiawei.kt.dsl
 
+import club.xiaojiawei.kt.ext.getValue
+import club.xiaojiawei.kt.ext.setValue
 import javafx.animation.Animation
 import javafx.animation.KeyFrame
 import javafx.animation.Timeline
+import javafx.beans.property.SimpleIntegerProperty
+import javafx.beans.property.SimpleStringProperty
 import javafx.util.Duration
 
 /**
- * FxState 响应式状态测试
+ * 响应式观察测试 — 直接使用 JavaFX Property
  * @author 肖嘉威
  */
 fun main() {
     launchApp {
-        title("FxState 响应式测试")
+        title("Property 响应式测试")
         size(500.0, 400.0)
         root {
-            val secondsState = state(0)
-            var seconds by secondsState
+            val secondsProperty = SimpleIntegerProperty(0)
+            var seconds by secondsProperty
 
-            val clickState = intState(0)
-            var clickCount by clickState
+            val clickProperty = SimpleIntegerProperty(0)
+            var clickCount by clickProperty
 
-            val nameState = state("世界")
-            var name by nameState
+            val nameProperty = SimpleStringProperty("世界")
+            var name by nameProperty
 
             // 定时器：每秒递增
             val timer = Timeline(KeyFrame(Duration.seconds(1.0), { seconds++ }))
@@ -33,25 +37,25 @@ fun main() {
                 padding(20.0)
                 alignCenter()
 
-                // 示例1：单 State 观察
+                // 示例1：单 Property 观察
                 addLabel {
-                    observe(secondsState) { "⏱ 已运行 $it 秒" }
+                    configure { observe(secondsProperty) { "⏱ 已运行 $seconds 秒" } }
                     fontSize(20.0)
                 }
 
-                // 示例2：多 State 观察
+                // 示例2：多 Property 观察
                 addLabel {
-                    observes(secondsState, clickState) { "⏱ $seconds 秒 | 🖱 点击 $clickCount 次" }
+                    configure { observes(secondsProperty, clickProperty) { "⏱ $seconds 秒 | 🖱 点击 $clickCount 次" } }
                     fontSize(16.0)
                 }
 
-                // 示例3：按钮点击修改 State
+                // 示例3：按钮点击修改 Property
                 addButton {
                     text("点击我")
                     onAction { clickCount++ }
                 }
 
-                // 示例4：输入框修改 State + 观察
+                // 示例4：输入框修改 Property + 观察
                 addTextField {
                     text("世界")
                     configure {
@@ -62,21 +66,23 @@ fun main() {
                 }
 
                 addLabel {
-                    observe(nameState) { "你好，$it！" }
+                    configure { observe(nameProperty) { "你好，$name！" } }
                     fontSize(18.0)
                 }
 
-                // 示例5：多 State 组合观察
+                // 示例5：多 Property 组合观察
                 addLabel {
-                    observes(secondsState, clickState, nameState) {
-                        "📊 $name 已运行 $seconds 秒，点击了 $clickCount 次"
+                    configure {
+                        observes(secondsProperty, clickProperty, nameProperty) {
+                            "📊 $name 已运行 $seconds 秒，点击了 $clickCount 次"
+                        }
                     }
                     fontSize(14.0)
                 }
 
-                // 示例6：使用泛型 FxState<T> + 单参数 observe
-                val colorState = state("红色")
-                var color by colorState
+                // 示例6：颜色切换
+                val colorProperty = SimpleStringProperty("红色")
+                var color by colorProperty
 
                 addButton {
                     text("切换颜色")
@@ -86,7 +92,7 @@ fun main() {
                 }
 
                 addLabel {
-                    observe(colorState) { "当前颜色: $it" }
+                    configure { observe(colorProperty) { "当前颜色: $color" } }
                     fontSize(16.0)
                 }
             }

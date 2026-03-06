@@ -6,349 +6,128 @@ import javafx.beans.value.ObservableValue
 import javafx.scene.control.Labeled
 import javafx.scene.control.TextInputControl
 import javafx.scene.text.Text
-import kotlin.reflect.KProperty
 
 /**
- * 响应式状态容器，类似 Compose 的 MutableState
+ * JavaFX Property 响应式观察扩展
  *
- * 使用方式：
+ * 直接使用 JavaFX Property，无需额外封装层。
+ * 配合 FXExt.kt 中的 by 委托，实现类似 Compose 的响应式效果：
+ *
  * ```
- * val secondsState = state(0)
- * var seconds by secondsState
+ * val secondsProperty = SimpleIntegerProperty(0)
+ * var seconds by secondsProperty
  *
- * label.observe(secondsState) { "已运行 $it 秒" }
+ * label.observe(secondsProperty) { "已运行 $seconds 秒" }
  * ```
  *
  * @author 肖嘉威
  */
 
-/**
- * FxState 公共接口，用于 observe 统一接受不同类型的 State
- */
-abstract class FxStateBase<T> {
-    abstract fun observableValue(): Property<T>
-    open fun value(): T = observableValue().value
-    override fun toString(): String = value().toString()
-}
-
-class FxState<T>(initial: T) : FxStateBase<T>() {
-
-    private val property = SimpleObjectProperty(initial)
-
-    fun property(): ObjectProperty<T> = property
-
-    override fun observableValue(): Property<T> = property
-
-    override fun value(): T = property.value
-
-    operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
-        return this.property.get()
-    }
-
-    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
-        this.property.set(value)
-    }
-}
-
-class FxIntState(initial: Int) : FxStateBase<Number>() {
-
-    private val property = SimpleIntegerProperty(initial)
-
-    fun property(): IntegerProperty = property
-
-    override fun observableValue(): Property<Number> = property
-
-    override fun value(): Int = property.value
-
-    operator fun getValue(thisRef: Any?, property: KProperty<*>): Int {
-        return this.property.get()
-    }
-
-    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: Int) {
-        this.property.set(value)
-    }
-
-    operator fun inc(): FxIntState {
-        property.set(property.get() + 1)
-        return this
-    }
-
-    operator fun dec(): FxIntState {
-        property.set(property.get() - 1)
-        return this
-    }
-
-    operator fun plusAssign(delta: Int) {
-        property.set(property.get() + delta)
-    }
-
-    operator fun minusAssign(delta: Int) {
-        property.set(property.get() - delta)
-    }
-
-    operator fun timesAssign(factor: Int) {
-        property.set(property.get() * factor)
-    }
-
-    operator fun divAssign(divisor: Int) {
-        property.set(property.get() / divisor)
-    }
-
-    operator fun unaryMinus(): Int = -property.get()
-
-    operator fun compareTo(other: Int): Int = property.get().compareTo(other)
-}
-
-class FxDoubleState(initial: Double) : FxStateBase<Number>() {
-
-    private val property = SimpleDoubleProperty(initial)
-
-    fun property(): DoubleProperty = property
-
-    override fun observableValue(): Property<Number> = property
-
-    override fun value(): Double = property.value
-
-    operator fun getValue(thisRef: Any?, property: KProperty<*>): Double {
-        return this.property.get()
-    }
-
-    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: Double) {
-        this.property.set(value)
-    }
-
-    operator fun inc(): FxDoubleState {
-        property.set(property.get() + 1.0)
-        return this
-    }
-
-    operator fun dec(): FxDoubleState {
-        property.set(property.get() - 1.0)
-        return this
-    }
-
-    operator fun plusAssign(delta: Double) {
-        property.set(property.get() + delta)
-    }
-
-    operator fun minusAssign(delta: Double) {
-        property.set(property.get() - delta)
-    }
-
-    operator fun timesAssign(factor: Double) {
-        property.set(property.get() * factor)
-    }
-
-    operator fun divAssign(divisor: Double) {
-        property.set(property.get() / divisor)
-    }
-
-    operator fun unaryMinus(): Double = -property.get()
-
-    operator fun compareTo(other: Double): Int = property.get().compareTo(other)
-}
-
-class FxBooleanState(initial: Boolean) : FxStateBase<Boolean>() {
-
-    private val property = SimpleBooleanProperty(initial)
-
-    fun property(): BooleanProperty = property
-
-    override fun observableValue(): Property<Boolean> = property
-
-    override fun value(): Boolean = property.value
-
-    operator fun getValue(thisRef: Any?, property: KProperty<*>): Boolean {
-        return this.property.get()
-    }
-
-    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: Boolean) {
-        this.property.set(value)
-    }
-
-    /** 取反 */
-    fun toggle() {
-        property.set(!property.get())
-    }
-
-    operator fun not(): Boolean = !property.get()
-
-    infix fun and(other: Boolean): Boolean = property.get() && other
-
-    infix fun or(other: Boolean): Boolean = property.get() || other
-
-    infix fun and(other: FxBooleanState): Boolean = property.get() && other.property.get()
-
-    infix fun or(other: FxBooleanState): Boolean = property.get() || other.property.get()
-}
-
-class FxStringState(initial: String) : FxStateBase<String>() {
-
-    private val property = SimpleStringProperty(initial)
-
-    fun property(): StringProperty = property
-
-    override fun observableValue(): Property<String> = property
-
-    override fun value(): String = property.value
-
-    operator fun getValue(thisRef: Any?, property: KProperty<*>): String {
-        return this.property.get()
-    }
-
-    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: String) {
-        this.property.set(value)
-    }
-
-    /** 字符串拼接赋值 */
-    operator fun plusAssign(suffix: String) {
-        property.set(property.get() + suffix)
-    }
-
-    /** 清空 */
-    fun clear() {
-        property.set("")
-    }
-
-    fun isEmpty(): Boolean = property.get().isEmpty()
-
-    fun isNotEmpty(): Boolean = property.get().isNotEmpty()
-
-    fun isBlank(): Boolean = property.get().isBlank()
-
-    fun isNotBlank(): Boolean = property.get().isNotBlank()
-
-    fun length(): Int = property.get().length
-
-    operator fun contains(other: CharSequence): Boolean = property.get().contains(other)
-}
-
-class FxLongState(initial: Long) : FxStateBase<Number>() {
-
-    private val property = SimpleLongProperty(initial)
-
-    fun property(): LongProperty = property
-
-    override fun observableValue(): Property<Number> = property
-
-    override fun value(): Long = property.value
-
-    operator fun getValue(thisRef: Any?, property: KProperty<*>): Long {
-        return this.property.get()
-    }
-
-    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: Long) {
-        this.property.set(value)
-    }
-
-    operator fun inc(): FxLongState {
-        property.set(property.get() + 1)
-        return this
-    }
-
-    operator fun dec(): FxLongState {
-        property.set(property.get() - 1)
-        return this
-    }
-
-    operator fun plusAssign(delta: Long) {
-        property.set(property.get() + delta)
-    }
-
-    operator fun minusAssign(delta: Long) {
-        property.set(property.get() - delta)
-    }
-
-    operator fun timesAssign(factor: Long) {
-        property.set(property.get() * factor)
-    }
-
-    operator fun divAssign(divisor: Long) {
-        property.set(property.get() / divisor)
-    }
-
-    operator fun unaryMinus(): Long = -property.get()
-
-    operator fun compareTo(other: Long): Int = property.get().compareTo(other)
-}
-
-// ======================== 工厂函数 ========================
-
-fun <T> state(initial: T): FxState<T> = FxState(initial)
-
-fun intState(initial: Int = 0): FxIntState = FxIntState(initial)
-
-fun doubleState(initial: Double = 0.0): FxDoubleState = FxDoubleState(initial)
-
-fun booleanState(initial: Boolean = false): FxBooleanState = FxBooleanState(initial)
-
-fun stringState(initial: String = ""): FxStringState = FxStringState(initial)
-
-fun longState(initial: Long = 0L): FxLongState = FxLongState(initial)
-
 // ======================== observe 扩展函数 ========================
 
-// --- 单个 FxState<T> 观察，block 接收当前值 ---
+// --- 单个 Property 观察，block 通过闭包捕获值 ---
 
-fun <T> Labeled.observe(state: FxState<T>, block: (T) -> String) {
-    val binding = Bindings.createStringBinding(
-        { block(state.property().get()) },
-        state.property()
-    )
+fun Labeled.observe(state: ObservableValue<*>, block: () -> String) {
+    val binding = Bindings.createStringBinding({ block() }, state)
     textProperty().bind(binding)
 }
 
-fun <T> Text.observe(state: FxState<T>, block: (T) -> String) {
-    val binding = Bindings.createStringBinding(
-        { block(state.property().get()) },
-        state.property()
-    )
+fun Text.observe(state: ObservableValue<*>, block: () -> String) {
+    val binding = Bindings.createStringBinding({ block() }, state)
     textProperty().bind(binding)
 }
 
-fun <T> TextInputControl.observe(state: FxState<T>, block: (T) -> String) {
-    val binding = Bindings.createStringBinding(
-        { block(state.property().get()) },
-        state.property()
-    )
+fun TextInputControl.observe(state: ObservableValue<*>, block: () -> String) {
+    val binding = Bindings.createStringBinding({ block() }, state)
     textProperty().bind(binding)
 }
 
-// --- 多个 State 观察，block 通过闭包捕获值 ---
+// --- 多个 Property 观察，任一变化时自动更新 ---
 
-fun Labeled.observes(vararg states: FxStateBase<*>, block: () -> String) {
-    val binding = Bindings.createStringBinding(
-        { block() },
-        *states.map { it.observableValue() }.toTypedArray()
-    )
+fun Labeled.observes(vararg states: ObservableValue<*>, block: () -> String) {
+    val binding = Bindings.createStringBinding({ block() }, *states)
     textProperty().bind(binding)
 }
 
-fun Text.observes(vararg states: FxStateBase<*>, block: () -> String) {
-    val binding = Bindings.createStringBinding(
-        { block() },
-        *states.map { it.observableValue() }.toTypedArray()
-    )
+fun Text.observes(vararg states: ObservableValue<*>, block: () -> String) {
+    val binding = Bindings.createStringBinding({ block() }, *states)
     textProperty().bind(binding)
 }
 
-fun TextInputControl.observes(vararg states: FxStateBase<*>, block: () -> String) {
-    val binding = Bindings.createStringBinding(
-        { block() },
-        *states.map { it.observableValue() }.toTypedArray()
-    )
+fun TextInputControl.observes(vararg states: ObservableValue<*>, block: () -> String) {
+    val binding = Bindings.createStringBinding({ block() }, *states)
     textProperty().bind(binding)
 }
 
+// ======================== IntegerProperty 特化扩展 ========================
 
-fun main() {
-    val stringState = FxStringState("hello")
-    stringState+="kotlin"
-    println(stringState)
-    var secondsState = FxIntState(0)
-    println(secondsState.property().get())
-    secondsState++
-    println(secondsState.property().get())
-    secondsState--
-    println(secondsState.property().get())
+operator fun IntegerProperty.plusAssign(delta: Int) {
+    set(get() + delta)
+}
+
+operator fun IntegerProperty.minusAssign(delta: Int) {
+    set(get() - delta)
+}
+
+operator fun IntegerProperty.timesAssign(factor: Int) {
+    set(get() * factor)
+}
+
+operator fun IntegerProperty.divAssign(divisor: Int) {
+    set(get() / divisor)
+}
+
+// ======================== LongProperty 特化扩展 ========================
+
+operator fun LongProperty.plusAssign(delta: Long) {
+    set(get() + delta)
+}
+
+operator fun LongProperty.minusAssign(delta: Long) {
+    set(get() - delta)
+}
+
+operator fun LongProperty.timesAssign(factor: Long) {
+    set(get() * factor)
+}
+
+operator fun LongProperty.divAssign(divisor: Long) {
+    set(get() / divisor)
+}
+
+// ======================== DoubleProperty 特化扩展 ========================
+
+operator fun DoubleProperty.plusAssign(delta: Double) {
+    set(get() + delta)
+}
+
+operator fun DoubleProperty.minusAssign(delta: Double) {
+    set(get() - delta)
+}
+
+operator fun DoubleProperty.timesAssign(factor: Double) {
+    set(get() * factor)
+}
+
+operator fun DoubleProperty.divAssign(divisor: Double) {
+    set(get() / divisor)
+}
+
+// ======================== BooleanProperty 特化扩展 ========================
+
+/** 取反 */
+fun BooleanProperty.toggle() {
+    set(!get())
+}
+
+// ======================== StringProperty 特化扩展 ========================
+
+/** 字符串拼接赋值 */
+operator fun StringProperty.plusAssign(suffix: String) {
+    set(get() + suffix)
+}
+
+/** 清空 */
+fun StringProperty.clear() {
+    set("")
 }
