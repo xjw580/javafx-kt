@@ -77,6 +77,26 @@ class FxIntState(initial: Int) : FxStateBase<Number>() {
         property.set(property.get() - 1)
         return this
     }
+
+    operator fun plusAssign(delta: Int) {
+        property.set(property.get() + delta)
+    }
+
+    operator fun minusAssign(delta: Int) {
+        property.set(property.get() - delta)
+    }
+
+    operator fun timesAssign(factor: Int) {
+        property.set(property.get() * factor)
+    }
+
+    operator fun divAssign(divisor: Int) {
+        property.set(property.get() / divisor)
+    }
+
+    operator fun unaryMinus(): Int = -property.get()
+
+    operator fun compareTo(other: Int): Int = property.get().compareTo(other)
 }
 
 class FxDoubleState(initial: Double) : FxStateBase<Number>() {
@@ -96,6 +116,36 @@ class FxDoubleState(initial: Double) : FxStateBase<Number>() {
     operator fun setValue(thisRef: Any?, property: KProperty<*>, value: Double) {
         this.property.set(value)
     }
+
+    operator fun inc(): FxDoubleState {
+        property.set(property.get() + 1.0)
+        return this
+    }
+
+    operator fun dec(): FxDoubleState {
+        property.set(property.get() - 1.0)
+        return this
+    }
+
+    operator fun plusAssign(delta: Double) {
+        property.set(property.get() + delta)
+    }
+
+    operator fun minusAssign(delta: Double) {
+        property.set(property.get() - delta)
+    }
+
+    operator fun timesAssign(factor: Double) {
+        property.set(property.get() * factor)
+    }
+
+    operator fun divAssign(divisor: Double) {
+        property.set(property.get() / divisor)
+    }
+
+    operator fun unaryMinus(): Double = -property.get()
+
+    operator fun compareTo(other: Double): Int = property.get().compareTo(other)
 }
 
 class FxBooleanState(initial: Boolean) : FxStateBase<Boolean>() {
@@ -115,6 +165,21 @@ class FxBooleanState(initial: Boolean) : FxStateBase<Boolean>() {
     operator fun setValue(thisRef: Any?, property: KProperty<*>, value: Boolean) {
         this.property.set(value)
     }
+
+    /** 取反 */
+    fun toggle() {
+        property.set(!property.get())
+    }
+
+    operator fun not(): Boolean = !property.get()
+
+    infix fun and(other: Boolean): Boolean = property.get() && other
+
+    infix fun or(other: Boolean): Boolean = property.get() || other
+
+    infix fun and(other: FxBooleanState): Boolean = property.get() && other.property.get()
+
+    infix fun or(other: FxBooleanState): Boolean = property.get() || other.property.get()
 }
 
 class FxStringState(initial: String) : FxStateBase<String>() {
@@ -134,6 +199,28 @@ class FxStringState(initial: String) : FxStateBase<String>() {
     operator fun setValue(thisRef: Any?, property: KProperty<*>, value: String) {
         this.property.set(value)
     }
+
+    /** 字符串拼接赋值 */
+    operator fun plusAssign(suffix: String) {
+        property.set(property.get() + suffix)
+    }
+
+    /** 清空 */
+    fun clear() {
+        property.set("")
+    }
+
+    fun isEmpty(): Boolean = property.get().isEmpty()
+
+    fun isNotEmpty(): Boolean = property.get().isNotEmpty()
+
+    fun isBlank(): Boolean = property.get().isBlank()
+
+    fun isNotBlank(): Boolean = property.get().isNotBlank()
+
+    fun length(): Int = property.get().length
+
+    operator fun contains(other: CharSequence): Boolean = property.get().contains(other)
 }
 
 class FxLongState(initial: Long) : FxStateBase<Number>() {
@@ -153,6 +240,36 @@ class FxLongState(initial: Long) : FxStateBase<Number>() {
     operator fun setValue(thisRef: Any?, property: KProperty<*>, value: Long) {
         this.property.set(value)
     }
+
+    operator fun inc(): FxLongState {
+        property.set(property.get() + 1)
+        return this
+    }
+
+    operator fun dec(): FxLongState {
+        property.set(property.get() - 1)
+        return this
+    }
+
+    operator fun plusAssign(delta: Long) {
+        property.set(property.get() + delta)
+    }
+
+    operator fun minusAssign(delta: Long) {
+        property.set(property.get() - delta)
+    }
+
+    operator fun timesAssign(factor: Long) {
+        property.set(property.get() * factor)
+    }
+
+    operator fun divAssign(divisor: Long) {
+        property.set(property.get() / divisor)
+    }
+
+    operator fun unaryMinus(): Long = -property.get()
+
+    operator fun compareTo(other: Long): Int = property.get().compareTo(other)
 }
 
 // ======================== 工厂函数 ========================
@@ -225,6 +342,9 @@ fun TextInputControl.observe(vararg states: FxStateBase<*>, block: () -> String)
 
 
 fun main() {
+    val stringState = FxStringState("hello")
+    stringState+="kotlin"
+    println(stringState)
     var secondsState = FxIntState(0)
     println(secondsState.property().get())
     secondsState++
