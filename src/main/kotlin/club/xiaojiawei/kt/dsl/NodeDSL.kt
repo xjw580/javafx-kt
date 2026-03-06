@@ -527,6 +527,26 @@ class TextAreaBuilder : RegionBaseBuilder<TextArea>() {
         settings { font = Font.font(size) }
     }
 
+    // 响应式观察
+    fun <T> observe(state: ObservableValue<T>, block: (T) -> String) = settings {
+        val binding = Bindings.createStringBinding({ block(state.value) }, state)
+        textProperty().bind(binding)
+    }
+
+    fun observes(vararg states: ObservableValue<*>, block: () -> String) = settings {
+        val binding = Bindings.createStringBinding({ block() }, *states)
+        textProperty().bind(binding)
+    }
+
+    // 数据绑定
+    fun byBindText(property: StringProperty) = settings { property.bind(textProperty()) }
+
+    fun bindText(property: StringProperty) = settings { textProperty().bind(property) }
+
+    fun bindBidirectionalText(property: StringProperty) = settings { textProperty().bindBidirectional(property) }
+
+    fun byBindBidirectionalText(property: StringProperty) = settings { property.bindBidirectional(textProperty()) }
+
     override fun style(styleColor: StyleColor, styleSize: StyleSize) {
         settings {
             styleClass.add("text-area-ui")
@@ -560,6 +580,13 @@ class CheckBoxBuilder : LabeledBuilder<CheckBox>() {
         settings { onAction = EventHandler { handler() } }
     }
 
+    // 响应式观察
+    fun <T> observeSelected(state: ObservableValue<T>, block: (T) -> Boolean) = settings {
+        val binding = Bindings.createBooleanBinding({ block(state.value) }, state)
+        selectedProperty().bind(binding)
+    }
+
+    // 数据绑定
     fun byBindSelected(property: BooleanProperty) {
         settings { property.bind(selectedProperty()) }
     }
@@ -634,6 +661,21 @@ class RadioButtonBuilder : LabeledBuilder<RadioButton>() {
     fun onAction(handler: () -> Unit) {
         settings { onAction = EventHandler { handler() } }
     }
+
+    // 响应式观察
+    fun <T> observeSelected(state: ObservableValue<T>, block: (T) -> Boolean) = settings {
+        val binding = Bindings.createBooleanBinding({ block(state.value) }, state)
+        selectedProperty().bind(binding)
+    }
+
+    // 数据绑定
+    fun byBindSelected(property: BooleanProperty) = settings { property.bind(selectedProperty()) }
+
+    fun bindSelected(property: BooleanProperty) = settings { selectedProperty().bind(property) }
+
+    fun bindBidirectionalSelected(property: BooleanProperty) = settings { selectedProperty().bindBidirectional(property) }
+
+    fun byBindBidirectionalSelected(property: BooleanProperty) = settings { property.bindBidirectional(selectedProperty()) }
 
     override fun style(styleColor: StyleColor, styleSize: StyleSize) {
         settings {
@@ -711,6 +753,21 @@ abstract class ComboBoxBaseBuilder<S : ComboBox<T>, T> : RegionBaseBuilder<S>() 
         settings { onAction = EventHandler { handler() } }
     }
 
+    // 响应式观察
+    fun <V> observeValue(state: ObservableValue<V>, block: (V) -> T) = settings {
+        val binding = Bindings.createObjectBinding({ block(state.value) }, state)
+        valueProperty().bind(binding)
+    }
+
+    // 数据绑定
+    fun byBindValue(property: ObjectProperty<T>) = settings { property.bind(valueProperty()) }
+
+    fun bindValue(property: ObjectProperty<T>) = settings { valueProperty().bind(property) }
+
+    fun bindBidirectionalValue(property: ObjectProperty<T>) = settings { valueProperty().bindBidirectional(property) }
+
+    fun byBindBidirectionalValue(property: ObjectProperty<T>) = settings { property.bindBidirectional(valueProperty()) }
+
     override fun style(styleColor: StyleColor, styleSize: StyleSize) {
         settings {
             styleClass.add("combo-box-ui")
@@ -776,22 +833,6 @@ open class ComboBoxBuilder<T> : ComboBoxBaseBuilder<ComboBox<T>, T>() {
 //        }
 //    }
 
-    // 数据绑定
-    fun byBindValue(property: ObjectProperty<T>) {
-        settings { property.bind(valueProperty()) }
-    }
-
-    fun bindText(property: ObjectProperty<T>) {
-        settings { valueProperty().bind(property) }
-    }
-
-    fun bindBidirectionalValue(property: ObjectProperty<T>) {
-        settings { valueProperty().bindBidirectional(property) }
-    }
-
-    fun byBindBidirectionalValue(property: ObjectProperty<T>) {
-        settings { property.bindBidirectional(valueProperty()) }
-    }
 }
 
 // ListView 构建器
@@ -890,6 +931,17 @@ class ProgressBarBuilder : RegionBaseBuilder<ProgressBar>() {
         settings { progress = ProgressBar.INDETERMINATE_PROGRESS }
     }
 
+    // 响应式观察
+    fun <T> observeProgress(state: ObservableValue<T>, block: (T) -> Double) = settings {
+        val binding = Bindings.createDoubleBinding({ block(state.value) }, state)
+        progressProperty().bind(binding)
+    }
+
+    // 数据绑定
+    fun byBindProgress(property: DoubleProperty) = settings { property.bind(progressProperty()) }
+
+    fun bindProgress(property: DoubleProperty) = settings { progressProperty().bind(property) }
+
     override fun style(styleColor: StyleColor, styleSize: StyleSize) {
         settings {
             styleClass.add("progress-bar-ui")
@@ -933,6 +985,21 @@ class SliderBuilder : RegionBaseBuilder<Slider>() {
     fun snapToTicks(snap: Boolean = true) {
         settings { isSnapToTicks = snap }
     }
+
+    // 响应式观察
+    fun <T> observeValue(state: ObservableValue<T>, block: (T) -> Double) = settings {
+        val binding = Bindings.createDoubleBinding({ block(state.value) }, state)
+        valueProperty().bind(binding)
+    }
+
+    // 数据绑定
+    fun byBindValue(property: DoubleProperty) = settings { property.bind(valueProperty()) }
+
+    fun bindValue(property: DoubleProperty) = settings { valueProperty().bind(property) }
+
+    fun addValueListener(listener: ChangeListener<Number>) = settings { valueProperty().addListener(listener) }
+
+    fun removeValueListener(listener: ChangeListener<Number>) = settings { valueProperty().removeListener(listener) }
 
     override fun style(styleColor: StyleColor, styleSize: StyleSize) {
         settings {
@@ -1019,6 +1086,12 @@ open class SwitchBuilder : RegionBaseBuilder<Switch>() {
     fun size(size: Double) = settings { this.size = size }
 
     fun loading(loading: Boolean) = settings { this.isLoading = loading }
+
+    // 响应式观察
+    fun <T> observeStatus(state: ObservableValue<T>, block: (T) -> Boolean) = settings {
+        val binding = Bindings.createBooleanBinding({ block(state.value) }, state)
+        statusProperty().bind(binding)
+    }
 
     // 数据绑定
     fun byBindStatus(property: BooleanProperty) {
