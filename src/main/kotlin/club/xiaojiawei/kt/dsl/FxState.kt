@@ -25,17 +25,21 @@ import kotlin.reflect.KProperty
 /**
  * FxState 公共接口，用于 observe 统一接受不同类型的 State
  */
-interface FxStateBase {
-    fun observableValue(): ObservableValue<*>
+abstract class FxStateBase<T> {
+    abstract fun observableValue(): Property<T>
+    open fun value(): T = observableValue().value
+    override fun toString(): String = value().toString()
 }
 
-class FxState<T>(initial: T) : FxStateBase {
+class FxState<T>(initial: T) : FxStateBase<T>() {
 
     private val property = SimpleObjectProperty(initial)
 
     fun property(): ObjectProperty<T> = property
 
-    override fun observableValue(): ObservableValue<*> = property
+    override fun observableValue(): Property<T> = property
+
+    override fun value(): T = property.value
 
     operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
         return this.property.get()
@@ -46,13 +50,15 @@ class FxState<T>(initial: T) : FxStateBase {
     }
 }
 
-class FxIntState(initial: Int) : FxStateBase {
+class FxIntState(initial: Int) : FxStateBase<Number>() {
 
     private val property = SimpleIntegerProperty(initial)
 
     fun property(): IntegerProperty = property
 
-    override fun observableValue(): ObservableValue<*> = property
+    override fun observableValue(): Property<Number> = property
+
+    override fun value(): Int = property.value
 
     operator fun getValue(thisRef: Any?, property: KProperty<*>): Int {
         return this.property.get()
@@ -61,15 +67,27 @@ class FxIntState(initial: Int) : FxStateBase {
     operator fun setValue(thisRef: Any?, property: KProperty<*>, value: Int) {
         this.property.set(value)
     }
+
+    operator fun inc(): FxIntState {
+        property.set(property.get() + 1)
+        return this
+    }
+
+    operator fun dec(): FxIntState {
+        property.set(property.get() - 1)
+        return this
+    }
 }
 
-class FxDoubleState(initial: Double) : FxStateBase {
+class FxDoubleState(initial: Double) : FxStateBase<Number>() {
 
     private val property = SimpleDoubleProperty(initial)
 
     fun property(): DoubleProperty = property
 
-    override fun observableValue(): ObservableValue<*> = property
+    override fun observableValue(): Property<Number> = property
+
+    override fun value(): Double = property.value
 
     operator fun getValue(thisRef: Any?, property: KProperty<*>): Double {
         return this.property.get()
@@ -80,13 +98,15 @@ class FxDoubleState(initial: Double) : FxStateBase {
     }
 }
 
-class FxBooleanState(initial: Boolean) : FxStateBase {
+class FxBooleanState(initial: Boolean) : FxStateBase<Boolean>() {
 
     private val property = SimpleBooleanProperty(initial)
 
     fun property(): BooleanProperty = property
 
-    override fun observableValue(): ObservableValue<*> = property
+    override fun observableValue(): Property<Boolean> = property
+
+    override fun value(): Boolean = property.value
 
     operator fun getValue(thisRef: Any?, property: KProperty<*>): Boolean {
         return this.property.get()
@@ -97,13 +117,15 @@ class FxBooleanState(initial: Boolean) : FxStateBase {
     }
 }
 
-class FxStringState(initial: String) : FxStateBase {
+class FxStringState(initial: String) : FxStateBase<String>() {
 
     private val property = SimpleStringProperty(initial)
 
     fun property(): StringProperty = property
 
-    override fun observableValue(): ObservableValue<*> = property
+    override fun observableValue(): Property<String> = property
+
+    override fun value(): String = property.value
 
     operator fun getValue(thisRef: Any?, property: KProperty<*>): String {
         return this.property.get()
@@ -114,13 +136,15 @@ class FxStringState(initial: String) : FxStateBase {
     }
 }
 
-class FxLongState(initial: Long) : FxStateBase {
+class FxLongState(initial: Long) : FxStateBase<Number>() {
 
     private val property = SimpleLongProperty(initial)
 
     fun property(): LongProperty = property
 
-    override fun observableValue(): ObservableValue<*> = property
+    override fun observableValue(): Property<Number> = property
+
+    override fun value(): Long = property.value
 
     operator fun getValue(thisRef: Any?, property: KProperty<*>): Long {
         return this.property.get()
@@ -175,7 +199,7 @@ fun <T> TextInputControl.observe(state: FxState<T>, block: (T) -> String) {
 
 // --- 多个 State 观察，block 通过闭包捕获值 ---
 
-fun Labeled.observe(vararg states: FxStateBase, block: () -> String) {
+fun Labeled.observe(vararg states: FxStateBase<*>, block: () -> String) {
     val binding = Bindings.createStringBinding(
         { block() },
         *states.map { it.observableValue() }.toTypedArray()
@@ -183,7 +207,7 @@ fun Labeled.observe(vararg states: FxStateBase, block: () -> String) {
     textProperty().bind(binding)
 }
 
-fun Text.observe(vararg states: FxStateBase, block: () -> String) {
+fun Text.observe(vararg states: FxStateBase<*>, block: () -> String) {
     val binding = Bindings.createStringBinding(
         { block() },
         *states.map { it.observableValue() }.toTypedArray()
@@ -191,10 +215,20 @@ fun Text.observe(vararg states: FxStateBase, block: () -> String) {
     textProperty().bind(binding)
 }
 
-fun TextInputControl.observe(vararg states: FxStateBase, block: () -> String) {
+fun TextInputControl.observe(vararg states: FxStateBase<*>, block: () -> String) {
     val binding = Bindings.createStringBinding(
         { block() },
         *states.map { it.observableValue() }.toTypedArray()
     )
     textProperty().bind(binding)
+}
+
+
+fun main() {
+    var secondsState = FxIntState(0)
+    println(secondsState.property().get())
+    secondsState++
+    println(secondsState.property().get())
+    secondsState--
+    println(secondsState.property().get())
 }

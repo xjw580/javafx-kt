@@ -188,7 +188,7 @@ abstract class LabeledBuilder<T : Labeled> : RegionBaseBuilder<T>() {
     /**
      * 观察多个 FxState，任一 state 值变化时自动更新 text
      */
-    fun observes(vararg states: FxStateBase, block: () -> String) = settings {
+    fun observes(vararg states: FxStateBase<*>, block: () -> String) = settings {
         observe(*states, block = block)
     }
 
@@ -289,7 +289,7 @@ class TextBuilder : NodeBuilder<Text>() {
         observe(state, block)
     }
 
-    fun observe(vararg states: FxStateBase, block: () -> String) = settings {
+    fun observe(vararg states: FxStateBase<*>, block: () -> String) = settings {
         observe(*states, block = block)
     }
 
@@ -406,7 +406,7 @@ class TextFieldBuilder : RegionBaseBuilder<TextField>() {
         observe(state, block)
     }
 
-    fun observe(vararg states: FxStateBase, block: () -> String) = settings {
+    fun observe(vararg states: FxStateBase<*>, block: () -> String) = settings {
         observe(*states, block = block)
     }
 
