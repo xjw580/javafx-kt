@@ -104,8 +104,6 @@ abstract class NodeBuilder<T : Node> : DslBuilder<T>() {
     fun onDragDropped(h: EventHandler<DragEvent>?) = settings { onDragDropped = h }
     fun onScroll(h: EventHandler<ScrollEvent>?) = settings { onScroll = h }
 
-    // --- 自由配置 ---
-    fun configure(block: T.() -> Unit) = settings(block)
 }
 
 @FXMarker
@@ -194,6 +192,15 @@ abstract class LabeledBuilder<T : Labeled> : RegionBaseBuilder<T>() {
         val binding = Bindings.createStringBinding({ block() }, *states)
         textProperty().bind(binding)
     }
+
+    // 数据绑定
+    fun byBindText(property: StringProperty) = settings { property.bind(textProperty()) }
+
+    fun bindText(property: StringProperty) = settings { textProperty().bind(property) }
+
+    fun bindBidirectionalText(property: StringProperty) = settings { textProperty().bindBidirectional(property) }
+
+    fun byBindBidirectionalText(property: StringProperty) = settings { property.bindBidirectional(textProperty()) }
 
     fun font(font: Font) = settings { this.font = font }
 
@@ -297,6 +304,15 @@ class TextBuilder : NodeBuilder<Text>() {
         val binding = Bindings.createStringBinding({ block() }, *states)
         textProperty().bind(binding)
     }
+
+    // 数据绑定
+    fun byBindText(property: StringProperty) = settings { property.bind(textProperty()) }
+
+    fun bindText(property: StringProperty) = settings { textProperty().bind(property) }
+
+    fun bindBidirectionalText(property: StringProperty) = settings { textProperty().bindBidirectional(property) }
+
+    fun byBindBidirectionalText(property: StringProperty) = settings { property.bindBidirectional(textProperty()) }
 
 }
 

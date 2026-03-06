@@ -58,7 +58,7 @@ fun main() {
                 // 示例4：输入框修改 Property + 观察
                 addTextField {
                     text("世界")
-                    configure {
+                    settings {
                         textProperty().addListener { _, _, newVal ->
                             name = newVal
                         }
