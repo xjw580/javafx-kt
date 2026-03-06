@@ -178,6 +178,20 @@ abstract class LabeledBuilder<T : Labeled> : RegionBaseBuilder<T>() {
 
     operator fun String.unaryPlus() = text(this)
 
+    /**
+     * 观察单个 FxState，state 值变化时自动更新 text
+     */
+    fun <S> observe(state: FxState<S>, block: (S) -> String) = settings {
+        observe(state, block)
+    }
+
+    /**
+     * 观察多个 FxState，任一 state 值变化时自动更新 text
+     */
+    fun observe(vararg states: FxStateBase, block: () -> String) = settings {
+        observe(*states, block = block)
+    }
+
     fun font(font: Font) = settings { this.font = font }
 
     fun font(family: String, size: Double) {
@@ -270,6 +284,14 @@ class TextBuilder : NodeBuilder<Text>() {
     fun text(text: String) = settings { this.text = text }
 
     operator fun String.unaryPlus() = text(this)
+
+    fun <S> observe(state: FxState<S>, block: (S) -> String) = settings {
+        observe(state, block)
+    }
+
+    fun observe(vararg states: FxStateBase, block: () -> String) = settings {
+        observe(*states, block = block)
+    }
 
 }
 
@@ -379,6 +401,14 @@ class TextFieldBuilder : RegionBaseBuilder<TextField>() {
     }
 
     operator fun String.unaryPlus() = text(this)
+
+    fun <S> observe(state: FxState<S>, block: (S) -> String) = settings {
+        observe(state, block)
+    }
+
+    fun observe(vararg states: FxStateBase, block: () -> String) = settings {
+        observe(*states, block = block)
+    }
 
     fun promptText(prompt: String) {
         settings { promptText = prompt }

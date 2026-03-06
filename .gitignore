@@ -39,3 +39,4 @@ build/
 ### Custom ###
 *.exe
 /easy-release_static/
+/.claude
