@@ -25,20 +25,23 @@ import javafx.scene.text.Text
 
 // ======================== observe 扩展函数 ========================
 
-// --- 单个 Property 观察，block 通过闭包捕获值 ---
+// --- 单个 Property 观察，block 接收当前值 ---
 
-fun Labeled.observe(state: ObservableValue<*>, block: () -> String) {
-    val binding = Bindings.createStringBinding({ block() }, state)
+@Suppress("UNCHECKED_CAST")
+fun <T> Labeled.observe(state: ObservableValue<T>, block: (T) -> String) {
+    val binding = Bindings.createStringBinding({ block(state.value) }, state)
     textProperty().bind(binding)
 }
 
-fun Text.observe(state: ObservableValue<*>, block: () -> String) {
-    val binding = Bindings.createStringBinding({ block() }, state)
+@Suppress("UNCHECKED_CAST")
+fun <T> Text.observe(state: ObservableValue<T>, block: (T) -> String) {
+    val binding = Bindings.createStringBinding({ block(state.value) }, state)
     textProperty().bind(binding)
 }
 
-fun TextInputControl.observe(state: ObservableValue<*>, block: () -> String) {
-    val binding = Bindings.createStringBinding({ block() }, state)
+@Suppress("UNCHECKED_CAST")
+fun <T> TextInputControl.observe(state: ObservableValue<T>, block: (T) -> String) {
+    val binding = Bindings.createStringBinding({ block(state.value) }, state)
     textProperty().bind(binding)
 }
 

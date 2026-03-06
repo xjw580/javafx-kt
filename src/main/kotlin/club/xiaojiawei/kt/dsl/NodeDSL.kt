@@ -182,8 +182,8 @@ abstract class LabeledBuilder<T : Labeled> : RegionBaseBuilder<T>() {
     /**
      * 观察单个 Property，值变化时自动更新 text
      */
-    fun observe(state: ObservableValue<*>, block: () -> String) = settings {
-        val binding = Bindings.createStringBinding({ block() }, state)
+    fun <T> observe(state: ObservableValue<T>, block: (T) -> String) = settings {
+        val binding = Bindings.createStringBinding({ block(state.value) }, state)
         textProperty().bind(binding)
     }
 
@@ -288,8 +288,8 @@ class TextBuilder : NodeBuilder<Text>() {
 
     operator fun String.unaryPlus() = text(this)
 
-    fun observe(state: ObservableValue<*>, block: () -> String) = settings {
-        val binding = Bindings.createStringBinding({ block() }, state)
+    fun <T> observe(state: ObservableValue<T>, block: (T) -> String) = settings {
+        val binding = Bindings.createStringBinding({ block(state.value) }, state)
         textProperty().bind(binding)
     }
 
@@ -407,8 +407,8 @@ class TextFieldBuilder : RegionBaseBuilder<TextField>() {
 
     operator fun String.unaryPlus() = text(this)
 
-    fun observe(state: ObservableValue<*>, block: () -> String) = settings {
-        val binding = Bindings.createStringBinding({ block() }, state)
+    fun <T> observe(state: ObservableValue<T>, block: (T) -> String) = settings {
+        val binding = Bindings.createStringBinding({ block(state.value) }, state)
         textProperty().bind(binding)
     }
 

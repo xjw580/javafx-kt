@@ -37,15 +37,15 @@ fun main() {
                 padding(20.0)
                 alignCenter()
 
-                // 示例1：单 Property 观察
+                // 示例1：单 Property 观察，block 接收当前值
                 addLabel {
-                    configure { observe(secondsProperty) { "⏱ 已运行 $seconds 秒" } }
+                    observe(secondsProperty) { "⏱ 已运行 $it 秒" }
                     fontSize(20.0)
                 }
 
                 // 示例2：多 Property 观察
                 addLabel {
-                    configure { observes(secondsProperty, clickProperty) { "⏱ $seconds 秒 | 🖱 点击 $clickCount 次" } }
+                    observes(secondsProperty, clickProperty) { "⏱ $seconds 秒 | 🖱 点击 $clickCount 次" }
                     fontSize(16.0)
                 }
 
@@ -66,16 +66,14 @@ fun main() {
                 }
 
                 addLabel {
-                    configure { observe(nameProperty) { "你好，$name！" } }
+                    observe(nameProperty) { "你好，$it！" }
                     fontSize(18.0)
                 }
 
                 // 示例5：多 Property 组合观察
                 addLabel {
-                    configure {
-                        observes(secondsProperty, clickProperty, nameProperty) {
-                            "📊 $name 已运行 $seconds 秒，点击了 $clickCount 次"
-                        }
+                    observes(secondsProperty, clickProperty, nameProperty) {
+                        "📊 $name 已运行 $seconds 秒，点击了 $clickCount 次"
                     }
                     fontSize(14.0)
                 }
@@ -92,7 +90,7 @@ fun main() {
                 }
 
                 addLabel {
-                    configure { observe(colorProperty) { "当前颜色: $color" } }
+                    observe(colorProperty) { "当前颜色: $it" }
                     fontSize(16.0)
                 }
             }
