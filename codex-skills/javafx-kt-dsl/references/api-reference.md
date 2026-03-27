@@ -22,7 +22,7 @@
 
 ## 布局与节点辅助
 
-- `add(...)`、`addAll(...)`
+- `addXXX{}`、`add(...)`、`addAll(...)`
 - `+node`、`+"文本"`
 - `padding(...)`、`size(...)`、`fixedSize(...)`
 - `background(...)`、`border(...)`

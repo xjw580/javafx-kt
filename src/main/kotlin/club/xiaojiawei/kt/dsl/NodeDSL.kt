@@ -216,6 +216,14 @@ abstract class LabeledBuilder<T : Labeled> : RegionBaseBuilder<T>() {
         settings { font = Font.font(size) }
     }
 
+    fun textFill(color: String) = settings {
+        textFill = Color.web(color)
+    }
+
+    fun textFill(color: Paint) = settings {
+        textFill = color
+    }
+
     fun alignment(alignment: Pos) = settings { this.alignment = alignment }
     fun alignCenter() = alignment(Pos.CENTER)
     fun alignTop() = alignment(Pos.TOP_CENTER)
@@ -673,9 +681,11 @@ class RadioButtonBuilder : LabeledBuilder<RadioButton>() {
 
     fun bindSelected(property: BooleanProperty) = settings { selectedProperty().bind(property) }
 
-    fun bindBidirectionalSelected(property: BooleanProperty) = settings { selectedProperty().bindBidirectional(property) }
+    fun bindBidirectionalSelected(property: BooleanProperty) =
+        settings { selectedProperty().bindBidirectional(property) }
 
-    fun byBindBidirectionalSelected(property: BooleanProperty) = settings { property.bindBidirectional(selectedProperty()) }
+    fun byBindBidirectionalSelected(property: BooleanProperty) =
+        settings { property.bindBidirectional(selectedProperty()) }
 
     override fun style(styleColor: StyleColor, styleSize: StyleSize) {
         settings {
