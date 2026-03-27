@@ -1,0 +1,7 @@
+interface:
+  display_name: "JavaFX Kotlin DSL"
+  short_description: "Kotlin JavaFX DSL 调用指南"
+  default_prompt: "Use $javafx-kt-dsl to generate or edit Kotlin JavaFX UI code with the repository's DSL conventions."
+
+policy:
+  allow_implicit_invocation: true
