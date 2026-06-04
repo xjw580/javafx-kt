@@ -13,6 +13,10 @@ class StyleBuilder {
     private val styles = mutableMapOf<String, String>()
 
     // 背景相关
+    fun background(background: String) {
+        styles["-fx-background"] = background
+    }
+
     fun backgroundColor(color: String) {
         styles["-fx-background-color"] = color
     }

@@ -852,8 +852,8 @@ class ScrollPaneBuilder : DslBuilder<ScrollPane>() {
         content = node
     }
 
-    fun content(builder: NodeBuilder<*>) = settings {
-        content = builder.build()
+    fun content(builder: () -> Node) = settings {
+        content = builder()
     }
 
     fun fitToWidth(fit: Boolean = true) = settings {
@@ -899,6 +899,8 @@ class ScrollPaneBuilder : DslBuilder<ScrollPane>() {
     fun vmax(max: Double) = settings {
         vmax = max
     }
+
+    fun styled(block: StyleBuilder.() -> Unit) = settings { this.styled(block) }
 }
 
 // ======================== SplitPane ========================

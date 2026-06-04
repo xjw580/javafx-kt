@@ -1,8 +1,11 @@
 package club.xiaojiawei.kt.dsl.examples
 
+import club.xiaojiawei.kt.controls.messageBox
 import club.xiaojiawei.kt.dsl.*
 import javafx.application.Application
 import javafx.geometry.Pos
+import javafx.scene.Node
+import javafx.scene.Parent
 import javafx.scene.Scene
 import javafx.scene.layout.Priority
 import javafx.scene.layout.StackPane
@@ -325,78 +328,136 @@ internal class DSLExamples : Application() {
         add(split)
     }
 
+    // 示例8：MessageBox使用
+    private fun messageBoxExample(node: Node) = vbox {
+        spacing(10.0)
+        padding(20.0)
+        alignCenter()
+
+        addButton("显示简单消息框") {
+            onClick {
+                messageBox(node.scene.root) {
+                    this.heading("操作提示")
+                    this.content("这是一条简单的提示消息。")
+                    this.okButton { println("点击了确认") }
+                }.show()
+            }
+        }
+
+        addButton("显示确认对话框") {
+            onClick {
+                messageBox(node.scene.root) {
+                    this.heading("删除确认")
+                    this.content("确定要删除选中的文件吗？此操作不可撤销。")
+                    this.maskClosable(true)
+                    this.okButton("确定删除") {
+                        println("执行删除操作")
+                    }
+                    this.cancelButton("我再想想") {
+                        println("取消删除")
+                    }
+                }.show()
+            }
+        }
+
+        addButton("显示自定义内容消息框") {
+            onClick {
+                messageBox(node.scene.root) {
+                    this.heading("自定义内容")
+                    this.content(hbox {
+                        spacing(10.0)
+                        alignCenter()
+                        addLabel("状态：")
+                        addLabel("正在运行") {
+                            styled { textFill("green"); fontWeight(club.xiaojiawei.kt.dsl.FontWeight.BOLD) }
+                        }
+                    })
+                    this.button("关闭") {
+                        onAction {
+                            println("对话框已关闭")
+                        }
+                    }
+                }.show()
+            }
+        }
+    }
+
     // 主视图 - 集成所有示例
-    private fun createMainView() = borderPane {
-        size(800.0, 600.0)
-
-        // 顶部标题
-        topNode(hbox {
-            padding(10.0)
-            background("#2c3e50")
-            alignCenter()
-            addLabel("JavaFX Kotlin DSL 框架示例") {
-                styled {
-                    textFill("white")
-                    fontSize(20.0)
-                    fontWeight(FontWeight.BOLD)
-                }
-            }
-        })
-
+    private fun createMainView(): Parent {
         val contentPane = StackPane()
-        // 左侧导航
-        leftNode(vbox {
-            spacing(5.0)
-            padding(10.0)
-            prefWidth(150.0)
-            background("#34495e")
 
-            val demos = listOf(
-                "布局约束" to ::constraintsExample,
-                "属性绑定" to ::bindingExample,
-                "动画效果" to ::animationExample,
-                "事件处理" to ::eventExample,
-                "快捷键" to ::shortcutExample,
-                "样式DSL" to ::styleExample,
-                "其他面板" to ::morePanesExample
-            )
+        return borderPane {
+            size(800.0, 600.0)
 
-
-
-            demos.forEach { (name, builder) ->
-                addButton(name) {
-                    prefWidth(Double.MAX_VALUE)
+            // 顶部标题
+            topNode(hbox {
+                padding(10.0)
+                background("#2c3e50")
+                alignCenter()
+                addLabel("JavaFX Kotlin DSL 框架示例") {
                     styled {
-                        backgroundColor("#95a5a6")
                         textFill("white")
-                    }
-                    onClick {
-                        contentPane.children.clear()
-                        contentPane.children.add(builder())
+                        fontSize(20.0)
+                        fontWeight(club.xiaojiawei.kt.dsl.FontWeight.BOLD)
                     }
                 }
-            }
-        })
+            })
 
-        // 中间内容区
-        centerNode(stackPane {
-            padding(20.0)
-            addLabel("选择左侧菜单查看示例") {
-                styled {
-                    fontSize(18.0)
-                    textFill("#7f8c8d")
+            // 左侧导航
+            leftNode(vbox {
+                spacing(5.0)
+                padding(10.0)
+                prefWidth(150.0)
+                background("#34495e")
+
+                val demos = listOf(
+                    "布局约束" to { constraintsExample() },
+                    "属性绑定" to { bindingExample() },
+                    "动画效果" to { animationExample() },
+                    "事件处理" to { eventExample() },
+                    "快捷键" to { shortcutExample() },
+                    "样式DSL" to { styleExample() },
+                    "其他面板" to { morePanesExample() },
+                    "消息对话框" to { messageBoxExample(contentPane) }
+                )
+
+
+
+                demos.forEach { (name, builder) ->
+                    addButton(name) {
+                        prefWidth(Double.MAX_VALUE)
+                        styled {
+                            backgroundColor("#95a5a6")
+                            textFill("white")
+                        }
+                        onClick {
+                            contentPane.children.clear()
+                            contentPane.children.add(builder())
+                        }
+                    }
                 }
-            }
-            add(contentPane)
-        })
+            })
 
-        // 底部状态栏
-        bottomNode(hbox {
-            padding(5.0)
-            background("#ecf0f1")
-            alignCenter()
-            addLabel("JavaFX Kotlin DSL - 现代化的UI开发框架")
-        })
+            // 中间内容区
+            centerNode(stackPane {
+                padding(20.0)
+                addLabel("选择左侧菜单查看示例") {
+                    styled {
+                        fontSize(18.0)
+                        textFill("#7f8c8d")
+                    }
+                }
+                add(contentPane)
+            })
+
+            // 底部状态栏
+            bottomNode(hbox {
+                padding(5.0)
+                background("#ecf0f1")
+                alignCenter()
+                addLabel("JavaFX Kotlin DSL - 现代化的UI开发框架")
+            })
+        }
     }
 }
 

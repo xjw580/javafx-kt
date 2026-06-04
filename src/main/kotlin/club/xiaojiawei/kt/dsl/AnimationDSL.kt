@@ -184,9 +184,14 @@ class PathAnimationBuilder : AnimationBuilder() {
 class SequentialAnimationBuilder {
 
     private val animations = mutableListOf<Animation>()
+    private var onFinished: EventHandler<ActionEvent>? = null
 
     fun add(animation: Animation) {
         animations.add(animation)
+    }
+
+    fun onFinished(handler: (ActionEvent) -> Unit) {
+        onFinished = EventHandler(handler)
     }
 
     fun fadeIn(node: Node, duration: Double = 300.0) {
@@ -208,7 +213,9 @@ class SequentialAnimationBuilder {
     }
 
     fun build(): SequentialTransition {
-        return SequentialTransition(*animations.toTypedArray())
+        return SequentialTransition(*animations.toTypedArray()).apply {
+            onFinished?.let { this.onFinished = it }
+        }
     }
 }
 
@@ -217,9 +224,14 @@ class SequentialAnimationBuilder {
 class ParallelAnimationBuilder {
 
     private val animations = mutableListOf<Animation>()
+    private var onFinished: EventHandler<ActionEvent>? = null
 
     fun add(animation: Animation) {
         animations.add(animation)
+    }
+
+    fun onFinished(handler: (ActionEvent) -> Unit) {
+        onFinished = EventHandler(handler)
     }
 
     fun fadeIn(node: Node, duration: Double = 300.0) {
@@ -241,7 +253,9 @@ class ParallelAnimationBuilder {
     }
 
     fun build(): ParallelTransition {
-        return ParallelTransition(*animations.toTypedArray())
+        return ParallelTransition(*animations.toTypedArray()).apply {
+            this@ParallelAnimationBuilder.onFinished?.let { this.onFinished = it }
+        }
     }
 }
 

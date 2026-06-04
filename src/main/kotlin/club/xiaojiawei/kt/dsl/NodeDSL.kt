@@ -1039,6 +1039,11 @@ class ImageViewBuilder : NodeBuilder<ImageView>() {
         }
     }
 
+    fun bindFitWidth(p: ObservableValue<out Number>) = settings { fitWidthProperty().bind(p) }
+    fun bindFitHeight(p: ObservableValue<out Number>) = settings { fitHeightProperty().bind(p) }
+    fun byBindFitWidth(p: DoubleProperty) = settings { p.bind(fitWidthProperty()) }
+    fun byBindFitHeight(p: DoubleProperty) = settings { p.bind(fitHeightProperty()) }
+
     fun preserveRatio(preserve: Boolean = true) {
         settings { isPreserveRatio = preserve }
     }
