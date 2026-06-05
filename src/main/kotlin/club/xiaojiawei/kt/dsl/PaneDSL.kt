@@ -90,12 +90,6 @@ abstract class PaneBaseBuilder<T : Pane> : RegionBaseBuilder<T>() {
         }
     }
 
-    fun styled(styleBuilder: StyleBuilder) {
-        settings {
-            style = styleBuilder.build()
-        }
-    }
-
     fun addRegion() {
         add {
             Region()
@@ -353,6 +347,13 @@ abstract class PaneBaseBuilder<T : Pane> : RegionBaseBuilder<T>() {
         setMode(this@PaneBaseBuilder.buildMode)
         config()
     })
+
+    inline fun addScrollPane(crossinline config: (ScrollPaneBuilder.() -> Unit) = {}) = settings {
+        children.add(ScrollPaneBuilder().apply {
+            setMode(this@PaneBaseBuilder.buildMode)
+            config()
+        }.build())
+    }
 
 }
 

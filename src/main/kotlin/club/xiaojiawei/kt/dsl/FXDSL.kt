@@ -670,6 +670,7 @@ abstract class DslBuilder<T>(
      */
     open fun build(): T {
         val t = if (buildMode == BuildMode.IMMEDIATE) {
+            builders.clear()
             instance()
         } else {
             instance().apply {
@@ -677,7 +678,6 @@ abstract class DslBuilder<T>(
             }
         }
         instanceInner = null
-        builders.clear()
         return t
     }
 
@@ -686,8 +686,8 @@ abstract class DslBuilder<T>(
      */
     open fun config(t: T) {
         if (buildMode == BuildMode.DELAY) {
-            t.apply {
-                builders.forEach { it() }
+            for (function in builders) {
+                t.function()
             }
         }
     }
@@ -704,7 +704,7 @@ abstract class DslBuilder<T>(
     }
 
     enum class BuildMode {
-        IMMEDIATE,  // 立即模式
-        DELAY       // 延迟模式
+        IMMEDIATE,  // 立即模式，即时配置
+        DELAY       // 延迟模式，可以重复利用
     }
 }

@@ -1,15 +1,12 @@
 package club.xiaojiawei.kt.dsl.examples
 
-import club.xiaojiawei.kt.controls.messageBox
+import club.xiaojiawei.kt.controls.messageModal
 import club.xiaojiawei.kt.dsl.*
 import javafx.application.Application
-import javafx.geometry.Pos
 import javafx.scene.Node
 import javafx.scene.Parent
 import javafx.scene.Scene
-import javafx.scene.layout.Priority
 import javafx.scene.layout.StackPane
-import javafx.scene.paint.Color
 import javafx.stage.Stage
 
 /**
@@ -112,7 +109,7 @@ internal class DSLExamples : Application() {
 
         addButton("缩放") {
             onClick {
-                box.scaleAnimation {
+                box.scaleTransition {
                     duration(300.0)
                     from(1.0)
                     to(1.5)
@@ -124,7 +121,7 @@ internal class DSLExamples : Application() {
 
         addButton("旋转") {
             onClick {
-                box.rotateAnimation {
+                box.rotateTransition {
                     duration(500.0)
                     to(360.0)
                 }.play()
@@ -145,12 +142,12 @@ internal class DSLExamples : Application() {
 
         addButton("组合动画") {
             onClick {
-                parallelAnimation {
-                    add(box.fadeAnimation {
+                parallelTransition {
+                    add(box.fadeTransition {
                         duration(500.0)
                         to(0.5)
                     })
-                    add(box.scaleAnimation {
+                    add(box.scaleTransition {
                         duration(500.0)
                         to(1.5)
                     })
@@ -336,7 +333,7 @@ internal class DSLExamples : Application() {
 
         addButton("显示简单消息框") {
             onClick {
-                messageBox(node.scene.root) {
+                messageModal(node.scene.root) {
                     this.heading("操作提示")
                     this.content("这是一条简单的提示消息。")
                     this.okButton { println("点击了确认") }
@@ -346,7 +343,7 @@ internal class DSLExamples : Application() {
 
         addButton("显示确认对话框") {
             onClick {
-                messageBox(node.scene.root) {
+                messageModal(node.scene.root) {
                     this.heading("删除确认")
                     this.content("确定要删除选中的文件吗？此操作不可撤销。")
                     this.maskClosable(true)
@@ -362,7 +359,7 @@ internal class DSLExamples : Application() {
 
         addButton("显示自定义内容消息框") {
             onClick {
-                messageBox(node.scene.root) {
+                messageModal(node.scene.root) {
                     this.heading("自定义内容")
                     this.content(hbox {
                         spacing(10.0)

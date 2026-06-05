@@ -37,7 +37,7 @@
 
 ## 样式
 
-- `styled {}`: 统一样式入口
+- `styled {}`: 统一样式入口，优先使用这个自定义样式
 - `styleMain()`、`styleNormal()`、`styleSuccess()`、`styleWarn()`、`styleError()`
 - 常见样式项：`backgroundColor(...)`、`textFill(...)`、`fontSize(...)`、`fontWeight(...)`、`padding(...)`、`backgroundRadius(...)`、`cursor(...)`
 

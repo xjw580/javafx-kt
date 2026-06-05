@@ -23,10 +23,10 @@ import javafx.stage.Stage
 import javafx.stage.StageStyle
 
 /**
- * 消息对话框 (DSL 风格，替代原 Java 版 Modal)
+ * 消息模态框
  * @author 肖嘉威
  */
-class MessageBox(val baseParent: Parent) {
+class MessageModal(val baseParent: Parent) {
 
     private val stage = Stage().apply {
         initStyle(StageStyle.TRANSPARENT)
@@ -121,16 +121,16 @@ class MessageBox(val baseParent: Parent) {
             initSize()
             stage.show()
 
-            parallelAnimation {
+            parallelTransition {
                 rootPane?.let {
-                    add(it.fadeAnimation {
+                    add(it.fadeTransition {
                         from(0.0)
                         to(1.0)
                         duration(200.0)
                     })
                 }
                 topPane?.let {
-                    add(it.translateAnimation {
+                    add(it.translateTransition {
                         from(0.0, 25.0)
                         to(0.0, 0.0)
                         duration(200.0)
@@ -148,16 +148,18 @@ class MessageBox(val baseParent: Parent) {
         isClosing = true
 
         val duration = 150.0
-        parallelAnimation {
+        parallelTransition {
             rootPane?.let {
-                add(it.fadeAnimation {
-                    from(1.0)
-                    to(0.0)
-                    duration(duration)
-                })
+                add {
+                    it.fadeTransition {
+                        from(1.0)
+                        to(0.0)
+                        duration(duration)
+                    }
+                }
             }
             topPane?.let {
-                add(it.translateAnimation {
+                add(it.translateTransition {
                     from(0.0, 0.0)
                     to(0.0, -25.0)
                     duration(duration)
@@ -175,12 +177,12 @@ class MessageBox(val baseParent: Parent) {
 }
 
 @FXMarker
-class MessageBoxBuilder(val baseParent: Parent) : DslBuilder<MessageBox>() {
+class MessageModalBuilder(val baseParent: Parent) : DslBuilder<MessageModal>() {
     private var headingText: String? = null
     private var contentObj: Any? = null
     private val buttonBuilders = mutableListOf<ButtonBuilder>()
 
-    override fun buildInstance(): MessageBox = MessageBox(baseParent)
+    override fun buildInstance(): MessageModal = MessageModal(baseParent)
 
     fun heading(text: String) {
         this.headingText = text
@@ -230,11 +232,11 @@ class MessageBoxBuilder(val baseParent: Parent) : DslBuilder<MessageBox>() {
         }
     }
 
-    override fun build(): MessageBox {
+    override fun build(): MessageModal {
         val messageBox = super.build()
 
         val vBox = VBox().apply {
-            prefWidth = Math.min(350.0, baseParent.scene.width - 10)
+            prefWidth = 350.0.coerceAtMost(baseParent.scene.width - 10)
             maxHeight = baseParent.scene.height - 10
             spacing = 20.0
             padding = Insets(20.0)
@@ -290,6 +292,6 @@ class MessageBoxBuilder(val baseParent: Parent) : DslBuilder<MessageBox>() {
     }
 }
 
-inline fun messageBox(baseParent: Parent, block: MessageBoxBuilder.() -> Unit): MessageBox {
-    return MessageBoxBuilder(baseParent).apply(block).build()
+inline fun messageModal(baseParent: Parent, block: MessageModalBuilder.() -> Unit): MessageModal {
+    return MessageModalBuilder(baseParent).apply(block).build()
 }
