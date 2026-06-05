@@ -27,7 +27,7 @@ import javafx.stage.StageStyle
  * 消息模态框
  * @author 肖嘉威
  */
-class MessageModal(val baseParent: Parent) {
+class MessageDialog(val baseParent: Parent) {
 
     private val stage = Stage().apply {
         initStyle(StageStyle.TRANSPARENT)
@@ -173,12 +173,12 @@ class MessageModal(val baseParent: Parent) {
 }
 
 @FXMarker
-class MessageModalBuilder(val baseParent: Parent) : DslBuilder<MessageModal>() {
+class MessageDialogBuilder(val baseParent: Parent) : DslBuilder<MessageDialog>() {
     private var headingText: String? = null
     private var contentObj: Any? = null
     private val buttonBuilders = mutableListOf<ButtonBuilder>()
 
-    override fun buildInstance(): MessageModal = MessageModal(baseParent)
+    override fun buildInstance(): MessageDialog = MessageDialog(baseParent)
 
     fun heading(text: String) {
         this.headingText = text
@@ -228,7 +228,7 @@ class MessageModalBuilder(val baseParent: Parent) : DslBuilder<MessageModal>() {
         }
     }
 
-    override fun build(): MessageModal {
+    override fun build(): MessageDialog {
         val messageBox = super.build()
 
         val vBox = VBox().apply {
@@ -288,6 +288,6 @@ class MessageModalBuilder(val baseParent: Parent) : DslBuilder<MessageModal>() {
     }
 }
 
-inline fun messageModal(baseParent: Parent, block: MessageModalBuilder.() -> Unit): MessageModal {
-    return MessageModalBuilder(baseParent).apply(block).build()
+inline fun messageDialog(baseParent: Parent, block: MessageDialogBuilder.() -> Unit): MessageDialog {
+    return MessageDialogBuilder(baseParent).apply(block).build()
 }

@@ -1,6 +1,6 @@
 package club.xiaojiawei.kt.dsl.examples
 
-import club.xiaojiawei.kt.controls.messageModal
+import club.xiaojiawei.kt.controls.messageDialog
 import club.xiaojiawei.kt.dsl.*
 import javafx.application.Application
 import javafx.scene.Node
@@ -347,7 +347,7 @@ internal class DSLExamples : Application() {
 
         addButton("显示简单消息框") {
             onClick {
-                messageModal(node.scene.root) {
+                messageDialog(node.scene.root) {
                     this.heading("操作提示")
                     this.content("这是一条简单的提示消息。")
                     this.okButton { println("点击了确认") }
@@ -357,7 +357,7 @@ internal class DSLExamples : Application() {
 
         addButton("显示确认对话框") {
             onClick {
-                messageModal(node.scene.root) {
+                messageDialog(node.scene.root) {
                     this.heading("删除确认")
                     this.content("确定要删除选中的文件吗？此操作不可撤销。")
                     this.maskClosable(true)
@@ -373,7 +373,7 @@ internal class DSLExamples : Application() {
 
         addButton("显示自定义内容消息框") {
             onClick {
-                messageModal(node.scene.root) {
+                messageDialog(node.scene.root) {
                     this.heading("自定义内容")
                     this.content(hbox {
                         spacing(10.0)
