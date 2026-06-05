@@ -1,11 +1,9 @@
 package club.xiaojiawei.kt.dsl
 
+import club.xiaojiawei.kt.annotations.FXMarker
 import javafx.beans.property.BooleanProperty
 import javafx.beans.property.SimpleBooleanProperty
-import javafx.beans.property.StringProperty
-import javafx.scene.control.Control
 import javafx.scene.control.TextField
-import javafx.scene.control.TextInputControl
 
 /**
  * 表单验证DSL

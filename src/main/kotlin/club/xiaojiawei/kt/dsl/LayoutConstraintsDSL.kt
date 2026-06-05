@@ -1,5 +1,6 @@
 package club.xiaojiawei.kt.dsl
 
+import club.xiaojiawei.kt.annotations.FXMarker
 import javafx.geometry.HPos
 import javafx.geometry.VPos
 import javafx.scene.Node

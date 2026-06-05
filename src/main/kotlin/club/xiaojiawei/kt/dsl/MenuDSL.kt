@@ -1,6 +1,7 @@
 package club.xiaojiawei.kt.dsl
 
 import club.xiaojiawei.controls.ico.AbstractIco
+import club.xiaojiawei.kt.annotations.FXMarker
 import javafx.beans.value.ChangeListener
 import javafx.event.ActionEvent
 import javafx.event.EventHandler
@@ -205,4 +206,81 @@ class RadioMenuItemBuilder() : MenuItemBaseBuilder<RadioMenuItem>() {
             }
         }
     }
+}
+
+// ContextMenu 衍生
+inline fun contextMenu(config: ContextMenuBuilder.() -> Unit): ContextMenu {
+    return contextMenuBuilder(config).build()
+}
+
+inline fun contextMenuBuilder(config: ContextMenuBuilder.() -> Unit): ContextMenuBuilder {
+    return ContextMenuBuilder().apply(config)
+}
+
+inline fun ContextMenu.config(config: ContextMenuBuilder.() -> Unit): ContextMenu {
+    ContextMenuBuilder().apply(config).config(this)
+    return this
+}
+
+// MenuItem 衍生
+inline fun menuItem(config: MenuItemBuilder.() -> Unit): MenuItem {
+    return menuItemBuilder(config).build()
+}
+
+inline fun menuItem(text: String, config: MenuItemBuilder.() -> Unit = {}): MenuItem {
+    return menuItemBuilder {
+        text(text)
+        config()
+    }.build()
+}
+
+inline fun menuItemBuilder(config: MenuItemBuilder.() -> Unit): MenuItemBuilder {
+    return MenuItemBuilder().apply(config)
+}
+
+inline fun MenuItem.config(config: MenuItemBuilder.() -> Unit): MenuItem {
+    MenuItemBuilder().apply(config).config(this)
+    return this
+}
+
+// RadioMenuItem 衍生
+inline fun radioMenuItem(config: RadioMenuItemBuilder.() -> Unit): RadioMenuItem {
+    return radioMenuItemBuilder(config).build()
+}
+
+inline fun radioMenuItem(text: String, config: RadioMenuItemBuilder.() -> Unit = {}): RadioMenuItem {
+    return radioMenuItemBuilder {
+        text(text)
+        config()
+    }.build()
+}
+
+inline fun radioMenuItemBuilder(config: RadioMenuItemBuilder.() -> Unit): RadioMenuItemBuilder {
+    return RadioMenuItemBuilder().apply(config)
+}
+
+inline fun RadioMenuItem.config(config: RadioMenuItemBuilder.() -> Unit): RadioMenuItem {
+    RadioMenuItemBuilder().apply(config).config(this)
+    return this
+}
+
+// Menu 衍生
+inline fun menu(config: MenuBuilder.() -> Unit): Menu {
+    return menuBuilder(config).build()
+}
+
+inline fun menu(text: String, config: MenuBuilder.() -> Unit = {}): Menu {
+    return menuBuilder {
+        text(text)
+        config()
+    }.build()
+}
+
+inline fun menuBuilder(config: MenuBuilder.() -> Unit): MenuBuilder {
+    return MenuBuilder().apply(config)
+}
+
+inline fun Menu.config(config: MenuBuilder.() -> Unit): Menu {
+    MenuBuilder().apply(config).config(this)
+    return this
 }

@@ -1,12 +1,37 @@
 package club.xiaojiawei.kt.dsl
 
+import club.xiaojiawei.kt.annotations.FXMarker
 import javafx.scene.Node
-import javafx.scene.paint.Color
+import javafx.scene.Scene
 
 /**
  * @author 肖嘉威
  * @date 2025/10/21 12:19
  */
+
+enum class FontWeight {
+    NORMAL, BOLD, BOLDER, LIGHTER, W100, W200, W300, W400, W500, W600, W700, W800, W900
+}
+
+enum class FontStyle {
+    NORMAL, ITALIC, OBLIQUE
+}
+
+enum class Cursor {
+    DEFAULT, HAND, WAIT, TEXT, CROSSHAIR, MOVE,
+    E_RESIZE, W_RESIZE, N_RESIZE, S_RESIZE,
+    NE_RESIZE, NW_RESIZE, SE_RESIZE, SW_RESIZE,
+    H_RESIZE, V_RESIZE, NONE
+}
+
+
+enum class StyleSize {
+    TINY, SMALL, BIG, DEFAULT
+}
+
+enum class StyleColor {
+    MAIN, NORMAL, SUCCESS, WARN, ERROR, DEFAULT
+}
 
 @FXMarker
 class StyleBuilder {
@@ -287,26 +312,6 @@ class StyleBuilder {
     fun build(): String = styles.entries.joinToString("; ") { "${it.key}: ${it.value}" }
 }
 
-enum class FontWeight {
-    NORMAL, BOLD, BOLDER, LIGHTER, W100, W200, W300, W400, W500, W600, W700, W800, W900
-}
-
-enum class FontStyle {
-    NORMAL, ITALIC, OBLIQUE
-}
-
-enum class Cursor {
-    DEFAULT, HAND, WAIT, TEXT, CROSSHAIR, MOVE,
-    E_RESIZE, W_RESIZE, N_RESIZE, S_RESIZE,
-    NE_RESIZE, NW_RESIZE, SE_RESIZE, SW_RESIZE,
-    H_RESIZE, V_RESIZE, NONE
-}
-
-fun Node.styled(block: StyleBuilder.() -> Unit) {
-    style = StyleBuilder().apply(block).build()
-}
-
-
 @FXMarker
 class StylesheetBuilder : DslBuilder<String>() {
 
@@ -374,4 +379,22 @@ class StylesheetBuilder : DslBuilder<String>() {
         val base64 = encoder.encodeToString(css.toByteArray())
         return "data:text/css;base64,$base64"
     }
+}
+
+// Style 衍生
+inline fun stylesheetBuilder(config: StylesheetBuilder.() -> Unit): StylesheetBuilder {
+    return StylesheetBuilder().apply(config)
+}
+
+inline fun Scene.configStylesheet(config: StylesheetBuilder.() -> Unit): Scene {
+    this.stylesheets.add(StylesheetBuilder().apply(config).toDataUri())
+    return this
+}
+
+inline fun styleBuilder(config: StyleBuilder.() -> Unit): StyleBuilder {
+    return StyleBuilder().apply(config)
+}
+
+fun Node.styled(block: StyleBuilder.() -> Unit) {
+    style = StyleBuilder().apply(block).build()
 }

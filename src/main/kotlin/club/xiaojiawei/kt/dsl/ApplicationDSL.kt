@@ -5,11 +5,11 @@ package club.xiaojiawei.kt.dsl
  * @date 2026/1/7 10:02
  */
 import club.xiaojiawei.JavaFXUI
+import club.xiaojiawei.kt.annotations.FXMarker
 import javafx.application.Application
 import javafx.event.EventHandler
 import javafx.scene.Parent
 import javafx.scene.Scene
-import javafx.scene.layout.Priority
 import javafx.scene.paint.Paint
 import javafx.stage.*
 
@@ -206,50 +206,22 @@ class StageBuilder(private val existingStage: Stage? = null) : DslBuilder<Stage>
     }
 }
 
-fun main() {
-    launchApp {
-        +"test"
-        size(400.0, 400.0)
-        scene {
-//            vbox {
-//                spacing(10.0)
-//                padding(10.0)
-//                addLabel {
-//                    +"hello"
-//                }
-//                addButton {
-//                    +"click"
-//                }
-//            }
-            stylesheet {
-                select("*") {
-                    backgroundColor("pink")
-                }
-            }
-            root {
-                gridPane {
-                    hgap(10.0)
-                    vgap(10.0)
+// Scene 衍生
+inline fun scene(config: SceneBuilder.() -> Unit) = SceneBuilder().apply(config).build()
 
-                    columnConstraints {
-                        column(percent = 25.0) // 第一列占 25%
-                        column(hgrow = Priority.ALWAYS) // 第二列填充剩余空间
-                    }
+inline fun sceneBuilder(config: SceneBuilder.() -> Unit) = SceneBuilder().apply(config)
 
-                    row {
-                        cellBuilder { itemLabel("账号:") }
-                        cellBuilder { itemTextField { promptText("Email/Phone") } }
-                    }
+inline fun Scene.config(config: SceneBuilder.() -> Unit): Scene {
+    SceneBuilder().apply(config).config(this)
+    return this
+}
 
-                    row {
-                        cellBuilder { itemLabel("密码:") }
-                        cellBuilder {
-                            itemTextField { promptText("Password") }
-                            hgrow(Priority.NEVER)
-                        }
-                    }
-                }
-            }
-        }
-    }
+// Stage 衍生
+inline fun stage(config: StageBuilder.() -> Unit) = StageBuilder().apply(config).build()
+
+inline fun stageBuilder(config: StageBuilder.() -> Unit) = StageBuilder().apply(config)
+
+inline fun Stage.config(config: StageBuilder.() -> Unit): Stage {
+    StageBuilder().apply(config).config(this)
+    return this
 }

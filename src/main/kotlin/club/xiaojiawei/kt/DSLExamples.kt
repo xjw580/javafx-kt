@@ -93,7 +93,7 @@ internal class DSLExamples : Application() {
 
         addButton("淡入") {
             onClick {
-                box.fadeIn(500.0) {
+                box.playFadeInTransition(500.0) {
                     onFinished {
                         println("淡入完成")
                     }
@@ -103,55 +103,69 @@ internal class DSLExamples : Application() {
 
         addButton("淡出") {
             onClick {
-                box.fadeOut(500.0)
+                box.playFadeOutTransition(500.0)
             }
         }
 
         addButton("缩放") {
             onClick {
-                box.scaleTransition {
+                box.playScaleTransition {
                     duration(300.0)
                     from(1.0)
                     to(1.5)
                     autoReverse()
                     cycleCount(2)
-                }.play()
+                }
             }
         }
 
         addButton("旋转") {
             onClick {
-                box.rotateTransition {
+                box.playRotateTransition {
                     duration(500.0)
                     to(360.0)
-                }.play()
+                }
             }
         }
 
         addButton("震动") {
             onClick {
-                box.shake()
+                box.playShakeTransition()
             }
         }
 
         addButton("脉冲") {
             onClick {
-                box.pulse()
+                box.playPulseTransition()
             }
         }
 
-        addButton("组合动画") {
+        addButton("组合串行动画") {
             onClick {
-                parallelTransition {
-                    add(box.fadeTransition {
-                        duration(500.0)
-                        to(0.5)
-                    })
-                    add(box.scaleTransition {
-                        duration(500.0)
+                box.playSequentialTransition {
+                    +fadeOutTransition()
+                    +fadeInTransition()
+                    +shakeTransition()
+                }
+            }
+        }
+
+        addButton("组合并行动画") {
+            onClick {
+                box.playParallelTransition {
+                    node(box)
+                    +scaleTransition {
+                        duration(300.0)
+                        from(1.0)
                         to(1.5)
-                    })
-                }.play()
+                        autoReverse()
+                    }
+                    +rotateTransition {
+                        duration(500.0)
+                        to(360.0)
+                        autoReverse()
+                    }
+                }
             }
         }
     }

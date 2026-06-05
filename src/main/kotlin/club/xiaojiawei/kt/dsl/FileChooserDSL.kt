@@ -1,5 +1,6 @@
 package club.xiaojiawei.kt.dsl
 
+import club.xiaojiawei.kt.annotations.FXMarker
 import javafx.stage.DirectoryChooser
 import javafx.stage.FileChooser
 import javafx.stage.FileChooser.ExtensionFilter

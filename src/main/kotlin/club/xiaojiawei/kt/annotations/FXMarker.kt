@@ -1,4 +1,4 @@
-package club.xiaojiawei.kt.dsl
+package club.xiaojiawei.kt.annotations
 
 /**
  * @author 肖嘉威

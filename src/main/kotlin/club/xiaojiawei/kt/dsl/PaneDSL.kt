@@ -2,6 +2,7 @@ package club.xiaojiawei.kt.dsl
 
 import club.xiaojiawei.controls.FilterComboBox
 import club.xiaojiawei.controls.Title
+import club.xiaojiawei.kt.annotations.FXMarker
 import javafx.collections.FXCollections
 import javafx.geometry.*
 import javafx.scene.Node
@@ -26,17 +27,21 @@ import kotlin.reflect.KProperty
 @FXMarker
 abstract class PaneBaseBuilder<T : Pane> : RegionBaseBuilder<T>() {
 
-    operator fun Node.unaryPlus() = add(this)
+    operator fun Node?.unaryPlus() = add(this)
+
+    operator fun (() -> Node?).unaryPlus() = add(this)
 
     // 添加子节点
-    fun add(node: Node) {
+    fun add(node: Node?) {
+        node ?: return
         settings {
             children.add(node)
         }
     }
 
-    fun add(builder: () -> Node) = settings {
-        children.add(builder())
+    fun add(builder: () -> Node?) = settings {
+        val node = builder() ?: return@settings
+        children.add(node)
     }
 
     fun add(node: NodeBuilder<*>) {
@@ -966,4 +971,156 @@ class TitledPaneBuilder : DslBuilder<TitledPane>() {
     }
 
     fun graphic(builder: () -> Node) = settings { graphic = builder() }
+}
+
+
+// Pane 衍生
+inline fun pane(config: PaneBuilder.() -> Unit): Pane {
+    return paneBuilder(config).build()
+}
+
+inline fun paneBuilder(config: PaneBuilder.() -> Unit): PaneBuilder {
+    return PaneBuilder().apply(config)
+}
+
+//inline fun Pane.config(config: PaneBuilder.() -> Unit) :Pane{
+//    PaneBuilder().apply(config).config(this)
+//return this
+//}
+
+// VBox 衍生
+inline fun vbox(config: VBoxBuilder.() -> Unit): VBox {
+    return vboxBuilder(config).build()
+}
+
+inline fun vboxBuilder(config: VBoxBuilder.() -> Unit): VBoxBuilder {
+    return VBoxBuilder().apply(config)
+}
+
+inline fun VBox.config(config: VBoxBuilder.() -> Unit): VBox {
+    VBoxBuilder().apply(config).config(this)
+    return this
+}
+
+// HBox 衍生
+inline fun hbox(config: HBoxBuilder.() -> Unit): HBox {
+    return hboxBuilder(config).build()
+}
+
+inline fun hboxBuilder(config: HBoxBuilder.() -> Unit): HBoxBuilder {
+    return HBoxBuilder().apply(config)
+}
+
+inline fun HBox.config(config: HBoxBuilder.() -> Unit): HBox {
+    HBoxBuilder().apply(config).config(this)
+    return this
+}
+
+// StackPane 衍生
+inline fun stackPane(config: StackPaneBuilder.() -> Unit): StackPane {
+    return stackPaneBuilder(config).build()
+}
+
+inline fun stackPaneBuilder(config: StackPaneBuilder.() -> Unit): StackPaneBuilder {
+    return StackPaneBuilder().apply(config)
+}
+
+inline fun StackPane.config(config: StackPaneBuilder.() -> Unit): StackPane {
+    StackPaneBuilder().apply(config).config(this)
+    return this
+}
+
+// BorderPane 衍生
+inline fun borderPane(config: BorderPaneBuilder.() -> Unit): BorderPane {
+    return borderPaneBuilder(config).build()
+}
+
+inline fun borderPaneBuilder(config: BorderPaneBuilder.() -> Unit): BorderPaneBuilder {
+    return BorderPaneBuilder().apply(config)
+}
+
+inline fun BorderPane.config(config: BorderPaneBuilder.() -> Unit): BorderPane {
+    BorderPaneBuilder().apply(config).config(this)
+    return this
+}
+
+// GridPane 衍生
+inline fun gridPane(config: GridPaneBuilder.() -> Unit): GridPane {
+    return gridPaneBuilder(config).build()
+}
+
+inline fun gridPaneBuilder(config: GridPaneBuilder.() -> Unit): GridPaneBuilder {
+    return GridPaneBuilder().apply(config)
+}
+
+inline fun GridPane.config(config: GridPaneBuilder.() -> Unit): GridPane {
+    GridPaneBuilder().apply(config).config(this)
+    return this
+}
+
+// AnchorPane 衍生
+inline fun anchorPane(config: AnchorPaneBuilder.() -> Unit): AnchorPane {
+    return AnchorPaneBuilder().apply(config).build()
+}
+
+inline fun AnchorPane.config(config: AnchorPaneBuilder.() -> Unit): AnchorPane {
+    AnchorPaneBuilder().apply(config).config(this)
+    return this
+}
+
+// FlowPane 衍生
+inline fun flowPane(config: FlowPaneBuilder.() -> Unit): FlowPane {
+    return FlowPaneBuilder().apply(config).build()
+}
+
+inline fun FlowPane.config(config: FlowPaneBuilder.() -> Unit): FlowPane {
+    FlowPaneBuilder().apply(config).config(this)
+    return this
+}
+
+// TilePane 衍生
+inline fun tilePane(config: TilePaneBuilder.() -> Unit): TilePane {
+    return TilePaneBuilder().apply(config).build()
+}
+
+inline fun TilePane.config(config: TilePaneBuilder.() -> Unit): TilePane {
+    TilePaneBuilder().apply(config).config(this)
+    return this
+}
+
+// ScrollPane 衍生
+inline fun scrollPane(config: ScrollPaneBuilder.() -> Unit): ScrollPane {
+    return ScrollPaneBuilder().apply(config).build()
+}
+
+inline fun ScrollPane.config(config: ScrollPaneBuilder.() -> Unit): ScrollPane {
+    ScrollPaneBuilder().apply(config).config(this)
+    return this
+}
+
+// SplitPane 衍生
+inline fun splitPane(config: SplitPaneBuilder.() -> Unit): SplitPane {
+    return SplitPaneBuilder().apply(config).build()
+}
+
+inline fun SplitPane.config(config: SplitPaneBuilder.() -> Unit): SplitPane {
+    SplitPaneBuilder().apply(config).config(this)
+    return this
+}
+
+// TitledPane 衍生
+inline fun titledPane(config: TitledPaneBuilder.() -> Unit): TitledPane {
+    return TitledPaneBuilder().apply(config).build()
+}
+
+inline fun titledPane(title: String, config: TitledPaneBuilder.() -> Unit = {}): TitledPane {
+    return TitledPaneBuilder().apply {
+        text(title)
+        config()
+    }.build()
+}
+
+inline fun TitledPane.config(config: TitledPaneBuilder.() -> Unit): TitledPane {
+    TitledPaneBuilder().apply(config).config(this)
+    return this
 }

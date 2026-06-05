@@ -8,6 +8,7 @@ package club.xiaojiawei.kt.dsl
 import club.xiaojiawei.controls.FilterComboBox
 import club.xiaojiawei.controls.Switch
 import club.xiaojiawei.enums.BaseTransitionEnum
+import club.xiaojiawei.kt.annotations.FXMarker
 import javafx.beans.binding.Bindings
 import javafx.beans.property.BooleanProperty
 import javafx.beans.property.DoubleProperty
@@ -1126,3 +1127,337 @@ open class SwitchBuilder : RegionBaseBuilder<Switch>() {
         settings { property.bindBidirectional(statusProperty()) }
     }
 }
+
+
+// Text 衍生
+inline fun text(config: TextBuilder.() -> Unit): Text {
+    return textBuilder(config).build()
+}
+
+inline fun text(text: String, config: TextBuilder.() -> Unit = {}): Text {
+    return textBuilder {
+        text(text)
+        config()
+    }.build()
+}
+
+inline fun textBuilder(config: TextBuilder.() -> Unit): TextBuilder {
+    return TextBuilder().apply(config)
+}
+
+inline fun Text.config(config: TextBuilder.() -> Unit): Text {
+    TextBuilder().apply(config).config(this)
+    return this
+}
+
+// Polygon 衍生
+inline fun polygon(config: PolygonBuilder.() -> Unit): Polygon {
+    return polygonBuilder(config).build()
+}
+
+inline fun polygon(points: DoubleArray, config: PolygonBuilder.() -> Unit = {}): Polygon {
+    return polygonBuilder {
+        points(*points)
+        config()
+    }.build()
+}
+
+inline fun polygon(points: List<Double>, config: PolygonBuilder.() -> Unit = {}): Polygon {
+    return polygonBuilder {
+        points(points)
+        config()
+    }.build()
+}
+
+inline fun polygonBuilder(config: PolygonBuilder.() -> Unit): PolygonBuilder {
+    return PolygonBuilder().apply(config)
+}
+
+inline fun Polygon.config(config: PolygonBuilder.() -> Unit): Polygon {
+    PolygonBuilder().apply(config).config(this)
+    return this
+}
+
+// Label 衍生
+inline fun label(config: LabelBuilder.() -> Unit): Label {
+    return labelBuilder(config).build()
+}
+
+inline fun label(text: String, config: LabelBuilder.() -> Unit = {}): Label {
+    return labelBuilder {
+        text(text)
+        config()
+    }.build()
+}
+
+inline fun labelBuilder(config: LabelBuilder.() -> Unit): LabelBuilder {
+    return LabelBuilder().apply(config)
+}
+
+inline fun Label.config(config: LabelBuilder.() -> Unit): Label {
+    LabelBuilder().apply(config).config(this)
+    return this
+}
+
+// Button 衍生
+inline fun button(config: ButtonBuilder.() -> Unit): Button {
+    return buttonBuilder(config).build()
+}
+
+inline fun button(text: String, config: ButtonBuilder.() -> Unit = {}): Button {
+    return buttonBuilder {
+        text(text)
+        config()
+    }.build()
+}
+
+inline fun buttonBuilder(config: ButtonBuilder.() -> Unit): ButtonBuilder {
+    return ButtonBuilder().apply(config)
+}
+
+inline fun Button.config(config: ButtonBuilder.() -> Unit): Button {
+    ButtonBuilder().apply(config).config(this)
+    return this
+}
+
+// TextField 衍生
+inline fun textField(config: TextFieldBuilder.() -> Unit = {}): TextField {
+    return textFieldBuilder(config).build()
+}
+
+inline fun textField(text: String, config: TextFieldBuilder.() -> Unit = {}): TextField {
+    return textFieldBuilder {
+        text(text)
+        config()
+    }.build()
+}
+
+inline fun textFieldBuilder(config: TextFieldBuilder.() -> Unit): TextFieldBuilder {
+    return TextFieldBuilder().apply(config)
+}
+
+inline fun TextField.config(config: TextFieldBuilder.() -> Unit): TextField {
+    TextFieldBuilder().apply(config).config(this)
+    return this
+}
+
+// TextArea 衍生
+inline fun textArea(config: TextAreaBuilder.() -> Unit = {}): TextArea {
+    return textAreaBuilder(config).build()
+}
+
+inline fun textArea(text: String, config: TextAreaBuilder.() -> Unit = {}): TextArea {
+    return textAreaBuilder {
+        text(text)
+        config()
+    }.build()
+}
+
+inline fun textAreaBuilder(config: TextAreaBuilder.() -> Unit): TextAreaBuilder {
+    return TextAreaBuilder().apply(config)
+}
+
+inline fun TextArea.config(config: TextAreaBuilder.() -> Unit): TextArea {
+    TextAreaBuilder().apply(config).config(this)
+    return this
+}
+
+// CheckBox 衍生
+inline fun checkBox(config: CheckBoxBuilder.() -> Unit): CheckBox {
+    return checkBoxBuilder(config).build()
+}
+
+inline fun checkBox(text: String, config: CheckBoxBuilder.() -> Unit = {}): CheckBox {
+    return checkBoxBuilder {
+        text(text)
+        config()
+    }.build()
+}
+
+inline fun checkBoxBuilder(config: CheckBoxBuilder.() -> Unit): CheckBoxBuilder {
+    return CheckBoxBuilder().apply(config)
+}
+
+inline fun CheckBox.config(config: CheckBoxBuilder.() -> Unit): CheckBox {
+    CheckBoxBuilder().apply(config).config(this)
+    return this
+}
+
+// RadioButton 衍生
+inline fun radioButton(config: RadioButtonBuilder.() -> Unit): RadioButton {
+    return radioButtonBuilder(config).build()
+}
+
+inline fun radioButton(text: String, config: RadioButtonBuilder.() -> Unit = {}): RadioButton {
+    return radioButtonBuilder {
+        text(text)
+        config()
+    }.build()
+}
+
+inline fun radioButton(
+    text: String,
+    toggleGroup: ToggleGroup,
+    config: RadioButtonBuilder.() -> Unit = {}
+): RadioButton {
+    return radioButtonBuilder {
+        text(text)
+        toggleGroup(toggleGroup)
+        config()
+    }.build()
+}
+
+inline fun radioButtonBuilder(config: RadioButtonBuilder.() -> Unit): RadioButtonBuilder {
+    return RadioButtonBuilder().apply(config)
+}
+
+inline fun RadioButton.config(config: RadioButtonBuilder.() -> Unit): RadioButton {
+    RadioButtonBuilder().apply(config).config(this)
+    return this
+}
+
+// ComboBox 衍生
+inline fun <T> comboBox(config: ComboBoxBuilder<T>.() -> Unit): ComboBox<T> {
+    return comboBoxBuilder(config).build()
+}
+
+inline fun <T> comboBox(items: List<T>, config: ComboBoxBuilder<T>.() -> Unit = {}): ComboBox<T> {
+    return comboBoxBuilder {
+        items(items)
+        config()
+    }.build()
+}
+
+inline fun <T> comboBoxBuilder(config: ComboBoxBuilder<T>.() -> Unit): ComboBoxBuilder<T> {
+    return ComboBoxBuilder<T>().apply(config)
+}
+
+inline fun <T> ComboBox<T>.config(config: ComboBoxBuilder<T>.() -> Unit): ComboBox<T> {
+    ComboBoxBuilder<T>().apply(config).config(this)
+    return this
+}
+
+// ListView 衍生
+inline fun <T> listView(config: ListViewBuilder<T>.() -> Unit): ListView<T> {
+    return listViewBuilder(config).build()
+}
+
+inline fun <T> listView(items: List<T>, config: ListViewBuilder<T>.() -> Unit = {}): ListView<T> {
+    return listViewBuilder {
+        items(items)
+        config()
+    }.build()
+}
+
+inline fun <T> listViewBuilder(config: ListViewBuilder<T>.() -> Unit): ListViewBuilder<T> {
+    return ListViewBuilder<T>().apply(config)
+}
+
+inline fun <T> ListView<T>.config(config: ListViewBuilder<T>.() -> Unit): ListView<T> {
+    ListViewBuilder<T>().apply(config).config(this)
+    return this
+}
+
+// TableView 衍生
+inline fun <T> tableView(config: TableViewBuilder<T>.() -> Unit): TableView<T> {
+    return tableViewBuilder(config).build()
+}
+
+inline fun <T> tableView(items: List<T>, config: TableViewBuilder<T>.() -> Unit = {}): TableView<T> {
+    return tableViewBuilder {
+        items(items)
+        config()
+    }.build()
+}
+
+inline fun <T> tableViewBuilder(config: TableViewBuilder<T>.() -> Unit): TableViewBuilder<T> {
+    return TableViewBuilder<T>().apply(config)
+}
+
+inline fun <T> TableView<T>.config(config: TableViewBuilder<T>.() -> Unit): TableView<T> {
+    TableViewBuilder<T>().apply(config).config(this)
+    return this
+}
+
+// ProgressBar 衍生
+inline fun progressBar(config: ProgressBarBuilder.() -> Unit = {}): ProgressBar {
+    return progressBarBuilder(config).build()
+}
+
+inline fun progressBarBuilder(config: ProgressBarBuilder.() -> Unit): ProgressBarBuilder {
+    return ProgressBarBuilder().apply(config)
+}
+
+inline fun ProgressBar.config(config: ProgressBarBuilder.() -> Unit): ProgressBar {
+    ProgressBarBuilder().apply(config).config(this)
+    return this
+}
+
+// Slider 衍生
+inline fun slider(config: SliderBuilder.() -> Unit = {}): Slider {
+    return sliderBuilder(config).build()
+}
+
+inline fun sliderBuilder(config: SliderBuilder.() -> Unit): SliderBuilder {
+    return SliderBuilder().apply(config)
+}
+
+inline fun Slider.config(config: SliderBuilder.() -> Unit): Slider {
+    SliderBuilder().apply(config).config(this)
+    return this
+}
+
+// ImageView 衍生
+inline fun imageView(config: ImageViewBuilder.() -> Unit = {}): ImageView {
+    return imageViewBuilder(config).build()
+}
+
+inline fun imageView(url: String, config: ImageViewBuilder.() -> Unit = {}): ImageView {
+    return imageViewBuilder {
+        image(url)
+        config()
+    }.build()
+}
+
+inline fun imageViewBuilder(config: ImageViewBuilder.() -> Unit): ImageViewBuilder {
+    return ImageViewBuilder().apply(config)
+}
+
+inline fun ImageView.config(config: ImageViewBuilder.() -> Unit): ImageView {
+    ImageViewBuilder().apply(config).config(this)
+    return this
+}
+
+// Separator 衍生
+inline fun separator(config: SeparatorBuilder.() -> Unit = {}): Separator {
+    return separatorBuilder(config).build()
+}
+
+inline fun separatorBuilder(config: SeparatorBuilder.() -> Unit): SeparatorBuilder {
+    return SeparatorBuilder().apply(config)
+}
+
+inline fun Separator.config(config: SeparatorBuilder.() -> Unit): Separator {
+    SeparatorBuilder().apply(config).config(this)
+    return this
+}
+
+// Spacer 衍生
+inline fun hSpacer(priority: Priority = Priority.ALWAYS, config: Region.() -> Unit = {}): Region {
+    val region = Region()
+    region.config()
+    HBox.setHgrow(region, priority)
+    return region
+}
+
+inline fun vSpacer(priority: Priority = Priority.ALWAYS, config: Region.() -> Unit = {}): Region {
+    val region = Region()
+    region.config()
+    VBox.setVgrow(region, priority)
+    return region
+}
+
+// Switch衍生
+inline fun switch(config: SwitchBuilder.() -> Unit) = SwitchBuilder().apply(config).build()
+
+inline fun switchBuilder(config: SwitchBuilder.() -> Unit) = SwitchBuilder().apply(config)

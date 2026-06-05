@@ -1,5 +1,6 @@
 package club.xiaojiawei.kt.dsl
 
+import club.xiaojiawei.kt.annotations.FXMarker
 import javafx.beans.binding.*
 import javafx.beans.property.*
 import javafx.beans.value.ObservableNumberValue

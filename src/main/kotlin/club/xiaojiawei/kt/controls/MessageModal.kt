@@ -1,6 +1,7 @@
 package club.xiaojiawei.kt.controls
 
 import club.xiaojiawei.JavaFXUI
+import club.xiaojiawei.kt.annotations.FXMarker
 import club.xiaojiawei.kt.dsl.*
 import club.xiaojiawei.kt.ext.runUI
 import javafx.geometry.Insets
@@ -122,19 +123,17 @@ class MessageModal(val baseParent: Parent) {
             stage.show()
 
             parallelTransition {
-                rootPane?.let {
-                    add(it.fadeTransition {
-                        from(0.0)
-                        to(1.0)
-                        duration(200.0)
-                    })
+                +fadeTransition {
+                    node(rootPane)
+                    from(0.0)
+                    to(1.0)
+                    duration(200.0)
                 }
-                topPane?.let {
-                    add(it.translateTransition {
-                        from(0.0, 25.0)
-                        to(0.0, 0.0)
-                        duration(200.0)
-                    })
+                +translateTransition {
+                    node(topPane)
+                    from(0.0, 25.0)
+                    to(0.0, 0.0)
+                    duration(200.0)
                 }
                 onFinished {
                     shownRunnable?.invoke()
@@ -148,22 +147,19 @@ class MessageModal(val baseParent: Parent) {
         isClosing = true
 
         val duration = 150.0
+
         parallelTransition {
-            rootPane?.let {
-                add {
-                    it.fadeTransition {
-                        from(1.0)
-                        to(0.0)
-                        duration(duration)
-                    }
-                }
+            +fadeTransition {
+                node(rootPane)
+                from(1.0)
+                to(0.0)
+                duration(duration)
             }
-            topPane?.let {
-                add(it.translateTransition {
-                    from(0.0, 0.0)
-                    to(0.0, -25.0)
-                    duration(duration)
-                })
+            +translateTransition {
+                node(topPane)
+                from(0.0, 0.0)
+                to(0.0, -25.0)
+                duration(duration)
             }
             onFinished {
                 stage.close()
