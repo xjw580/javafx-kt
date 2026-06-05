@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  * @date 2025/8/12 15:20
  */
 
-class DynamicTaskManager<T : TaskBuilder>(
+class TaskManager<T : TaskBuilder>(
     var taskBuilderProvider: (() -> T),
     private val scope: CoroutineScope = GlobalScope
 ) : Closeable {

@@ -13,7 +13,7 @@ import javafx.scene.layout.VBox
  * @date 2025/8/12 15:21
  */
 
-class DynamicTaskProgressView<T : TaskBuilder> : VBox() {
+class TaskProgressView<T : TaskBuilder> : VBox() {
     private val taskContainers = mutableMapOf<String, VBox>()
     private val taskProgressBars = mutableMapOf<String, ProgressBar>()
     private val taskLabels = mutableMapOf<String, Label>()
@@ -154,9 +154,9 @@ class DynamicTaskProgressView<T : TaskBuilder> : VBox() {
                 val resumeBtn = Button("继续")
                 resumeBtn.style = "-fx-font-size: 11px; -fx-padding: 3 8 3 8;"
                 resumeBtn.setOnAction {
-                    if (resumeBtn.text == "继续"){
+                    if (resumeBtn.text == "继续") {
                         onResumeTask?.invoke(task.id)
-                    }else{
+                    } else {
                         onRetryTask?.invoke(task.id)
                     }
                 }
@@ -301,9 +301,9 @@ class DynamicTaskProgressView<T : TaskBuilder> : VBox() {
     }
 
     // 添加方法来获取任务信息（需要从TaskManager获取）
-    private var taskManager: DynamicTaskManager<T>? = null
+    private var taskManager: TaskManager<T>? = null
 
-    fun setTaskManager(taskManager: DynamicTaskManager<T>) {
+    fun setTaskManager(taskManager: TaskManager<T>) {
         this.taskManager = taskManager
     }
 

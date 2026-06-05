@@ -7,8 +7,8 @@ import java.util.*
  * @date 2025/8/12 15:22
  */
 class TaskController<T : TaskBuilder>(taskBuilderProvider: (() -> T)) {
-    private val taskManager = DynamicTaskManager<T>(taskBuilderProvider)
-    private val progressView = DynamicTaskProgressView<T>()
+    private val taskManager = TaskManager<T>(taskBuilderProvider)
+    private val progressView = TaskProgressView<T>()
 
     init {
         // 连接任务管理器和UI
@@ -103,9 +103,9 @@ class TaskController<T : TaskBuilder>(taskBuilderProvider: (() -> T)) {
         taskManager.deleteTask(taskId)
     }
 
-    fun getProgressView(): DynamicTaskProgressView<T> = progressView
+    fun getProgressView(): TaskProgressView<T> = progressView
 
-    fun getTaskManager(): DynamicTaskManager<T> = taskManager
+    fun getTaskManager(): TaskManager<T> = taskManager
 
     /**
      * 添加批量完成回调监听器
