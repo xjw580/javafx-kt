@@ -6,6 +6,7 @@ import javafx.beans.property.BooleanProperty
 import javafx.beans.property.DoubleProperty
 import javafx.beans.property.IntegerProperty
 import javafx.beans.property.LongProperty
+import javafx.beans.property.StringProperty
 import javafx.beans.value.WritableValue
 import javafx.scene.Node
 import javafx.scene.layout.*
@@ -39,6 +40,8 @@ inline fun runUI(crossinline block: () -> Unit) {
 inline fun runUILater(crossinline block: () -> Unit) {
     Platform.runLater { block() }
 }
+
+// ======================== Property代理 ========================
 
 operator fun <T> WritableValue<T>.getValue(thisRef: Any?, property: KProperty<*>): T {
     return this.value
@@ -80,11 +83,76 @@ operator fun BooleanProperty.setValue(thisRef: Any?, property: KProperty<*>, val
     this.value = value
 }
 
-fun Node.setLeftAnchor(v: Double) = AnchorPane.setLeftAnchor(this, v)
-fun Node.setRightAnchor(v: Double) = AnchorPane.setRightAnchor(this, v)
-fun Node.setTopAnchor(v: Double) = AnchorPane.setTopAnchor(this, v)
-fun Node.setBottomAnchor(v: Double) = AnchorPane.setBottomAnchor(this, v)
-fun Node.setHgrow(priority: Priority) = HBox.setHgrow(this, priority)
-fun Node.setHgrowAlways() = HBox.setHgrow(this, Priority.ALWAYS)
-fun Node.setVgrow(priority: Priority) = VBox.setVgrow(this, priority)
-fun Node.setVgrowAlways(priority: Priority) = VBox.setVgrow(this, Priority.ALWAYS)
+
+// ======================== IntegerProperty 特化扩展 ========================
+
+operator fun IntegerProperty.plusAssign(delta: Int) {
+    set(get() + delta)
+}
+
+operator fun IntegerProperty.minusAssign(delta: Int) {
+    set(get() - delta)
+}
+
+operator fun IntegerProperty.timesAssign(factor: Int) {
+    set(get() * factor)
+}
+
+operator fun IntegerProperty.divAssign(divisor: Int) {
+    set(get() / divisor)
+}
+
+// ======================== LongProperty 特化扩展 ========================
+
+operator fun LongProperty.plusAssign(delta: Long) {
+    set(get() + delta)
+}
+
+operator fun LongProperty.minusAssign(delta: Long) {
+    set(get() - delta)
+}
+
+operator fun LongProperty.timesAssign(factor: Long) {
+    set(get() * factor)
+}
+
+operator fun LongProperty.divAssign(divisor: Long) {
+    set(get() / divisor)
+}
+
+// ======================== DoubleProperty 特化扩展 ========================
+
+operator fun DoubleProperty.plusAssign(delta: Double) {
+    set(get() + delta)
+}
+
+operator fun DoubleProperty.minusAssign(delta: Double) {
+    set(get() - delta)
+}
+
+operator fun DoubleProperty.timesAssign(factor: Double) {
+    set(get() * factor)
+}
+
+operator fun DoubleProperty.divAssign(divisor: Double) {
+    set(get() / divisor)
+}
+
+// ======================== BooleanProperty 特化扩展 ========================
+
+/** 取反 */
+fun BooleanProperty.toggle() {
+    set(!get())
+}
+
+// ======================== StringProperty 特化扩展 ========================
+
+/** 字符串拼接赋值 */
+operator fun StringProperty.plusAssign(suffix: String) {
+    set(get() + suffix)
+}
+
+/** 清空 */
+fun StringProperty.clear() {
+    set("")
+}

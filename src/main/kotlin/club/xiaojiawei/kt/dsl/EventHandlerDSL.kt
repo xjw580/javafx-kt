@@ -150,10 +150,10 @@ class DragHandlers {
     var onDragEnd: ((DragEvent) -> Unit)? = null
 
     fun applyTo(node: Node) {
-        onDragStart?.let { 
+        onDragStart?.let {
             node.onDragDetected = EventHandler(it)
         }
-        onDragOver?.let { 
+        onDragOver?.let {
             node.onDragOver = EventHandler { event ->
                 event.acceptTransferModes(*TransferMode.ANY)
                 it(event)
@@ -171,7 +171,7 @@ fun Node.dragHandlers(block: DragHandlers.() -> Unit) {
 // 键盘快捷键
 @FXMarker
 class KeyboardShortcuts {
-    
+
     private val shortcuts = mutableMapOf<KeyCombination, () -> Unit>()
 
     fun on(keyCombination: KeyCombination, action: () -> Unit) {
@@ -219,29 +219,4 @@ fun <T : Event> Node.addEventHandler(
     handler: (T) -> Unit
 ) {
     addEventHandler(eventType, EventHandler(handler))
-}
-
-// 事件消费
-fun Event.consume() {
-    this.consume()
-}
-
-// 防抖动
-class Debouncer(private val delayMs: Long) {
-    private var lastTime = 0L
-
-    fun execute(action: () -> Unit) {
-        val currentTime = System.currentTimeMillis()
-        if (currentTime - lastTime >= delayMs) {
-            action()
-            lastTime = currentTime
-        }
-    }
-}
-
-fun Node.onClickDebounced(delayMs: Long = 500, handler: (MouseEvent) -> Unit) {
-    val debouncer = Debouncer(delayMs)
-    onClick { event ->
-        debouncer.execute { handler(event) }
-    }
 }

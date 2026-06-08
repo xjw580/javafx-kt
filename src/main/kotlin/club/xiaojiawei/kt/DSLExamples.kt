@@ -59,10 +59,7 @@ internal class DSLExamples : Application() {
         val textField2 = textField()
         add(textField2)
 
-        // 绑定文本
-        bindings {
-            textField2.textProperty() bind textField1.textProperty()
-        }
+        textField2.textProperty().bind(textField1.textProperty())
 
         val slider1 = slider {
             range(0.0, 100.0)
@@ -73,10 +70,7 @@ internal class DSLExamples : Application() {
         val progressBar1 = progressBar()
         add(progressBar1)
 
-        // 绑定进度
-        bindings {
-            progressBar1.progressProperty() bind slider1.valueProperty().divide(100.0)
-        }
+        progressBar1.progressProperty().bind(slider1.valueProperty().divide(100.0))
     }
 
     // 示例3：动画使用
@@ -166,58 +160,6 @@ internal class DSLExamples : Application() {
                         autoReverse()
                     }
                 }
-            }
-        }
-    }
-
-    // 示例4：事件处理使用
-    private fun eventExample() = vbox {
-        spacing(10.0)
-        padding(20.0)
-
-        val label1 = label("点击按钮测试事件")
-        add(label1)
-
-        addButton("单击测试") {
-            onClick { event ->
-                label1.text = "单击在: ${event.x}, ${event.y}"
-            }
-        }
-
-        addButton("悬停测试") {
-            onHover(
-                onEnter = {
-                    label1.text = "鼠标进入"
-                    this.opacity = 0.7
-                },
-                onExit = {
-                    label1.text = "鼠标离开"
-                    this.opacity = 1.0
-                }
-            )
-        }
-
-        addButton("多事件测试") {
-            events {
-                onMouseClicked = { label1.text = "点击" }
-                onMousePressed = { label1.text = "按下" }
-                onMouseReleased = { label1.text = "释放" }
-            }
-        }
-
-        addButton("防抖测试") {
-            var count = 0
-            onClickDebounced(1000) {
-                count++
-                label1.text = "防抖点击次数: $count"
-            }
-        }
-
-        addButton("右键菜单") {
-            mouseHandlers {
-                onClick = { label1.text = "左键单击" }
-                onDoubleClick = { label1.text = "左键双击" }
-                onRightClick = { label1.text = "右键点击" }
             }
         }
     }
@@ -425,7 +367,6 @@ internal class DSLExamples : Application() {
                     "布局约束" to { constraintsExample() },
                     "属性绑定" to { bindingExample() },
                     "动画效果" to { animationExample() },
-                    "事件处理" to { eventExample() },
                     "快捷键" to { shortcutExample() },
                     "样式DSL" to { styleExample() },
                     "其他面板" to { morePanesExample() },

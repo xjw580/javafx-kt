@@ -159,3 +159,12 @@ fun <T : Node> PaneBaseBuilder<*>.addWithBox(
     node.boxConstraints(block)
     return node
 }
+
+fun Node.setLeftAnchor(v: Double) = AnchorPane.setLeftAnchor(this, v)
+fun Node.setRightAnchor(v: Double) = AnchorPane.setRightAnchor(this, v)
+fun Node.setTopAnchor(v: Double) = AnchorPane.setTopAnchor(this, v)
+fun Node.setBottomAnchor(v: Double) = AnchorPane.setBottomAnchor(this, v)
+fun Node.setHgrow(priority: Priority) = HBox.setHgrow(this, priority)
+fun Node.setHgrowAlways() = HBox.setHgrow(this, Priority.ALWAYS)
+fun Node.setVgrow(priority: Priority) = VBox.setVgrow(this, priority)
+fun Node.setVgrowAlways(priority: Priority) = VBox.setVgrow(this, Priority.ALWAYS)

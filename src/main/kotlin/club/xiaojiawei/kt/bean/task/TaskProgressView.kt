@@ -2,7 +2,11 @@ package club.xiaojiawei.kt.bean.task
 
 import club.xiaojiawei.controls.ico.FailIco
 import club.xiaojiawei.controls.ico.OKIco
+import club.xiaojiawei.kt.dsl.FontWeight
+import club.xiaojiawei.kt.dsl.styled
 import club.xiaojiawei.kt.ext.runUI
+import javafx.geometry.Insets
+import javafx.geometry.Pos
 import javafx.scene.control.*
 import javafx.scene.layout.HBox
 import javafx.scene.layout.Priority
@@ -27,7 +31,13 @@ class TaskProgressView<T : TaskBuilder> : VBox() {
     private var completedCountLabel: Label? = null
     private var failedCountLabel: Label? = null
     private var totalCountLabel: Label? = null
-    private val taskPane = VBox()
+    private val taskPane = VBox(10.0).apply {
+        padding = Insets(12.0)
+//        styleClass.addAll("bg-ui")
+        styled {
+            backgroundColor("#f7f8fa")
+        }
+    }
 
     // 任务控制回调
     var onPauseTask: ((String) -> Unit)? = null
@@ -44,37 +54,44 @@ class TaskProgressView<T : TaskBuilder> : VBox() {
     var onDeleteAll: (() -> Unit)? = null
 
     init {
+        styleClass.addAll("task-progress-view", "radius-ui")
+        styled {
+            backgroundColor("#ffffff")
+            backgroundRadius(8.0)
+        }
         createGlobalControlPanel()
-        maxWidth = 650.0
+        maxWidth = 700.0
     }
 
     private fun createGlobalControlPanel() {
-        val globalControlPanel = HBox(10.0).apply {
-            style =
-                "-fx-padding: 10; -fx-background-color: #e8e8e8; -fx-border-color: #cccccc; -fx-border-width: 0 0 1 0;"
+        val globalControlPanel = HBox(14.0).apply {
+            alignment = Pos.CENTER_LEFT
+            padding = Insets(14.0, 16.0, 12.0, 16.0)
+//            styleClass.addAll("bg-ui")
+            styled {
+                backgroundColor("#ffffff")
+                borderColor("#edf0f4")
+                borderWidth(0.0)
+                custom("-fx-border-width", "0 0 1 0")
+            }
         }
 
-        val titleLabel = Label("任务管理器")
-        titleLabel.style = "-fx-font-weight: bold; -fx-font-size: 16px;"
+        val titleLabel = Label("任务管理器").applyTitleStyle()
 
         // 添加状态统计显示
-        val statisticsContainer = HBox(15.0)
-        statisticsContainer.style = "-fx-alignment: center-left;"
+        val statisticsContainer = HBox(8.0).apply {
+            alignment = Pos.CENTER_LEFT
+        }
 
-        val runningLabel = Label("运行中: 0")
-        runningLabel.style = "-fx-font-size: 12px; -fx-text-fill: #4CAF50; -fx-font-weight: bold;"
+        val runningLabel = Label("运行中: 0").applyStatisticStyle("#24a148")
 
-        val pendingLabel = Label("等待中: 0")
-        pendingLabel.style = "-fx-font-size: 12px; -fx-text-fill: #FF9800; -fx-font-weight: bold;"
+        val pendingLabel = Label("等待中: 0").applyStatisticStyle("#c77700")
 
-        val completedLabel = Label("已完成: 0")
-        completedLabel.style = "-fx-font-size: 12px; -fx-text-fill: #2196F3; -fx-font-weight: bold;"
+        val completedLabel = Label("已完成: 0").applyStatisticStyle("#2773d9")
 
-        val failedLabel = Label("已完成: 0")
-        failedLabel.style = "-fx-font-size: 12px; -fx-text-fill: #fa7a7a; -fx-font-weight: bold;"
+        val failedLabel = Label("已失败: 0").applyStatisticStyle("#d64545")
 
-        val totalLabel = Label("总计: 0")
-        totalLabel.style = "-fx-font-size: 12px; -fx-text-fill: #666666; -fx-font-weight: bold;"
+        val totalLabel = Label("总计: 0").applyStatisticStyle("#5f6875")
 
         statisticsContainer.children.addAll(runningLabel, pendingLabel, completedLabel, failedLabel, totalLabel)
 
@@ -85,33 +102,26 @@ class TaskProgressView<T : TaskBuilder> : VBox() {
         this.failedCountLabel = failedLabel
         this.totalCountLabel = totalLabel
 
-        val buttonContainer = HBox(5.0)
-        buttonContainer.style = "-fx-alignment: center-right;"
+        val buttonContainer = HBox(6.0).apply {
+            alignment = Pos.BOTTOM_RIGHT
+        }
 
-        val pauseAllBtn = Button("暂停所有")
-        pauseAllBtn.style =
-            "-fx-font-size: 11px; -fx-padding: 5 10 5 10; -fx-background-color: #FF9800; -fx-text-fill: white;"
+        val pauseAllBtn = Button("暂停所有").applyActionStyle("btn-ui-warn")
         pauseAllBtn.setOnAction { onPauseAll?.invoke() }
 
-        val resumeAllBtn = Button("继续所有")
-        resumeAllBtn.style =
-            "-fx-font-size: 11px; -fx-padding: 5 10 5 10; -fx-background-color: #4CAF50; -fx-text-fill: white;"
+        val resumeAllBtn = Button("继续所有").applyActionStyle("btn-ui-success")
         resumeAllBtn.setOnAction { onResumeAll?.invoke() }
 
-        val cancelAllBtn = Button("取消所有")
-        cancelAllBtn.style =
-            "-fx-font-size: 11px; -fx-padding: 5 10 5 10; -fx-background-color: #f44336; -fx-text-fill: white;"
+        val cancelAllBtn = Button("取消所有").applyActionStyle("btn-ui-error")
         cancelAllBtn.setOnAction { onCancelAll?.invoke() }
 
-        val deleteAllBtn = Button("删除所有")
-        deleteAllBtn.style =
-            "-fx-font-size: 11px; -fx-padding: 5 10 5 10; -fx-background-color: #9C27B0; -fx-text-fill: white;"
+        val deleteAllBtn = Button("删除所有").applyActionStyle("btn-ui-normal")
         deleteAllBtn.setOnAction { onDeleteAll?.invoke() }
 
         buttonContainer.children.addAll(pauseAllBtn, resumeAllBtn, cancelAllBtn, deleteAllBtn)
 
         // 布局：标题 - 统计信息 - 按钮
-        val leftContainer = VBox(5.0)
+        val leftContainer = VBox(6.0)
         leftContainer.children.addAll(titleLabel, statisticsContainer)
 
         HBox.setHgrow(leftContainer, Priority.ALWAYS)
@@ -120,6 +130,14 @@ class TaskProgressView<T : TaskBuilder> : VBox() {
         children.addAll(globalControlPanel, ScrollPane(taskPane).apply {
             maxHeight = 800.0
             isFitToWidth = true
+            hbarPolicy = ScrollPane.ScrollBarPolicy.NEVER
+            styleClass.addAll("edge-to-edge")
+            styled {
+                background("#f7f8fa")
+                backgroundColor("#f7f8fa")
+                backgroundInsets(0.0)
+                padding(0.0)
+            }
         })
     }
 
@@ -132,27 +150,24 @@ class TaskProgressView<T : TaskBuilder> : VBox() {
                 // 如果任务已存在，跳过继续处理下一个（修复：使用 continue 而不是 return）
                 if (taskContainers.containsKey(task.id)) continue
 
-                val container = VBox(8.0)
-                container.style =
-                    "-fx-border-color: #cccccc; -fx-border-width: 1; -fx-padding: 10; -fx-background-color: #fafafa;"
+                val container = VBox(9.0).applyTaskCardStyle()
 
                 // 任务头部（标题和控制按钮）
-                val headerBox = HBox(10.0)
-                headerBox.style = "-fx-alignment: center-left;"
+                val headerBox = HBox(10.0).apply {
+                    alignment = Pos.CENTER_LEFT
+                }
 
-                val label = Label("任务: ${task.name}")
-                label.style = "-fx-font-weight: bold; -fx-font-size: 14px;"
+                val label = Label(task.name).applyTaskTitleStyle()
 
-                val controlBox = HBox(5.0)
-                controlBox.style = "-fx-alignment: center-right;"
+                val controlBox = HBox(5.0).apply {
+                    alignment = Pos.CENTER_RIGHT
+                }
 
-                val pauseBtn = Button("暂停")
+                val pauseBtn = Button("暂停").applyActionStyle("btn-ui-warn", compact = true)
                 pauseBtn.isDisable = true
-                pauseBtn.style = "-fx-font-size: 11px; -fx-padding: 3 8 3 8;"
                 pauseBtn.setOnAction { onPauseTask?.invoke(task.id) }
 
-                val resumeBtn = Button("继续")
-                resumeBtn.style = "-fx-font-size: 11px; -fx-padding: 3 8 3 8;"
+                val resumeBtn = Button("继续").applyActionStyle("btn-ui-success", compact = true)
                 resumeBtn.setOnAction {
                     if (resumeBtn.text == "继续") {
                         onResumeTask?.invoke(task.id)
@@ -162,14 +177,10 @@ class TaskProgressView<T : TaskBuilder> : VBox() {
                 }
                 resumeBtn.isDisable = true // 初始状态禁用
 
-                val cancelBtn = Button("取消")
-                cancelBtn.style =
-                    "-fx-font-size: 11px; -fx-padding: 3 8 3 8; -fx-background-color: #f44336; -fx-text-fill: white;"
+                val cancelBtn = Button("取消").applyActionStyle("btn-ui-error", compact = true)
                 cancelBtn.setOnAction { onCancelTask?.invoke(task.id) }
 
-                val deleteBtn = Button("删除")
-                deleteBtn.style =
-                    "-fx-font-size: 11px; -fx-padding: 3 8 3 8; -fx-background-color: #9C27B0; -fx-text-fill: white;"
+                val deleteBtn = Button("删除").applyActionStyle("btn-ui-normal", compact = true)
                 deleteBtn.setOnAction { onDeleteTask?.invoke(task.id) }
 
                 controlBox.children.addAll(pauseBtn, resumeBtn, cancelBtn, deleteBtn)
@@ -180,11 +191,14 @@ class TaskProgressView<T : TaskBuilder> : VBox() {
 
                 val progressBar = ProgressBar(0.0)
                 progressBar.prefWidthProperty().bind(container.widthProperty())
-                progressBar.prefHeight = 11.0
-                progressBar.style = "-fx-accent: #80ce80!important;"
+                progressBar.prefHeight = 6.0
+                progressBar.styleClass.add("progress-bar-ui")
+                progressBar.styled {
+                    accentColor("#38b86b")
+                }
 
                 val statusLabel = Label("等待中")
-                statusLabel.style = "-fx-font-size: 12px; -fx-text-fill: #666666;"
+                statusLabel.applyStatusStyle()
                 statusLabel.contentDisplay = ContentDisplay.RIGHT
 
                 container.children.addAll(headerBox, progressBar, statusLabel)
@@ -210,7 +224,7 @@ class TaskProgressView<T : TaskBuilder> : VBox() {
         runUI {
             taskProgressBars[progress.taskId]?.progress = progress.progress
             taskStatuses[progress.taskId]?.let {
-                it.text = "${progress.status.name}: ${progress.message}"
+                it.text = "${progress.status.comment}: ${progress.message}"
                 if (progress.status == TaskStatus.COMPLETED) {
                     if (it.graphic !is OKIco) {
                         it.graphic = OKIco()
@@ -340,21 +354,21 @@ class TaskProgressView<T : TaskBuilder> : VBox() {
         val taskSubViews = subTaskViews[taskId] ?: return
 
         if (subTaskId !in taskSubViews) {
-            val subContainer = VBox(3.0)
-            subContainer.style =
-                "-fx-padding: 0 0 0 20; -fx-background-color: #f0f0f0; -fx-border-radius: 3; -fx-padding: 5;"
+            val subContainer = VBox(4.0).applySubTaskCardStyle()
 
             // 直接显示子任务的名称
-            val subLabel = Label("  └ ${progress.subTaskName}")
-            subLabel.style = "-fx-font-size: 12px;"
+            val subLabel = Label(progress.subTaskName).applySubTaskTitleStyle()
 
             val subProgressBar = ProgressBar(0.0)
-            subProgressBar.prefHeight = 9.0
+            subProgressBar.prefHeight = 4.0
             subProgressBar.prefWidthProperty().bind(subContainer.widthProperty())
-            subProgressBar.style = "-fx-accent: #4f9fff!important;"
+            subProgressBar.styleClass.add("progress-bar-ui")
+            subProgressBar.styled {
+                accentColor("#4f8fff")
+            }
 
             val subStatus = Label("等待中")
-            subStatus.style = "-fx-font-size: 10px; -fx-text-fill: #888888;"
+            subStatus.applySubStatusStyle()
 
             subContainer.children.addAll(subLabel, subProgressBar, subStatus)
             taskSubViews[subTaskId] = subContainer
@@ -364,8 +378,112 @@ class TaskProgressView<T : TaskBuilder> : VBox() {
         val subContainer = taskSubViews[subTaskId]
         if (subContainer != null && subContainer.children.size >= 3) {
             (subContainer.children[1] as ProgressBar).progress = progress.progress
-            (subContainer.children[2] as Label).text = "${progress.status.name}: ${progress.message}"
+            (subContainer.children[2] as Label).text = "${progress.status.comment}: ${progress.message}"
         }
+    }
+
+    private fun Label.applyTitleStyle(): Label {
+        styled {
+            fontSize(15.0)
+            fontWeight(FontWeight.BOLD)
+            textFill("#1f2937")
+        }
+        return this
+    }
+
+    private fun Label.applyStatisticStyle(textColor: String): Label {
+        styleClass.addAll("label-ui", "radius-ui")
+        styled {
+            fontSize(12.0)
+            fontWeight(FontWeight.BOLD)
+            textFill(textColor)
+            padding(3.0, 8.0, 3.0, 8.0)
+            backgroundColor("#f8fafc")
+            backgroundRadius(12.0)
+            borderColor("#e5eaf0")
+            borderRadius(12.0)
+            borderWidth(1.0)
+        }
+        return this
+    }
+
+    private fun Label.applyTaskTitleStyle(): Label {
+        styleClass.addAll("label-ui", "label-ui-small", "label-ui-normal")
+        styled {
+            fontSize(13.0)
+            fontWeight(FontWeight.BOLD)
+            textFill("#1f2937")
+        }
+        return this
+    }
+
+    private fun Label.applyStatusStyle(): Label {
+        styleClass.addAll("label-ui", "label-ui-small", "radius-ui")
+        styled {
+            fontSize(12.0)
+            textFill("#687385")
+        }
+        return this
+    }
+
+    private fun Label.applySubTaskTitleStyle(): Label {
+        styleClass.addAll("label-ui", "label-ui-tiny", "label-ui-normal")
+        styled {
+            fontSize(12.0)
+            fontWeight(FontWeight.BOLD)
+            textFill("#3f4a5a")
+        }
+        return this
+    }
+
+    private fun Label.applySubStatusStyle(): Label {
+        styleClass.addAll("label-ui", "label-ui-tiny", "radius-ui")
+        styled {
+            fontSize(10.0)
+            textFill("#7d8794")
+        }
+        return this
+    }
+
+    private fun Button.applyActionStyle(variant: String, compact: Boolean = false): Button {
+        styleClass.addAll("btn-ui", "btn-ui-small", variant)
+        styled {
+            fontSize(11.0)
+            if (compact) {
+                padding(3.0, 8.0, 3.0, 8.0)
+            } else {
+                padding(5.0, 10.0, 5.0, 10.0)
+            }
+        }
+        return this
+    }
+
+    private fun VBox.applyTaskCardStyle(): VBox {
+        padding = Insets(12.0)
+        styleClass.addAll("radius-ui")
+        styled {
+            backgroundColor("#ffffff")
+            backgroundRadius(6.0)
+            borderColor("#e6ebf1")
+            borderRadius(6.0)
+            borderWidth(1.0)
+            effect("dropshadow(gaussian, rgba(15, 23, 42, 0.08), 8, 0, 0, 2)")
+        }
+        return this
+    }
+
+    private fun VBox.applySubTaskCardStyle(): VBox {
+        padding = Insets(8.0, 10.0, 8.0, 14.0)
+        setMargin(this, Insets(2.0, 0.0, 0.0, 12.0))
+        styleClass.addAll("radius-ui")
+        styled {
+            backgroundColor("#f8fafc")
+            backgroundRadius(6.0)
+            borderColor("#edf1f5")
+            borderRadius(6.0)
+            borderWidth(1.0)
+        }
+        return this
     }
 
     fun removeTask(taskId: String) {
