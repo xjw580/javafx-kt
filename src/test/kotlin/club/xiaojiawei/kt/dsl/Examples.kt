@@ -7,6 +7,7 @@ import javafx.animation.KeyFrame
 import javafx.animation.Timeline
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleStringProperty
+import javafx.scene.layout.StackPane
 import javafx.util.Duration
 
 /**
@@ -15,9 +16,25 @@ import javafx.util.Duration
  * @date 2026/3/27 15:04
  */
 fun main() {
-//    example1()
+    example1()
 //    example2()
 //    example3()
+}
+
+class TestPane: StackPane() {
+    init {
+        config {
+            styled {
+                backgroundColor("pink")
+            }
+            addVBox {
+                spacing(10.0)
+                addLabel { +"test1" }
+                addLabel { +"test2" }
+                addLabel { +"test3" }
+            }
+        }
+    }
 }
 
 /**
@@ -43,6 +60,7 @@ fun example1() {
                         }
                     }
                     addVBox { }
+                    +TestPane()
                 }
             }
         }

@@ -95,21 +95,21 @@ abstract class PaneBaseBuilder<T : Pane> : RegionBaseBuilder<T>() {
         }
     }
 
-    fun addRegion() {
+    fun addRegion(config: Region.() -> Unit = {}) {
         add {
-            Region()
+            Region().apply(config)
         }
     }
 
-    fun addVSpacer(priority: Priority = Priority.ALWAYS) {
+    fun addVSpacer(priority: Priority = Priority.ALWAYS, config: Region.() -> Unit = {}) {
         add {
-            vSpacer(priority)
+            vSpacer(priority, config)
         }
     }
 
-    fun addHSpacer(priority: Priority = Priority.ALWAYS) {
+    fun addHSpacer(priority: Priority = Priority.ALWAYS, config: Region.() -> Unit = {}) {
         add {
-            hSpacer(priority)
+            hSpacer(priority, config)
         }
     }
 
@@ -983,11 +983,6 @@ inline fun paneBuilder(config: PaneBuilder.() -> Unit): PaneBuilder {
     return PaneBuilder().apply(config)
 }
 
-//inline fun Pane.config(config: PaneBuilder.() -> Unit) :Pane{
-//    PaneBuilder().apply(config).config(this)
-//return this
-//}
-
 // VBox 衍生
 inline fun vbox(config: VBoxBuilder.() -> Unit): VBox {
     return vboxBuilder(config).build()
@@ -998,7 +993,10 @@ inline fun vboxBuilder(config: VBoxBuilder.() -> Unit): VBoxBuilder {
 }
 
 inline fun VBox.config(config: VBoxBuilder.() -> Unit): VBox {
-    VBoxBuilder().apply(config).config(this)
+    VBoxBuilder().apply {
+        delayMode()
+        config()
+    }.config(this)
     return this
 }
 
@@ -1012,7 +1010,10 @@ inline fun hboxBuilder(config: HBoxBuilder.() -> Unit): HBoxBuilder {
 }
 
 inline fun HBox.config(config: HBoxBuilder.() -> Unit): HBox {
-    HBoxBuilder().apply(config).config(this)
+    HBoxBuilder().apply {
+        delayMode()
+        config()
+    }.config(this)
     return this
 }
 
@@ -1026,7 +1027,10 @@ inline fun stackPaneBuilder(config: StackPaneBuilder.() -> Unit): StackPaneBuild
 }
 
 inline fun StackPane.config(config: StackPaneBuilder.() -> Unit): StackPane {
-    StackPaneBuilder().apply(config).config(this)
+    StackPaneBuilder().apply {
+        delayMode()
+        config()
+    }.config(this)
     return this
 }
 
@@ -1040,7 +1044,10 @@ inline fun borderPaneBuilder(config: BorderPaneBuilder.() -> Unit): BorderPaneBu
 }
 
 inline fun BorderPane.config(config: BorderPaneBuilder.() -> Unit): BorderPane {
-    BorderPaneBuilder().apply(config).config(this)
+    BorderPaneBuilder().apply {
+        delayMode()
+        config()
+    }.config(this)
     return this
 }
 
@@ -1054,7 +1061,10 @@ inline fun gridPaneBuilder(config: GridPaneBuilder.() -> Unit): GridPaneBuilder 
 }
 
 inline fun GridPane.config(config: GridPaneBuilder.() -> Unit): GridPane {
-    GridPaneBuilder().apply(config).config(this)
+    GridPaneBuilder().apply {
+        delayMode()
+        config()
+    }.config(this)
     return this
 }
 
@@ -1064,7 +1074,10 @@ inline fun anchorPane(config: AnchorPaneBuilder.() -> Unit): AnchorPane {
 }
 
 inline fun AnchorPane.config(config: AnchorPaneBuilder.() -> Unit): AnchorPane {
-    AnchorPaneBuilder().apply(config).config(this)
+    AnchorPaneBuilder().apply {
+        delayMode()
+        config()
+    }.config(this)
     return this
 }
 
@@ -1074,7 +1087,10 @@ inline fun flowPane(config: FlowPaneBuilder.() -> Unit): FlowPane {
 }
 
 inline fun FlowPane.config(config: FlowPaneBuilder.() -> Unit): FlowPane {
-    FlowPaneBuilder().apply(config).config(this)
+    FlowPaneBuilder().apply {
+        delayMode()
+        config()
+    }.config(this)
     return this
 }
 
@@ -1084,7 +1100,10 @@ inline fun tilePane(config: TilePaneBuilder.() -> Unit): TilePane {
 }
 
 inline fun TilePane.config(config: TilePaneBuilder.() -> Unit): TilePane {
-    TilePaneBuilder().apply(config).config(this)
+    TilePaneBuilder().apply {
+        delayMode()
+        config()
+    }.config(this)
     return this
 }
 
@@ -1094,7 +1113,10 @@ inline fun scrollPane(config: ScrollPaneBuilder.() -> Unit): ScrollPane {
 }
 
 inline fun ScrollPane.config(config: ScrollPaneBuilder.() -> Unit): ScrollPane {
-    ScrollPaneBuilder().apply(config).config(this)
+    ScrollPaneBuilder().apply {
+        delayMode()
+        config()
+    }.config(this)
     return this
 }
 
@@ -1104,7 +1126,10 @@ inline fun splitPane(config: SplitPaneBuilder.() -> Unit): SplitPane {
 }
 
 inline fun SplitPane.config(config: SplitPaneBuilder.() -> Unit): SplitPane {
-    SplitPaneBuilder().apply(config).config(this)
+    SplitPaneBuilder().apply {
+        delayMode()
+        config()
+    }.config(this)
     return this
 }
 
@@ -1121,6 +1146,9 @@ inline fun titledPane(title: String, config: TitledPaneBuilder.() -> Unit = {}):
 }
 
 inline fun TitledPane.config(config: TitledPaneBuilder.() -> Unit): TitledPane {
-    TitledPaneBuilder().apply(config).config(this)
+    TitledPaneBuilder().apply {
+        delayMode()
+        config()
+    }.config(this)
     return this
 }

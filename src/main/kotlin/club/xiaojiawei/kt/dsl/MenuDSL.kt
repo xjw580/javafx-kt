@@ -218,7 +218,10 @@ inline fun contextMenuBuilder(config: ContextMenuBuilder.() -> Unit): ContextMen
 }
 
 inline fun ContextMenu.config(config: ContextMenuBuilder.() -> Unit): ContextMenu {
-    ContextMenuBuilder().apply(config).config(this)
+    ContextMenuBuilder().apply {
+        delayMode()
+        config()
+    }.config(this)
     return this
 }
 
@@ -239,7 +242,10 @@ inline fun menuItemBuilder(config: MenuItemBuilder.() -> Unit): MenuItemBuilder 
 }
 
 inline fun MenuItem.config(config: MenuItemBuilder.() -> Unit): MenuItem {
-    MenuItemBuilder().apply(config).config(this)
+    MenuItemBuilder().apply {
+        delayMode()
+        config()
+    }.config(this)
     return this
 }
 
@@ -260,7 +266,10 @@ inline fun radioMenuItemBuilder(config: RadioMenuItemBuilder.() -> Unit): RadioM
 }
 
 inline fun RadioMenuItem.config(config: RadioMenuItemBuilder.() -> Unit): RadioMenuItem {
-    RadioMenuItemBuilder().apply(config).config(this)
+    RadioMenuItemBuilder().apply {
+        delayMode()
+        config()
+    }.config(this)
     return this
 }
 
@@ -281,6 +290,9 @@ inline fun menuBuilder(config: MenuBuilder.() -> Unit): MenuBuilder {
 }
 
 inline fun Menu.config(config: MenuBuilder.() -> Unit): Menu {
-    MenuBuilder().apply(config).config(this)
+    MenuBuilder().apply {
+        delayMode()
+        config()
+    }.config(this)
     return this
 }

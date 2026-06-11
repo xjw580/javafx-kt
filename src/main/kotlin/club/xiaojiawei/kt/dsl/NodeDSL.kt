@@ -1146,7 +1146,10 @@ inline fun textBuilder(config: TextBuilder.() -> Unit): TextBuilder {
 }
 
 inline fun Text.config(config: TextBuilder.() -> Unit): Text {
-    TextBuilder().apply(config).config(this)
+    TextBuilder().apply {
+        delayMode()
+        config()
+    }.config(this)
     return this
 }
 
@@ -1174,7 +1177,10 @@ inline fun polygonBuilder(config: PolygonBuilder.() -> Unit): PolygonBuilder {
 }
 
 inline fun Polygon.config(config: PolygonBuilder.() -> Unit): Polygon {
-    PolygonBuilder().apply(config).config(this)
+    PolygonBuilder().apply {
+        delayMode()
+        config()
+    }.config(this)
     return this
 }
 
@@ -1195,7 +1201,10 @@ inline fun labelBuilder(config: LabelBuilder.() -> Unit): LabelBuilder {
 }
 
 inline fun Label.config(config: LabelBuilder.() -> Unit): Label {
-    LabelBuilder().apply(config).config(this)
+    LabelBuilder().apply {
+        delayMode()
+        config()
+    }.config(this)
     return this
 }
 
@@ -1216,7 +1225,10 @@ inline fun buttonBuilder(config: ButtonBuilder.() -> Unit): ButtonBuilder {
 }
 
 inline fun Button.config(config: ButtonBuilder.() -> Unit): Button {
-    ButtonBuilder().apply(config).config(this)
+    ButtonBuilder().apply {
+        delayMode()
+        config()
+    }.config(this)
     return this
 }
 
@@ -1237,7 +1249,10 @@ inline fun textFieldBuilder(config: TextFieldBuilder.() -> Unit): TextFieldBuild
 }
 
 inline fun TextField.config(config: TextFieldBuilder.() -> Unit): TextField {
-    TextFieldBuilder().apply(config).config(this)
+    TextFieldBuilder().apply {
+        delayMode()
+        config()
+    }.config(this)
     return this
 }
 
@@ -1258,7 +1273,10 @@ inline fun textAreaBuilder(config: TextAreaBuilder.() -> Unit): TextAreaBuilder 
 }
 
 inline fun TextArea.config(config: TextAreaBuilder.() -> Unit): TextArea {
-    TextAreaBuilder().apply(config).config(this)
+    TextAreaBuilder().apply {
+        delayMode()
+        config()
+    }.config(this)
     return this
 }
 
@@ -1279,7 +1297,10 @@ inline fun checkBoxBuilder(config: CheckBoxBuilder.() -> Unit): CheckBoxBuilder 
 }
 
 inline fun CheckBox.config(config: CheckBoxBuilder.() -> Unit): CheckBox {
-    CheckBoxBuilder().apply(config).config(this)
+    CheckBoxBuilder().apply {
+        delayMode()
+        config()
+    }.config(this)
     return this
 }
 
@@ -1312,7 +1333,10 @@ inline fun radioButtonBuilder(config: RadioButtonBuilder.() -> Unit): RadioButto
 }
 
 inline fun RadioButton.config(config: RadioButtonBuilder.() -> Unit): RadioButton {
-    RadioButtonBuilder().apply(config).config(this)
+    RadioButtonBuilder().apply {
+        delayMode()
+        config()
+    }.config(this)
     return this
 }
 
@@ -1333,7 +1357,10 @@ inline fun <T> comboBoxBuilder(config: ComboBoxBuilder<T>.() -> Unit): ComboBoxB
 }
 
 inline fun <T> ComboBox<T>.config(config: ComboBoxBuilder<T>.() -> Unit): ComboBox<T> {
-    ComboBoxBuilder<T>().apply(config).config(this)
+    ComboBoxBuilder<T>().apply {
+        delayMode()
+        config()
+    }.config(this)
     return this
 }
 
@@ -1354,7 +1381,10 @@ inline fun <T> listViewBuilder(config: ListViewBuilder<T>.() -> Unit): ListViewB
 }
 
 inline fun <T> ListView<T>.config(config: ListViewBuilder<T>.() -> Unit): ListView<T> {
-    ListViewBuilder<T>().apply(config).config(this)
+    ListViewBuilder<T>().apply {
+        delayMode()
+        config()
+    }.config(this)
     return this
 }
 
@@ -1375,7 +1405,10 @@ inline fun <T> tableViewBuilder(config: TableViewBuilder<T>.() -> Unit): TableVi
 }
 
 inline fun <T> TableView<T>.config(config: TableViewBuilder<T>.() -> Unit): TableView<T> {
-    TableViewBuilder<T>().apply(config).config(this)
+    TableViewBuilder<T>().apply {
+        delayMode()
+        config()
+    }.config(this)
     return this
 }
 
@@ -1389,7 +1422,10 @@ inline fun progressBarBuilder(config: ProgressBarBuilder.() -> Unit): ProgressBa
 }
 
 inline fun ProgressBar.config(config: ProgressBarBuilder.() -> Unit): ProgressBar {
-    ProgressBarBuilder().apply(config).config(this)
+    ProgressBarBuilder().apply {
+        delayMode()
+        config()
+    }.config(this)
     return this
 }
 
@@ -1403,7 +1439,10 @@ inline fun sliderBuilder(config: SliderBuilder.() -> Unit): SliderBuilder {
 }
 
 inline fun Slider.config(config: SliderBuilder.() -> Unit): Slider {
-    SliderBuilder().apply(config).config(this)
+    SliderBuilder().apply {
+        delayMode()
+        config()
+    }.config(this)
     return this
 }
 
@@ -1424,7 +1463,10 @@ inline fun imageViewBuilder(config: ImageViewBuilder.() -> Unit): ImageViewBuild
 }
 
 inline fun ImageView.config(config: ImageViewBuilder.() -> Unit): ImageView {
-    ImageViewBuilder().apply(config).config(this)
+    ImageViewBuilder().apply {
+        delayMode()
+        config()
+    }.config(this)
     return this
 }
 
@@ -1438,7 +1480,10 @@ inline fun separatorBuilder(config: SeparatorBuilder.() -> Unit): SeparatorBuild
 }
 
 inline fun Separator.config(config: SeparatorBuilder.() -> Unit): Separator {
-    SeparatorBuilder().apply(config).config(this)
+    SeparatorBuilder().apply {
+        delayMode()
+        config()
+    }.config(this)
     return this
 }
 

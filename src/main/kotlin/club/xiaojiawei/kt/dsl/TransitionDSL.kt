@@ -397,7 +397,10 @@ inline fun fadeTransitionBuilder(config: FadeTransitionBuilder.() -> Unit): Fade
 }
 
 inline fun FadeTransition.config(config: FadeTransitionBuilder.() -> Unit): FadeTransition {
-    FadeTransitionBuilder().apply(config).config(this)
+    FadeTransitionBuilder().apply {
+        delayMode()
+        config()
+    }.config(this)
     return this
 }
 
@@ -429,7 +432,10 @@ inline fun scaleTransitionBuilder(config: ScaleTransitionBuilder.() -> Unit): Sc
 }
 
 inline fun ScaleTransition.config(config: ScaleTransitionBuilder.() -> Unit): ScaleTransition {
-    ScaleTransitionBuilder().apply(config).config(this)
+    ScaleTransitionBuilder().apply {
+        delayMode()
+        config()
+    }.config(this)
     return this
 }
 
@@ -443,7 +449,10 @@ inline fun translateTransitionBuilder(config: TranslateTransitionBuilder.() -> U
 }
 
 inline fun TranslateTransition.config(config: TranslateTransitionBuilder.() -> Unit): TranslateTransition {
-    TranslateTransitionBuilder().apply(config).config(this)
+    TranslateTransitionBuilder().apply {
+        delayMode()
+        config()
+    }.config(this)
     return this
 }
 
@@ -457,7 +466,10 @@ inline fun rotateTransitionBuilder(config: RotateTransitionBuilder.() -> Unit): 
 }
 
 inline fun RotateTransition.config(config: RotateTransitionBuilder.() -> Unit): RotateTransition {
-    RotateTransitionBuilder().apply(config).config(this)
+    RotateTransitionBuilder().apply {
+        delayMode()
+        config()
+    }.config(this)
     return this
 }
 
@@ -471,7 +483,10 @@ inline fun pathTransitionBuilder(config: PathTransitionBuilder.() -> Unit): Path
 }
 
 inline fun PathTransition.config(config: PathTransitionBuilder.() -> Unit): PathTransition {
-    PathTransitionBuilder().apply(config).config(this)
+    PathTransitionBuilder().apply {
+        delayMode()
+        config()
+    }.config(this)
     return this
 }
 
@@ -485,7 +500,10 @@ inline fun pauseTransitionBuilder(config: PauseTransitionBuilder.() -> Unit): Pa
 }
 
 inline fun PauseTransition.config(config: PauseTransitionBuilder.() -> Unit): PauseTransition {
-    PauseTransitionBuilder().apply(config).config(this)
+    PauseTransitionBuilder().apply {
+        delayMode()
+        config()
+    }.config(this)
     return this
 }
 
@@ -549,7 +567,10 @@ inline fun sequentialTransitionBuilder(config: SequentialTransitionBuilder.() ->
 }
 
 inline fun SequentialTransition.config(config: SequentialTransitionBuilder.() -> Unit): SequentialTransition {
-    SequentialTransitionBuilder().apply(config).config(this)
+    SequentialTransitionBuilder().apply {
+        delayMode()
+        config()
+    }.config(this)
     return this
 }
 
@@ -563,6 +584,9 @@ inline fun parallelTransitionBuilder(config: ParallelTransitionBuilder.() -> Uni
 }
 
 inline fun ParallelTransition.config(config: ParallelTransitionBuilder.() -> Unit): ParallelTransition {
-    ParallelTransitionBuilder().apply(config).config(this)
+    ParallelTransitionBuilder().apply {
+        delayMode()
+        config()
+    }.config(this)
     return this
 }

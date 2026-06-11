@@ -122,6 +122,10 @@ class StageBuilder(private val existingStage: Stage? = null) : DslBuilder<Stage>
         }
     }
 
+    fun style() = settings {
+        JavaFXUI.addjavafxUIStylesheet(scene)
+    }
+
     fun initOwner(window: Window?) {
         window ?: return
         settings {
@@ -212,7 +216,10 @@ inline fun scene(config: SceneBuilder.() -> Unit) = SceneBuilder().apply(config)
 inline fun sceneBuilder(config: SceneBuilder.() -> Unit) = SceneBuilder().apply(config)
 
 inline fun Scene.config(config: SceneBuilder.() -> Unit): Scene {
-    SceneBuilder().apply(config).config(this)
+    SceneBuilder().apply {
+        delayMode()
+        config()
+    }.config(this)
     return this
 }
 
@@ -222,6 +229,9 @@ inline fun stage(config: StageBuilder.() -> Unit) = StageBuilder().apply(config)
 inline fun stageBuilder(config: StageBuilder.() -> Unit) = StageBuilder().apply(config)
 
 inline fun Stage.config(config: StageBuilder.() -> Unit): Stage {
-    StageBuilder().apply(config).config(this)
+    StageBuilder().apply {
+        delayMode()
+        config()
+    }.config(this)
     return this
 }
