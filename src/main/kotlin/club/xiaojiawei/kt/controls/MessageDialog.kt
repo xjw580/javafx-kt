@@ -15,6 +15,7 @@ import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyEvent
 import javafx.scene.input.MouseEvent
 import javafx.scene.layout.HBox
+import javafx.scene.layout.Pane
 import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
 import javafx.scene.paint.Color
@@ -47,48 +48,53 @@ class MessageDialog(val baseParent: Parent) {
 
     fun init(content: Node) {
         this.contentNode = content
-
-        val rootPane = stackPane {
-            rootPane = instance()
-            styled {
-                backgroundColor("#00000011")
-            }
-            styleClass("fixed-label-color")
-
-            +scrollPane {
-                content {
-                    stackPane {
-                        topPane = instance()
-                        +Group(
-                            stackPane {
-                                +content
-                                styled {
-                                    effect("dropshadow(gaussian, rgba(128, 128, 128, 0.67), 10, 0, 0, 3)")
-                                    backgroundColor("white")
-                                }
-                            }
-                        )
-                    }
+        stage.config {
+            scene {
+                JavaFXUI.addjavafxUIStylesheet(instance())
+                root {
+                    buildRootPane(content)
                 }
-                fitToWidth(true)
-                fitToHeight(true)
-                styled {
-                    background("transparent")
-                    backgroundColor("transparent")
-                    backgroundInsets(0.0)
-                    padding(0.0)
-                }
+                fill(Color.TRANSPARENT)
             }
+            initStyle(StageStyle.TRANSPARENT)
+            initModality(Modality.WINDOW_MODAL)
+            initOwner(baseParent.scene.window)
+
         }
-        val scene = scene {
-            root {
-                rootPane
-            }
-            fill(Color.TRANSPARENT)
-        }
-        stage.scene = scene
-        JavaFXUI.addjavafxUIStylesheet(scene)
         addClosingListeners()
+    }
+
+    private fun buildRootPane(content: Node): Pane = stackPane {
+        rootPane = instance()
+        styled {
+            backgroundColor("#00000011")
+        }
+        styleClass("fixed-label-color")
+
+        +scrollPane {
+            content {
+                stackPane {
+                    topPane = instance()
+                    +Group(
+                        stackPane {
+                            +content
+                            styled {
+                                effect("dropshadow(gaussian, rgba(128, 128, 128, 0.67), 10, 0, 0, 3)")
+                                backgroundColor("white")
+                            }
+                        }
+                    )
+                }
+            }
+            fitToWidth(true)
+            fitToHeight(true)
+            styled {
+                background("transparent")
+                backgroundColor("transparent")
+                backgroundInsets(0.0)
+                padding(0.0)
+            }
+        }
     }
 
     private fun addClosingListeners() {
@@ -218,13 +224,13 @@ class MessageDialogBuilder(val baseParent: Parent) : DslBuilder<MessageDialog>()
     fun okButton(text: String = "确认", action: () -> Unit = {}) {
         button(text) {
             styleClass("btn-ui-success")
-            onAction(action)
+            onAction { action() }
         }
     }
 
     fun cancelButton(text: String = "取消", action: () -> Unit = {}) {
         button(text) {
-            onAction(action)
+            onAction { action() }
         }
     }
 

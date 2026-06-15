@@ -179,25 +179,27 @@ class StageBuilder(private val existingStage: Stage? = null) : DslBuilder<Stage>
         }
     }
 
-    fun onHiding(action: EventHandler<WindowEvent>) = settings {
-        onHiding = action
+    fun onHiding(action: (WindowEvent) -> Unit) = settings {
+        onHiding = EventHandler(action)
     }
 
-    fun onHidden(action: EventHandler<WindowEvent>) = settings {
-        onHidden = action
+    fun onHidden(action: (WindowEvent) -> Unit) = settings {
+        onHidden = EventHandler(action)
     }
 
-    fun onShown(action: EventHandler<WindowEvent>) = settings {
-        onShown = action
+    fun onShown(action: (WindowEvent) -> Unit) = settings {
+        onShown = EventHandler(action)
     }
 
-    fun onShowing(action: EventHandler<WindowEvent>) = settings {
-        onShowing = action
+    fun onShowing(action: (WindowEvent) -> Unit) = settings {
+        onShowing = EventHandler(action)
     }
 
-    fun onCloseRequest(action: EventHandler<WindowEvent>) = settings {
-        onCloseRequest = action
+    fun onCloseRequest(action: (WindowEvent) -> Unit) = settings {
+        onCloseRequest = EventHandler(action)
     }
+
+    fun resizable(value: Boolean = true) = settings { isResizable = value }
 
     fun alwaysOnTop(value: Boolean = true) = settings { isAlwaysOnTop = value }
 

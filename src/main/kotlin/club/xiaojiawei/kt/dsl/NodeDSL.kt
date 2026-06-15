@@ -93,18 +93,31 @@ abstract class NodeBuilder<T : Node> : DslBuilder<T>() {
     fun cursorMove() = cursor(Cursor.MOVE)
 
     // --- 鼠标 & 拖拽事件 ---
-    fun onMouseClicked(h: EventHandler<MouseEvent>?) = settings { onMouseClicked = h }
-    fun onMouseEntered(h: EventHandler<MouseEvent>?) = settings { onMouseEntered = h }
-    fun onMouseExited(h: EventHandler<MouseEvent>?) = settings { onMouseExited = h }
-    fun onMouseReleased(h: EventHandler<MouseEvent>?) = settings { onMouseReleased = h }
-    fun onMousePressed(h: EventHandler<MouseEvent>?) = settings { onMousePressed = h }
-    fun onMouseDragged(h: EventHandler<MouseEvent>?) = settings { onMouseDragged = h }
-    fun onDragDetected(h: EventHandler<MouseEvent>?) = settings { onDragDetected = h }
-    fun onDragDone(h: EventHandler<DragEvent>?) = settings { onDragDone = h }
-    fun onDragOver(h: EventHandler<DragEvent>?) = settings { onDragOver = h }
-    fun onDragExited(h: EventHandler<DragEvent>?) = settings { onDragExited = h }
-    fun onDragDropped(h: EventHandler<DragEvent>?) = settings { onDragDropped = h }
-    fun onScroll(h: EventHandler<ScrollEvent>?) = settings { onScroll = h }
+    fun onMouseClicked(h: EventHandler<MouseEvent>? = null) = settings { onMouseClicked = h }
+    fun onMouseEntered(h: EventHandler<MouseEvent>? = null) = settings { onMouseEntered = h }
+    fun onMouseExited(h: EventHandler<MouseEvent>? = null) = settings { onMouseExited = h }
+    fun onMouseReleased(h: EventHandler<MouseEvent>? = null) = settings { onMouseReleased = h }
+    fun onMousePressed(h: EventHandler<MouseEvent>? = null) = settings { onMousePressed = h }
+    fun onMouseDragged(h: EventHandler<MouseEvent>? = null) = settings { onMouseDragged = h }
+    fun onDragDetected(h: EventHandler<MouseEvent>? = null) = settings { onDragDetected = h }
+    fun onDragDone(h: EventHandler<DragEvent>? = null) = settings { onDragDone = h }
+    fun onDragOver(h: EventHandler<DragEvent>? = null) = settings { onDragOver = h }
+    fun onDragExited(h: EventHandler<DragEvent>? = null) = settings { onDragExited = h }
+    fun onDragDropped(h: EventHandler<DragEvent>? = null) = settings { onDragDropped = h }
+    fun onScroll(h: EventHandler<ScrollEvent>? = null) = settings { onScroll = h }
+
+    fun onMouseClicked(h: (MouseEvent) -> Unit = {}) = settings { onMouseClicked = EventHandler(h) }
+    fun onMouseEntered(h: (MouseEvent) -> Unit = {}) = settings { onMouseEntered = EventHandler(h) }
+    fun onMouseExited(h: (MouseEvent) -> Unit = {}) = settings { onMouseExited = EventHandler(h) }
+    fun onMouseReleased(h: (MouseEvent) -> Unit = {}) = settings { onMouseReleased = EventHandler(h) }
+    fun onMousePressed(h: (MouseEvent) -> Unit = {}) = settings { onMousePressed = EventHandler(h) }
+    fun onMouseDragged(h: (MouseEvent) -> Unit = {}) = settings { onMouseDragged = EventHandler(h) }
+    fun onDragDetected(h: (MouseEvent) -> Unit = {}) = settings { onDragDetected = EventHandler(h) }
+    fun onDragDone(h: (DragEvent) -> Unit = {}) = settings { onDragDone = EventHandler(h) }
+    fun onDragOver(h: (DragEvent) -> Unit = {}) = settings { onDragOver = EventHandler(h) }
+    fun onDragExited(h: (DragEvent) -> Unit = {}) = settings { onDragExited = EventHandler(h) }
+    fun onDragDropped(h: (DragEvent) -> Unit = {}) = settings { onDragDropped = EventHandler(h) }
+    fun onScroll(h: (ScrollEvent) -> Unit = {}) = settings { onScroll = EventHandler(h) }
 
 }
 
@@ -164,6 +177,13 @@ abstract class RegionBaseBuilder<T : Region> : NodeBuilder<T>() {
     fun addMaxHeightListener(l: ChangeListener<Number>) = settings { maxHeightProperty().addListener(l) }
     fun removeMaxWidthListener(l: ChangeListener<Number>) = settings { maxWidthProperty().removeListener(l) }
     fun removeMaxHeightListener(l: ChangeListener<Number>) = settings { maxHeightProperty().removeListener(l) }
+}
+
+@FXMarker
+class RegionBuilder : RegionBaseBuilder<Region>() {
+
+    override fun buildInstance(): Region = Region()
+
 }
 
 @FXMarker
@@ -239,6 +259,7 @@ abstract class LabeledBuilder<T : Labeled> : RegionBaseBuilder<T>() {
     fun alignBaseLeft() = alignment(Pos.BASELINE_LEFT)
     fun alignBaseCenter() = alignment(Pos.BASELINE_CENTER)
     fun alignBaseRight() = alignment(Pos.BASELINE_RIGHT)
+
 }
 
 
@@ -383,12 +404,12 @@ class ButtonBuilder : LabeledBuilder<Button>() {
 
     override fun buildInstance(): Button = Button()
 
-    fun onAction(handler: EventHandler<ActionEvent>) {
+    fun onAction(handler: EventHandler<ActionEvent>?) {
         settings { onAction = handler }
     }
 
-    fun onAction(handler: () -> Unit) {
-        settings { onAction = EventHandler { handler() } }
+    fun onAction(handler: (ActionEvent) -> Unit) {
+        settings { onAction = EventHandler(handler) }
     }
 
     fun defaultButton(default: Boolean = true) {
@@ -916,6 +937,10 @@ class TableViewBuilder<T> : RegionBaseBuilder<TableView<T>>() {
         settings { columnResizePolicy = policy }
     }
 
+    fun columns() = settings {
+
+    }
+
     override fun style(styleColor: StyleColor, styleSize: StyleSize) {
         settings {
             styleClass.add("table-view-ui")
@@ -1076,6 +1101,24 @@ class SeparatorBuilder : RegionBaseBuilder<Separator>() {
 
 }
 
+@FXMarker
+class PaginationBuilder : RegionBaseBuilder<Pagination>() {
+
+    override fun buildInstance(): Pagination = Pagination()
+
+    fun pageCount(pageCount: Int) = settings {
+        this.pageCount = pageCount
+    }
+
+    fun currentPageIndex(currentPageIndex: Int) = settings {
+        this.currentPageIndex = currentPageIndex
+    }
+
+    fun maxPageIndicatorCount(maxPageIndicatorCount: Int) = settings {
+        this.maxPageIndicatorCount = maxPageIndicatorCount
+    }
+}
+
 // Switch 构建器
 @FXMarker
 open class SwitchBuilder : RegionBaseBuilder<Switch>() {
@@ -1183,6 +1226,22 @@ inline fun Polygon.config(config: PolygonBuilder.() -> Unit): Polygon {
     }.config(this)
     return this
 }
+
+// Region 衍生
+inline fun region(config: RegionBuilder.() -> Unit): Region {
+    return regionBuilder(config).build()
+}
+
+inline fun regionBuilder(config: RegionBuilder.() -> Unit): RegionBuilder {
+    return RegionBuilder().apply(config)
+}
+
+//inline fun Region.config(config: RegionBuilder.() -> Unit): Region {
+//    RegionBuilder().apply {
+//        delayMode()
+//    }.config(this)
+//    return this
+//}
 
 // Label 衍生
 inline fun label(config: LabelBuilder.() -> Unit): Label {
@@ -1481,6 +1540,23 @@ inline fun separatorBuilder(config: SeparatorBuilder.() -> Unit): SeparatorBuild
 
 inline fun Separator.config(config: SeparatorBuilder.() -> Unit): Separator {
     SeparatorBuilder().apply {
+        delayMode()
+        config()
+    }.config(this)
+    return this
+}
+
+// Pagination 衍生
+inline fun pagination(config: PaginationBuilder.() -> Unit = {}): Pagination {
+    return paginationBuilder(config).build()
+}
+
+inline fun paginationBuilder(config: PaginationBuilder.() -> Unit): PaginationBuilder {
+    return PaginationBuilder().apply(config)
+}
+
+inline fun Pagination.config(config: PaginationBuilder.() -> Unit): Pagination {
+    PaginationBuilder().apply {
         delayMode()
         config()
     }.config(this)

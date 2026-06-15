@@ -1,5 +1,6 @@
 package club.xiaojiawei.kt.dsl
 
+import club.xiaojiawei.kt.controls.PageResult
 import club.xiaojiawei.kt.ext.getValue
 import club.xiaojiawei.kt.ext.setValue
 import javafx.animation.Animation
@@ -7,6 +8,7 @@ import javafx.animation.KeyFrame
 import javafx.animation.Timeline
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleStringProperty
+import javafx.scene.control.TableColumn
 import javafx.scene.layout.StackPane
 import javafx.util.Duration
 
@@ -16,12 +18,19 @@ import javafx.util.Duration
  * @date 2026/3/27 15:04
  */
 fun main() {
-    example1()
+//    example1()
 //    example2()
 //    example3()
+    example4()
 }
 
-class TestPane: StackPane() {
+data class UserRow(
+    val id: Int,
+    val name: String,
+    val role: String
+)
+
+class TestPane : StackPane() {
     init {
         config {
             styled {
@@ -173,6 +182,74 @@ fun example3() {
                 addLabel {
                     observe(colorProperty) { "当前颜色: $it" }
                     fontSize(16.0)
+                }
+            }
+        }
+    }
+}
+
+/**
+ * 分页表格示例
+ */
+fun example4() {
+    val users = (1..86).map {
+        UserRow(
+            id = it,
+            name = "用户$it",
+            role = if (it % 2 == 0) "管理员" else "普通用户"
+        )
+    }
+
+    launchApp {
+        title("分页表格示例")
+        size(800.0, 600.0)
+        scene {
+            root {
+                vbox {
+                    spacing(12.0)
+                    padding(16.0)
+
+                    addPaginationTableView<UserRow> {
+                        pageSize(10)
+                        vgrowAlways()
+                        style()
+
+                        table {
+                            items()
+                            settings {
+                                columns.setAll(
+                                    TableColumn<UserRow, String>("ID").apply {
+                                        setCellValueFactory { SimpleStringProperty(it.value.id.toString()) }
+                                    },
+                                    TableColumn<UserRow, String>("姓名").apply {
+                                        setCellValueFactory { SimpleStringProperty(it.value.name) }
+                                    },
+                                    TableColumn<UserRow, String>("角色").apply {
+                                        setCellValueFactory { SimpleStringProperty(it.value.role) }
+                                    }
+                                )
+                            }
+                        }
+
+                        pagination {
+                            maxPageIndicatorCount(7)
+                        }
+
+                        loader { request ->
+                            val fromIndex = request.pageIndex * request.pageSize
+                            val toIndex = (fromIndex + request.pageSize).coerceAtMost(users.size)
+                            val pageItems = if (fromIndex >= users.size) {
+                                emptyList()
+                            } else {
+                                users.subList(fromIndex, toIndex)
+                            }
+                            PageResult(pageItems, users.size)
+                        }
+
+                        settings {
+                            refresh()
+                        }
+                    }
                 }
             }
         }
