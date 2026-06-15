@@ -8,7 +8,6 @@ import javafx.animation.KeyFrame
 import javafx.animation.Timeline
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleStringProperty
-import javafx.scene.control.TableColumn
 import javafx.scene.layout.StackPane
 import javafx.util.Duration
 
@@ -216,19 +215,9 @@ fun example4() {
 
                         table {
                             items()
-                            settings {
-                                columns.setAll(
-                                    TableColumn<UserRow, String>("ID").apply {
-                                        setCellValueFactory { SimpleStringProperty(it.value.id.toString()) }
-                                    },
-                                    TableColumn<UserRow, String>("姓名").apply {
-                                        setCellValueFactory { SimpleStringProperty(it.value.name) }
-                                    },
-                                    TableColumn<UserRow, String>("角色").apply {
-                                        setCellValueFactory { SimpleStringProperty(it.value.role) }
-                                    }
-                                )
-                            }
+                            addColumn<String>("ID") { cellValue { it.id.toString() } }
+                            addColumn<String>("姓名") { cellValue { it.name } }
+                            addColumn<String>("角色") { cellValue { it.role } }
                         }
 
                         pagination {

@@ -13,6 +13,7 @@ import javafx.beans.binding.Bindings
 import javafx.beans.property.BooleanProperty
 import javafx.beans.property.DoubleProperty
 import javafx.beans.property.ObjectProperty
+import javafx.beans.property.ReadOnlyObjectWrapper
 import javafx.beans.property.StringProperty
 import javafx.beans.value.ChangeListener
 import javafx.beans.value.ObservableValue
@@ -40,8 +41,10 @@ import javafx.scene.shape.*
 import javafx.scene.text.Font
 import javafx.scene.text.FontWeight
 import javafx.scene.text.Text
+import javafx.util.Callback
 import javafx.util.Duration
 import javafx.util.StringConverter
+import java.util.Comparator
 
 // 基础 Node 构建器
 @FXMarker
@@ -907,6 +910,85 @@ class ListViewBuilder<T> : RegionBaseBuilder<ListView<T>>() {
     }
 }
 
+// TableColumn 构建器
+@FXMarker
+class TableColumnBuilder<S, T> : DslBuilder<TableColumn<S, T>>() {
+
+    override fun buildInstance(): TableColumn<S, T> = TableColumn()
+
+    fun text(text: String) = settings { this.text = text }
+
+    operator fun String.unaryPlus() = text(this)
+
+    fun cellValue(valueFactory: (S) -> T) = cellDataValueFactory {
+        ReadOnlyObjectWrapper(valueFactory(it.value))
+    }
+
+    fun cellValueFactory(valueFactory: (S) -> ObservableValue<T>) = cellDataValueFactory {
+        valueFactory(it.value)
+    }
+
+    fun cellDataValueFactory(
+        valueFactory: (TableColumn.CellDataFeatures<S, T>) -> ObservableValue<T>
+    ) = settings {
+        cellValueFactory = Callback { valueFactory(it) }
+    }
+
+    fun cellFactory(cellFactory: (TableColumn<S, T>) -> TableCell<S, T>) = settings {
+        this.cellFactory = Callback { cellFactory(it) }
+    }
+
+    fun prefWidth(v: Double) = settings { prefWidth = v }
+    fun minWidth(v: Double) = settings { minWidth = v }
+    fun maxWidth(v: Double) = settings { maxWidth = v }
+    fun sortable(v: Boolean = true) = settings { isSortable = v }
+    fun resizable(v: Boolean = true) = settings { isResizable = v }
+    fun reorderable(v: Boolean = true) = settings { isReorderable = v }
+    fun editable(v: Boolean = true) = settings { isEditable = v }
+    fun visible(v: Boolean = true) = settings { isVisible = v }
+    fun style(v: String) = settings { style = v }
+    fun styleClass(vararg c: String) = settings { styleClass.addAll(c) }
+    fun graphic(node: Node) = settings { graphic = node }
+    fun graphic(builder: () -> Node) = settings { graphic = builder() }
+    fun contextMenu(contextMenu: ContextMenu) = settings { this.contextMenu = contextMenu }
+    fun comparator(comparator: Comparator<T>) = settings { this.comparator = comparator }
+    fun sortType(sortType: TableColumn.SortType) = settings { this.sortType = sortType }
+
+    fun addColumn(column: TableColumn<S, *>) = settings {
+        columns.add(column)
+    }
+
+    fun addColumns(vararg columns: TableColumn<S, *>) = settings {
+        this.columns.addAll(columns)
+    }
+
+    fun setColumns(vararg columns: TableColumn<S, *>) = settings {
+        this.columns.setAll(*columns)
+    }
+
+    fun clearColumns() = settings {
+        columns.clear()
+    }
+
+    fun <V> addColumn(
+        text: String = "",
+        config: TableColumnBuilder<S, V>.() -> Unit = {}
+    ) = settings {
+        columns.add(tableColumn(text, config))
+    }
+
+    fun <V> addColumn(
+        text: String,
+        cellValue: (S) -> V,
+        config: TableColumnBuilder<S, V>.() -> Unit = {}
+    ) = settings {
+        columns.add(tableColumn<S, V>(text) {
+            cellValue(cellValue)
+            config()
+        })
+    }
+}
+
 // TableView 构建器
 @FXMarker
 class TableViewBuilder<T> : RegionBaseBuilder<TableView<T>>() {
@@ -939,6 +1021,40 @@ class TableViewBuilder<T> : RegionBaseBuilder<TableView<T>>() {
 
     fun columns() = settings {
 
+    }
+
+    fun addColumn(column: TableColumn<T, *>) = settings {
+        columns.add(column)
+    }
+
+    fun addColumns(vararg columns: TableColumn<T, *>) = settings {
+        this.columns.addAll(columns)
+    }
+
+    fun setColumns(vararg columns: TableColumn<T, *>) = settings {
+        this.columns.setAll(*columns)
+    }
+
+    fun clearColumns() = settings {
+        columns.clear()
+    }
+
+    fun <V> addColumn(
+        text: String = "",
+        config: TableColumnBuilder<T, V>.() -> Unit = {}
+    ) = settings {
+        columns.add(tableColumn(text, config))
+    }
+
+    fun <V> addColumn(
+        text: String,
+        cellValue: (T) -> V,
+        config: TableColumnBuilder<T, V>.() -> Unit = {}
+    ) = settings {
+        columns.add(tableColumn<T, V>(text) {
+            cellValue(cellValue)
+            config()
+        })
     }
 
     override fun style(styleColor: StyleColor, styleSize: StyleSize) {
@@ -1441,6 +1557,32 @@ inline fun <T> listViewBuilder(config: ListViewBuilder<T>.() -> Unit): ListViewB
 
 inline fun <T> ListView<T>.config(config: ListViewBuilder<T>.() -> Unit): ListView<T> {
     ListViewBuilder<T>().apply {
+        delayMode()
+        config()
+    }.config(this)
+    return this
+}
+
+// TableColumn 衍生
+inline fun <S, T> tableColumn(
+    text: String = "",
+    config: TableColumnBuilder<S, T>.() -> Unit = {}
+): TableColumn<S, T> {
+    return tableColumnBuilder(text, config).build()
+}
+
+inline fun <S, T> tableColumnBuilder(
+    text: String = "",
+    config: TableColumnBuilder<S, T>.() -> Unit = {}
+): TableColumnBuilder<S, T> {
+    return TableColumnBuilder<S, T>().apply {
+        text(text)
+        config()
+    }
+}
+
+inline fun <S, T> TableColumn<S, T>.config(config: TableColumnBuilder<S, T>.() -> Unit): TableColumn<S, T> {
+    TableColumnBuilder<S, T>().apply {
         delayMode()
         config()
     }.config(this)
