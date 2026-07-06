@@ -1,5 +1,12 @@
 package club.xiaojiawei.kt.controls
 
+import club.xiaojiawei.kt.annotations.FXMarker
+import club.xiaojiawei.kt.dsl.PaginationBuilder
+import club.xiaojiawei.kt.dsl.PaneBaseBuilder
+import club.xiaojiawei.kt.dsl.RegionBaseBuilder
+import club.xiaojiawei.kt.dsl.StyleColor
+import club.xiaojiawei.kt.dsl.StyleSize
+import club.xiaojiawei.kt.dsl.TableViewBuilder
 import club.xiaojiawei.kt.dsl.pagination
 import club.xiaojiawei.kt.dsl.tableView
 import club.xiaojiawei.kt.dsl.label
@@ -77,17 +84,8 @@ open class PaginationTableView<T> : VBox() {
     private var loadVersion: Long = 0
 
     init {
-        val builder = VBoxBuilder().apply {
-            delayMode()
-            spacing(8.0)
-            +tableView
-            +pagination
-        }
-        config {
-            spacing(8.0)
-            +tableView
-            +pagination
-        }
+        spacing = 8.0
+        children.addAll(tableView, pagination)
         pagination.currentPageIndexProperty().addListener { _, _, newValue ->
             loadPage(newValue.toInt())
         }
@@ -172,4 +170,70 @@ open class PaginationTableView<T> : VBox() {
     private fun updatePageCount() {
         pagination.pageCount = max(1, ceil(totalItemsWrapper.get().toDouble() / pageSize).toInt())
     }
+}
+
+
+@FXMarker
+class PaginationTableViewBuilder<T> : RegionBaseBuilder<PaginationTableView<T>>() {
+
+    override fun buildInstance(): PaginationTableView<T> = PaginationTableView()
+
+    fun pageSize(pageSize: Int) = settings {
+        this.pageSize = pageSize
+    }
+
+    fun loader(loader: suspend (PageRequest) -> PageResult<T>) = settings {
+        pageLoader = loader
+    }
+
+    fun table(config: TableViewBuilder<T>.() -> Unit) = settings {
+        tableView.config(config)
+    }
+
+    fun pagination(config: PaginationBuilder.() -> Unit) = settings {
+        pagination.config(config)
+    }
+
+    override fun style(styleColor: StyleColor, styleSize: StyleSize) {
+        settings {
+            pagination.config {
+                style()
+            }
+            tableView.config {
+                style()
+            }
+        }
+    }
+}
+
+inline fun <T> paginationTableView(config: PaginationTableViewBuilder<T>.() -> Unit): PaginationTableView<T> {
+    return paginationTableViewBuilder(config).build()
+}
+
+inline fun <T> paginationTableViewBuilder(
+    config: PaginationTableViewBuilder<T>.() -> Unit
+): PaginationTableViewBuilder<T> {
+    return PaginationTableViewBuilder<T>().apply(config)
+}
+
+fun <T> paginationTableViewConfig(config: PaginationTableViewBuilder<T>.() -> Unit): PaginationTableViewBuilder<T>.() -> Unit =
+    config
+
+inline fun <T> PaginationTableView<T>.config(
+    config: PaginationTableViewBuilder<T>.() -> Unit
+): PaginationTableView<T> {
+    PaginationTableViewBuilder<T>().apply {
+        delayMode()
+        config()
+    }.config(this)
+    return this
+}
+
+inline fun <T> PaneBaseBuilder<*>.addPaginationTableView(
+    config: PaginationTableViewBuilder<T>.() -> Unit = {}
+) {
+    add(PaginationTableViewBuilder<T>().apply {
+        setMode(this@addPaginationTableView.buildMode)
+        config()
+    })
 }

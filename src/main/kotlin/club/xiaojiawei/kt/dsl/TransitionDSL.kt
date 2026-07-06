@@ -388,138 +388,156 @@ fun Node.playParallelTransition(block: ParallelTransitionBuilder.() -> Unit) {
 }
 
 // FadeTransition 衍生
-inline fun fadeTransition(config: FadeTransitionBuilder.() -> Unit): FadeTransition {
-    return fadeTransitionBuilder(config).build()
-}
+inline fun fadeTransition(config: FadeTransitionBuilder.() -> Unit): FadeTransition =
+    fadeTransitionBuilder(config).build()
 
-inline fun fadeTransitionBuilder(config: FadeTransitionBuilder.() -> Unit): FadeTransitionBuilder {
-    return FadeTransitionBuilder().apply(config)
-}
+inline fun fadeTransitionBuilder(config: FadeTransitionBuilder.() -> Unit): FadeTransitionBuilder =
+    FadeTransitionBuilder().apply(config)
 
-inline fun FadeTransition.config(config: FadeTransitionBuilder.() -> Unit): FadeTransition {
-    FadeTransitionBuilder().apply {
-        delayMode()
-        config()
-    }.config(this)
-    return this
-}
+fun fadeTransitionConfig(config: FadeTransitionBuilder.() -> Unit): FadeTransitionBuilder.() -> Unit =
+    config
 
-fun fadeInTransition(duration: Double = 300.0, block: FadeTransitionBuilder.() -> Unit = {}): FadeTransition {
-    return fadeTransitionBuilder {
+inline fun FadeTransition.config(config: FadeTransitionBuilder.() -> Unit): FadeTransition =
+    apply {
+        FadeTransitionBuilder().apply {
+            delayMode()
+            config()
+        }.config(this@config)
+    }
+
+fun fadeInTransition(
+    duration: Double = 300.0,
+    block: FadeTransitionBuilder.() -> Unit = {}
+): FadeTransition =
+    fadeTransitionBuilder {
         duration(duration)
         from(0.0)
         to(1.0)
         block()
     }.build()
-}
 
-fun fadeOutTransition(duration: Double = 300.0, block: FadeTransitionBuilder.() -> Unit = {}): FadeTransition {
-    return fadeTransitionBuilder {
+fun fadeOutTransition(
+    duration: Double = 300.0,
+    block: FadeTransitionBuilder.() -> Unit = {}
+): FadeTransition =
+    fadeTransitionBuilder {
         duration(duration)
         from(1.0)
         to(0.0)
         block()
     }.build()
-}
+
 
 // ScaleTransition 衍生
-inline fun scaleTransition(config: ScaleTransitionBuilder.() -> Unit): ScaleTransition {
-    return scaleTransitionBuilder(config).build()
-}
+inline fun scaleTransition(config: ScaleTransitionBuilder.() -> Unit): ScaleTransition =
+    scaleTransitionBuilder(config).build()
 
-inline fun scaleTransitionBuilder(config: ScaleTransitionBuilder.() -> Unit): ScaleTransitionBuilder {
-    return ScaleTransitionBuilder().apply(config)
-}
+inline fun scaleTransitionBuilder(config: ScaleTransitionBuilder.() -> Unit): ScaleTransitionBuilder =
+    ScaleTransitionBuilder().apply(config)
 
-inline fun ScaleTransition.config(config: ScaleTransitionBuilder.() -> Unit): ScaleTransition {
-    ScaleTransitionBuilder().apply {
-        delayMode()
-        config()
-    }.config(this)
-    return this
-}
+fun scaleTransitionConfig(config: ScaleTransitionBuilder.() -> Unit): ScaleTransitionBuilder.() -> Unit =
+    config
+
+inline fun ScaleTransition.config(config: ScaleTransitionBuilder.() -> Unit): ScaleTransition =
+    apply {
+        ScaleTransitionBuilder().apply {
+            delayMode()
+            config()
+        }.config(this@config)
+    }
+
 
 // TranslateTransition 衍生
-inline fun translateTransition(config: TranslateTransitionBuilder.() -> Unit): TranslateTransition {
-    return translateTransitionBuilder(config).build()
-}
+inline fun translateTransition(config: TranslateTransitionBuilder.() -> Unit): TranslateTransition =
+    translateTransitionBuilder(config).build()
 
-inline fun translateTransitionBuilder(config: TranslateTransitionBuilder.() -> Unit): TranslateTransitionBuilder {
-    return TranslateTransitionBuilder().apply(config)
-}
+inline fun translateTransitionBuilder(config: TranslateTransitionBuilder.() -> Unit): TranslateTransitionBuilder =
+    TranslateTransitionBuilder().apply(config)
 
-inline fun TranslateTransition.config(config: TranslateTransitionBuilder.() -> Unit): TranslateTransition {
-    TranslateTransitionBuilder().apply {
-        delayMode()
-        config()
-    }.config(this)
-    return this
-}
+fun translateTransitionConfig(config: TranslateTransitionBuilder.() -> Unit): TranslateTransitionBuilder.() -> Unit =
+    config
+
+inline fun TranslateTransition.config(config: TranslateTransitionBuilder.() -> Unit): TranslateTransition =
+    apply {
+        TranslateTransitionBuilder().apply {
+            delayMode()
+            config()
+        }.config(this@config)
+    }
+
 
 // RotateTransition 衍生
-inline fun rotateTransition(config: RotateTransitionBuilder.() -> Unit): RotateTransition {
-    return rotateTransitionBuilder(config).build()
-}
+inline fun rotateTransition(config: RotateTransitionBuilder.() -> Unit): RotateTransition =
+    rotateTransitionBuilder(config).build()
 
-inline fun rotateTransitionBuilder(config: RotateTransitionBuilder.() -> Unit): RotateTransitionBuilder {
-    return RotateTransitionBuilder().apply(config)
-}
+inline fun rotateTransitionBuilder(config: RotateTransitionBuilder.() -> Unit): RotateTransitionBuilder =
+    RotateTransitionBuilder().apply(config)
 
-inline fun RotateTransition.config(config: RotateTransitionBuilder.() -> Unit): RotateTransition {
-    RotateTransitionBuilder().apply {
-        delayMode()
-        config()
-    }.config(this)
-    return this
-}
+fun rotateTransitionConfig(config: RotateTransitionBuilder.() -> Unit): RotateTransitionBuilder.() -> Unit =
+    config
+
+inline fun RotateTransition.config(config: RotateTransitionBuilder.() -> Unit): RotateTransition =
+    apply {
+        RotateTransitionBuilder().apply {
+            delayMode()
+            config()
+        }.config(this@config)
+    }
+
 
 // PathTransition 衍生
-inline fun pathTransition(config: PathTransitionBuilder.() -> Unit): PathTransition {
-    return pathTransitionBuilder(config).build()
-}
+inline fun pathTransition(config: PathTransitionBuilder.() -> Unit): PathTransition =
+    pathTransitionBuilder(config).build()
 
-inline fun pathTransitionBuilder(config: PathTransitionBuilder.() -> Unit): PathTransitionBuilder {
-    return PathTransitionBuilder().apply(config)
-}
+inline fun pathTransitionBuilder(config: PathTransitionBuilder.() -> Unit): PathTransitionBuilder =
+    PathTransitionBuilder().apply(config)
 
-inline fun PathTransition.config(config: PathTransitionBuilder.() -> Unit): PathTransition {
-    PathTransitionBuilder().apply {
-        delayMode()
-        config()
-    }.config(this)
-    return this
-}
+fun pathTransitionConfig(config: PathTransitionBuilder.() -> Unit): PathTransitionBuilder.() -> Unit =
+    config
+
+inline fun PathTransition.config(config: PathTransitionBuilder.() -> Unit): PathTransition =
+    apply {
+        PathTransitionBuilder().apply {
+            delayMode()
+            config()
+        }.config(this@config)
+    }
+
 
 // PauseTransition 衍生
-inline fun pauseTransition(config: PauseTransitionBuilder.() -> Unit): PauseTransition {
-    return pauseTransitionBuilder(config).build()
-}
+inline fun pauseTransition(config: PauseTransitionBuilder.() -> Unit): PauseTransition =
+    pauseTransitionBuilder(config).build()
 
-inline fun pauseTransitionBuilder(config: PauseTransitionBuilder.() -> Unit): PauseTransitionBuilder {
-    return PauseTransitionBuilder().apply(config)
-}
+inline fun pauseTransitionBuilder(config: PauseTransitionBuilder.() -> Unit): PauseTransitionBuilder =
+    PauseTransitionBuilder().apply(config)
 
-inline fun PauseTransition.config(config: PauseTransitionBuilder.() -> Unit): PauseTransition {
-    PauseTransitionBuilder().apply {
-        delayMode()
-        config()
-    }.config(this)
-    return this
-}
+fun pauseTransitionConfig(config: PauseTransitionBuilder.() -> Unit): PauseTransitionBuilder.() -> Unit =
+    config
 
-fun pauseTransition(duration: Double, block: PauseTransitionBuilder.() -> Unit = {}): PauseTransition {
-    return pauseTransitionBuilder {
+inline fun PauseTransition.config(config: PauseTransitionBuilder.() -> Unit): PauseTransition =
+    apply {
+        PauseTransitionBuilder().apply {
+            delayMode()
+            config()
+        }.config(this@config)
+    }
+
+fun pauseTransition(
+    duration: Double,
+    block: PauseTransitionBuilder.() -> Unit = {}
+): PauseTransition =
+    pauseTransitionBuilder {
         duration(duration)
         block()
     }.build()
-}
+
 
 // 便捷 Transition 衍生
 fun shakeTransition(
     duration: Double = 500.0,
     block: TranslateTransitionBuilder.() -> Unit = {}
-): TranslateTransition {
-    return translateTransition {
+): TranslateTransition =
+    translateTransition {
         duration(duration / 8)
         from(0.0, 0.0)
         to(10.0, 0.0)
@@ -527,13 +545,12 @@ fun shakeTransition(
         autoReverse()
         block()
     }
-}
 
 fun pulseTransition(
     duration: Double = 300.0,
     block: ScaleTransitionBuilder.() -> Unit = {}
-): ScaleTransition {
-    return scaleTransition {
+): ScaleTransition =
+    scaleTransition {
         duration(duration)
         from(1.0)
         to(1.1)
@@ -541,13 +558,12 @@ fun pulseTransition(
         autoReverse()
         block()
     }
-}
 
 fun bounceTransition(
     duration: Double = 500.0,
     block: TranslateTransitionBuilder.() -> Unit = {}
-): TranslateTransition {
-    return translateTransition {
+): TranslateTransition =
+    translateTransition {
         duration(duration)
         from(0.0, 0.0)
         to(0.0, -20.0)
@@ -555,38 +571,41 @@ fun bounceTransition(
         autoReverse()
         block()
     }
-}
+
 
 // SequentialTransition 衍生
-inline fun sequentialTransition(config: SequentialTransitionBuilder.() -> Unit): SequentialTransition {
-    return sequentialTransitionBuilder(config).build()
-}
+inline fun sequentialTransition(config: SequentialTransitionBuilder.() -> Unit): SequentialTransition =
+    sequentialTransitionBuilder(config).build()
 
-inline fun sequentialTransitionBuilder(config: SequentialTransitionBuilder.() -> Unit): SequentialTransitionBuilder {
-    return SequentialTransitionBuilder().apply(config)
-}
+inline fun sequentialTransitionBuilder(config: SequentialTransitionBuilder.() -> Unit): SequentialTransitionBuilder =
+    SequentialTransitionBuilder().apply(config)
 
-inline fun SequentialTransition.config(config: SequentialTransitionBuilder.() -> Unit): SequentialTransition {
-    SequentialTransitionBuilder().apply {
-        delayMode()
-        config()
-    }.config(this)
-    return this
-}
+fun sequentialTransitionConfig(config: SequentialTransitionBuilder.() -> Unit): SequentialTransitionBuilder.() -> Unit =
+    config
+
+inline fun SequentialTransition.config(config: SequentialTransitionBuilder.() -> Unit): SequentialTransition =
+    apply {
+        SequentialTransitionBuilder().apply {
+            delayMode()
+            config()
+        }.config(this@config)
+    }
+
 
 // ParallelTransition 衍生
-inline fun parallelTransition(config: ParallelTransitionBuilder.() -> Unit): ParallelTransition {
-    return parallelTransitionBuilder(config).build()
-}
+inline fun parallelTransition(config: ParallelTransitionBuilder.() -> Unit): ParallelTransition =
+    parallelTransitionBuilder(config).build()
 
-inline fun parallelTransitionBuilder(config: ParallelTransitionBuilder.() -> Unit): ParallelTransitionBuilder {
-    return ParallelTransitionBuilder().apply(config)
-}
+inline fun parallelTransitionBuilder(config: ParallelTransitionBuilder.() -> Unit): ParallelTransitionBuilder =
+    ParallelTransitionBuilder().apply(config)
 
-inline fun ParallelTransition.config(config: ParallelTransitionBuilder.() -> Unit): ParallelTransition {
-    ParallelTransitionBuilder().apply {
-        delayMode()
-        config()
-    }.config(this)
-    return this
-}
+fun parallelTransitionConfig(config: ParallelTransitionBuilder.() -> Unit): ParallelTransitionBuilder.() -> Unit =
+    config
+
+inline fun ParallelTransition.config(config: ParallelTransitionBuilder.() -> Unit): ParallelTransition =
+    apply {
+        ParallelTransitionBuilder().apply {
+            delayMode()
+            config()
+        }.config(this@config)
+    }

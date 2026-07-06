@@ -15,6 +15,9 @@ import java.nio.file.Path
  * @author 肖嘉威
  */
 
+private const val DEFAULT_FILE_CHOOSER_TITLE = "选择文件"
+private const val DEFAULT_DIRECTORY_CHOOSER_TITLE = "选择文件夹"
+
 @FXMarker
 class FileChooserBuilder : DslBuilder<FileChooser>() {
 
@@ -99,56 +102,51 @@ class DirectoryChooserBuilder : DslBuilder<DirectoryChooser>() {
     }
 }
 
-inline fun showFileSaveDialog(ownerWidow: Window? = null, config: FileChooserBuilder.() -> Unit = {}): File? {
-    return fileChooserBuilder(config).build().showSaveDialog(ownerWidow)
-}
+inline fun showFileSaveDialog(ownerWidow: Window? = null, config: FileChooserBuilder.() -> Unit = {}): File? =
+    fileChooserBuilder(config).build().showSaveDialog(ownerWidow)
 
-inline fun showFileOpenDialog(ownerWidow: Window? = null, config: FileChooserBuilder.() -> Unit = {}): File? {
-    return fileChooserBuilder(config).build().showOpenDialog(ownerWidow)
-}
+inline fun showFileOpenDialog(ownerWidow: Window? = null, config: FileChooserBuilder.() -> Unit = {}): File? =
+    fileChooserBuilder(config).build().showOpenDialog(ownerWidow)
 
-inline fun showFileMultipleDialog(ownerWidow: Window? = null, config: FileChooserBuilder.() -> Unit = {}): List<File> {
-    return fileChooserBuilder(config).build().showOpenMultipleDialog(ownerWidow) ?: emptyList()
-}
-
-inline fun fileChooser(config: FileChooserBuilder.() -> Unit = {}): FileChooser {
-    return fileChooserBuilder(config).build()
-}
-
-inline fun fileChooserBuilder(config: FileChooserBuilder.() -> Unit = {}): FileChooserBuilder {
-    return FileChooserBuilder().apply(config)
-}
-
-inline fun FileChooser.config(config: FileChooserBuilder.() -> Unit): FileChooser {
-    FileChooserBuilder().apply {
-        delayMode()
-        config()
-    }.config(this)
-    return this
-}
+inline fun showFileMultipleDialog(ownerWidow: Window? = null, config: FileChooserBuilder.() -> Unit = {}): List<File> =
+    fileChooserBuilder(config).build().showOpenMultipleDialog(ownerWidow) ?: emptyList()
 
 inline fun showDirectoryChooserDialog(
     ownerWidow: Window? = null,
     config: DirectoryChooserBuilder.() -> Unit = {}
-): File? {
-    return directoryChooserBuilder(config).build().showDialog(ownerWidow)
-}
+): File? =
+    directoryChooserBuilder(config).build().showDialog(ownerWidow)
 
-inline fun directoryChooser(config: DirectoryChooserBuilder.() -> Unit = {}): DirectoryChooser {
-    return directoryChooserBuilder(config).build()
-}
+inline fun fileChooser(config: FileChooserBuilder.() -> Unit = {}): FileChooser =
+    fileChooserBuilder(config).build()
 
-inline fun directoryChooserBuilder(config: DirectoryChooserBuilder.() -> Unit = {}): DirectoryChooserBuilder {
-    return DirectoryChooserBuilder().apply(config)
-}
+inline fun fileChooserBuilder(config: FileChooserBuilder.() -> Unit = {}): FileChooserBuilder =
+    FileChooserBuilder().apply(config)
 
-inline fun DirectoryChooser.config(config: DirectoryChooserBuilder.() -> Unit): DirectoryChooser {
-    DirectoryChooserBuilder().apply {
-        delayMode()
-        config()
-    }.config(this)
-    return this
-}
+fun fileChooserConfig(config: FileChooserBuilder.() -> Unit): FileChooserBuilder.() -> Unit =
+    config
 
-private const val DEFAULT_FILE_CHOOSER_TITLE = "选择文件"
-private const val DEFAULT_DIRECTORY_CHOOSER_TITLE = "选择文件夹"
+inline fun FileChooser.config(config: FileChooserBuilder.() -> Unit): FileChooser =
+    apply {
+        FileChooserBuilder().apply {
+            delayMode()
+            config()
+        }.config(this@config)
+    }
+
+inline fun directoryChooser(config: DirectoryChooserBuilder.() -> Unit = {}): DirectoryChooser =
+    directoryChooserBuilder(config).build()
+
+inline fun directoryChooserBuilder(config: DirectoryChooserBuilder.() -> Unit = {}): DirectoryChooserBuilder =
+    DirectoryChooserBuilder().apply(config)
+
+fun directoryChooserConfig(config: DirectoryChooserBuilder.() -> Unit): DirectoryChooserBuilder.() -> Unit =
+    config
+
+inline fun DirectoryChooser.config(config: DirectoryChooserBuilder.() -> Unit): DirectoryChooser =
+    apply {
+        DirectoryChooserBuilder().apply {
+            delayMode()
+            config()
+        }.config(this@config)
+    }

@@ -213,27 +213,38 @@ class StageBuilder(private val existingStage: Stage? = null) : DslBuilder<Stage>
 }
 
 // Scene 衍生
-inline fun scene(config: SceneBuilder.() -> Unit) = SceneBuilder().apply(config).build()
+inline fun scene(config: SceneBuilder.() -> Unit): Scene =
+    sceneBuilder(config).build()
 
-inline fun sceneBuilder(config: SceneBuilder.() -> Unit) = SceneBuilder().apply(config)
+inline fun sceneBuilder(config: SceneBuilder.() -> Unit): SceneBuilder =
+    SceneBuilder().apply(config)
 
-inline fun Scene.config(config: SceneBuilder.() -> Unit): Scene {
-    SceneBuilder().apply {
-        delayMode()
-        config()
-    }.config(this)
-    return this
-}
+fun sceneConfig(config: SceneBuilder.() -> Unit): SceneBuilder.() -> Unit =
+    config
+
+inline fun Scene.config(config: SceneBuilder.() -> Unit): Scene =
+    apply {
+        SceneBuilder().apply {
+            delayMode()
+            config()
+        }.config(this@config)
+    }
+
 
 // Stage 衍生
-inline fun stage(config: StageBuilder.() -> Unit) = StageBuilder().apply(config).build()
+inline fun stage(config: StageBuilder.() -> Unit): Stage =
+    stageBuilder(config).build()
 
-inline fun stageBuilder(config: StageBuilder.() -> Unit) = StageBuilder().apply(config)
+inline fun stageBuilder(config: StageBuilder.() -> Unit): StageBuilder =
+    StageBuilder().apply(config)
 
-inline fun Stage.config(config: StageBuilder.() -> Unit): Stage {
-    StageBuilder().apply {
-        delayMode()
-        config()
-    }.config(this)
-    return this
-}
+fun stageConfig(config: StageBuilder.() -> Unit): StageBuilder.() -> Unit =
+    config
+
+inline fun Stage.config(config: StageBuilder.() -> Unit): Stage =
+    apply {
+        StageBuilder().apply {
+            delayMode()
+            config()
+        }.config(this@config)
+    }

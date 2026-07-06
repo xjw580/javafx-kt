@@ -382,18 +382,23 @@ class StylesheetBuilder : DslBuilder<String>() {
 }
 
 // Style 衍生
-inline fun stylesheetBuilder(config: StylesheetBuilder.() -> Unit): StylesheetBuilder {
-    return StylesheetBuilder().apply(config)
-}
+inline fun stylesheetBuilder(config: StylesheetBuilder.() -> Unit): StylesheetBuilder =
+    StylesheetBuilder().apply(config)
 
-inline fun Scene.configStylesheet(config: StylesheetBuilder.() -> Unit): Scene {
-    this.stylesheets.add(StylesheetBuilder().apply(config).toDataUri())
-    return this
-}
+fun stylesheetConfig(config: StylesheetBuilder.() -> Unit): StylesheetBuilder.() -> Unit =
+    config
 
-inline fun styleBuilder(config: StyleBuilder.() -> Unit): StyleBuilder {
-    return StyleBuilder().apply(config)
-}
+inline fun Scene.configStylesheet(config: StylesheetBuilder.() -> Unit): Scene =
+    apply {
+        stylesheets.add(StylesheetBuilder().apply(config).toDataUri())
+    }
+
+
+inline fun styleBuilder(config: StyleBuilder.() -> Unit): StyleBuilder =
+    StyleBuilder().apply(config)
+
+fun styleConfig(config: StyleBuilder.() -> Unit): StyleBuilder.() -> Unit =
+    config
 
 fun Node.styled(block: StyleBuilder.() -> Unit) {
     style = StyleBuilder().apply(block).build()

@@ -10,11 +10,7 @@ import club.xiaojiawei.controls.Switch
 import club.xiaojiawei.enums.BaseTransitionEnum
 import club.xiaojiawei.kt.annotations.FXMarker
 import javafx.beans.binding.Bindings
-import javafx.beans.property.BooleanProperty
-import javafx.beans.property.DoubleProperty
-import javafx.beans.property.ObjectProperty
-import javafx.beans.property.ReadOnlyObjectWrapper
-import javafx.beans.property.StringProperty
+import javafx.beans.property.*
 import javafx.beans.value.ChangeListener
 import javafx.beans.value.ObservableValue
 import javafx.collections.ObservableList
@@ -44,7 +40,6 @@ import javafx.scene.text.Text
 import javafx.util.Callback
 import javafx.util.Duration
 import javafx.util.StringConverter
-import java.util.Comparator
 
 // 基础 Node 构建器
 @FXMarker
@@ -755,12 +750,12 @@ abstract class ComboBoxBaseBuilder<S : ComboBox<T>, T> : RegionBaseBuilder<S>() 
         }
     }
 
-    fun converter(fromString: (String?) -> T? = { null }, toString: (T?) -> String?) {
+    fun converter(fromString: ((String?) -> T?)? = null, toString: ((T?) -> String?)?) {
         settings {
             converter = object : StringConverter<T>() {
-                override fun toString(p0: T?): String? = toString(p0)
+                override fun toString(p0: T?): String? = toString?.invoke(p0)
 
-                override fun fromString(p0: String?): T? = fromString(p0)
+                override fun fromString(p0: String?): T? = fromString?.invoke(p0)
             }
         }
     }
@@ -1289,438 +1284,470 @@ open class SwitchBuilder : RegionBaseBuilder<Switch>() {
 
 
 // Text 衍生
-inline fun text(config: TextBuilder.() -> Unit): Text {
-    return textBuilder(config).build()
-}
+inline fun text(config: TextBuilder.() -> Unit): Text =
+    textBuilder(config).build()
 
-inline fun text(text: String, config: TextBuilder.() -> Unit = {}): Text {
-    return textBuilder {
+inline fun text(text: String, config: TextBuilder.() -> Unit = {}): Text =
+    textBuilder {
         text(text)
         config()
     }.build()
-}
 
-inline fun textBuilder(config: TextBuilder.() -> Unit): TextBuilder {
-    return TextBuilder().apply(config)
-}
+inline fun textBuilder(config: TextBuilder.() -> Unit): TextBuilder =
+    TextBuilder().apply(config)
 
-inline fun Text.config(config: TextBuilder.() -> Unit): Text {
-    TextBuilder().apply {
-        delayMode()
-        config()
-    }.config(this)
-    return this
-}
+fun textConfig(config: TextBuilder.() -> Unit): TextBuilder.() -> Unit =
+    config
+
+inline fun Text.config(config: TextBuilder.() -> Unit): Text =
+    apply {
+        TextBuilder().apply {
+            delayMode()
+            config()
+        }.config(this@config)
+    }
+
 
 // Polygon 衍生
-inline fun polygon(config: PolygonBuilder.() -> Unit): Polygon {
-    return polygonBuilder(config).build()
-}
+inline fun polygon(config: PolygonBuilder.() -> Unit): Polygon =
+    polygonBuilder(config).build()
 
-inline fun polygon(points: DoubleArray, config: PolygonBuilder.() -> Unit = {}): Polygon {
-    return polygonBuilder {
+inline fun polygon(points: DoubleArray, config: PolygonBuilder.() -> Unit = {}): Polygon =
+    polygonBuilder {
         points(*points)
         config()
     }.build()
-}
 
-inline fun polygon(points: List<Double>, config: PolygonBuilder.() -> Unit = {}): Polygon {
-    return polygonBuilder {
+inline fun polygon(points: List<Double>, config: PolygonBuilder.() -> Unit = {}): Polygon =
+    polygonBuilder {
         points(points)
         config()
     }.build()
-}
 
-inline fun polygonBuilder(config: PolygonBuilder.() -> Unit): PolygonBuilder {
-    return PolygonBuilder().apply(config)
-}
+inline fun polygonBuilder(config: PolygonBuilder.() -> Unit): PolygonBuilder =
+    PolygonBuilder().apply(config)
 
-inline fun Polygon.config(config: PolygonBuilder.() -> Unit): Polygon {
-    PolygonBuilder().apply {
-        delayMode()
-        config()
-    }.config(this)
-    return this
-}
+fun polygonConfig(config: PolygonBuilder.() -> Unit): PolygonBuilder.() -> Unit =
+    config
+
+inline fun Polygon.config(config: PolygonBuilder.() -> Unit): Polygon =
+    apply {
+        PolygonBuilder().apply {
+            delayMode()
+            config()
+        }.config(this@config)
+    }
+
 
 // Region 衍生
-inline fun region(config: RegionBuilder.() -> Unit): Region {
-    return regionBuilder(config).build()
-}
+inline fun region(config: RegionBuilder.() -> Unit): Region =
+    regionBuilder(config).build()
 
-inline fun regionBuilder(config: RegionBuilder.() -> Unit): RegionBuilder {
-    return RegionBuilder().apply(config)
-}
+inline fun regionBuilder(config: RegionBuilder.() -> Unit): RegionBuilder =
+    RegionBuilder().apply(config)
 
-//inline fun Region.config(config: RegionBuilder.() -> Unit): Region {
-//    RegionBuilder().apply {
-//        delayMode()
-//    }.config(this)
-//    return this
-//}
+fun regionConfig(config: RegionBuilder.() -> Unit): RegionBuilder.() -> Unit =
+    config
+
+// 如果后续 RegionBuilder 支持 config(region)，可以再打开
+// inline fun Region.config(config: RegionBuilder.() -> Unit): Region =
+//     apply {
+//         RegionBuilder().apply {
+//             delayMode()
+//             config()
+//         }.config(this@config)
+//     }
+
 
 // Label 衍生
-inline fun label(config: LabelBuilder.() -> Unit): Label {
-    return labelBuilder(config).build()
-}
+inline fun label(config: LabelBuilder.() -> Unit): Label =
+    labelBuilder(config).build()
 
-inline fun label(text: String, config: LabelBuilder.() -> Unit = {}): Label {
-    return labelBuilder {
+inline fun label(text: String, config: LabelBuilder.() -> Unit = {}): Label =
+    labelBuilder {
         text(text)
         config()
     }.build()
-}
 
-inline fun labelBuilder(config: LabelBuilder.() -> Unit): LabelBuilder {
-    return LabelBuilder().apply(config)
-}
+inline fun labelBuilder(config: LabelBuilder.() -> Unit): LabelBuilder =
+    LabelBuilder().apply(config)
 
-inline fun Label.config(config: LabelBuilder.() -> Unit): Label {
-    LabelBuilder().apply {
-        delayMode()
-        config()
-    }.config(this)
-    return this
-}
+fun labelConfig(config: LabelBuilder.() -> Unit): LabelBuilder.() -> Unit =
+    config
+
+inline fun Label.config(config: LabelBuilder.() -> Unit): Label =
+    apply {
+        LabelBuilder().apply {
+            delayMode()
+            config()
+        }.config(this@config)
+    }
+
 
 // Button 衍生
-inline fun button(config: ButtonBuilder.() -> Unit): Button {
-    return buttonBuilder(config).build()
-}
+inline fun button(config: ButtonBuilder.() -> Unit): Button =
+    buttonBuilder(config).build()
 
-inline fun button(text: String, config: ButtonBuilder.() -> Unit = {}): Button {
-    return buttonBuilder {
+inline fun button(text: String, config: ButtonBuilder.() -> Unit = {}): Button =
+    buttonBuilder {
         text(text)
         config()
     }.build()
-}
 
-inline fun buttonBuilder(config: ButtonBuilder.() -> Unit): ButtonBuilder {
-    return ButtonBuilder().apply(config)
-}
+inline fun buttonBuilder(config: ButtonBuilder.() -> Unit): ButtonBuilder =
+    ButtonBuilder().apply(config)
 
-inline fun Button.config(config: ButtonBuilder.() -> Unit): Button {
-    ButtonBuilder().apply {
-        delayMode()
-        config()
-    }.config(this)
-    return this
-}
+fun buttonConfig(config: ButtonBuilder.() -> Unit): ButtonBuilder.() -> Unit =
+    config
+
+inline fun Button.config(config: ButtonBuilder.() -> Unit): Button =
+    apply {
+        ButtonBuilder().apply {
+            delayMode()
+            config()
+        }.config(this@config)
+    }
+
 
 // TextField 衍生
-inline fun textField(config: TextFieldBuilder.() -> Unit = {}): TextField {
-    return textFieldBuilder(config).build()
-}
+inline fun textField(config: TextFieldBuilder.() -> Unit = {}): TextField =
+    textFieldBuilder(config).build()
 
-inline fun textField(text: String, config: TextFieldBuilder.() -> Unit = {}): TextField {
-    return textFieldBuilder {
+inline fun textField(text: String, config: TextFieldBuilder.() -> Unit = {}): TextField =
+    textFieldBuilder {
         text(text)
         config()
     }.build()
-}
 
-inline fun textFieldBuilder(config: TextFieldBuilder.() -> Unit): TextFieldBuilder {
-    return TextFieldBuilder().apply(config)
-}
+inline fun textFieldBuilder(config: TextFieldBuilder.() -> Unit): TextFieldBuilder =
+    TextFieldBuilder().apply(config)
 
-inline fun TextField.config(config: TextFieldBuilder.() -> Unit): TextField {
-    TextFieldBuilder().apply {
-        delayMode()
-        config()
-    }.config(this)
-    return this
-}
+fun textFieldConfig(config: TextFieldBuilder.() -> Unit): TextFieldBuilder.() -> Unit =
+    config
+
+inline fun TextField.config(config: TextFieldBuilder.() -> Unit): TextField =
+    apply {
+        TextFieldBuilder().apply {
+            delayMode()
+            config()
+        }.config(this@config)
+    }
+
 
 // TextArea 衍生
-inline fun textArea(config: TextAreaBuilder.() -> Unit = {}): TextArea {
-    return textAreaBuilder(config).build()
-}
+inline fun textArea(config: TextAreaBuilder.() -> Unit = {}): TextArea =
+    textAreaBuilder(config).build()
 
-inline fun textArea(text: String, config: TextAreaBuilder.() -> Unit = {}): TextArea {
-    return textAreaBuilder {
+inline fun textArea(text: String, config: TextAreaBuilder.() -> Unit = {}): TextArea =
+    textAreaBuilder {
         text(text)
         config()
     }.build()
-}
 
-inline fun textAreaBuilder(config: TextAreaBuilder.() -> Unit): TextAreaBuilder {
-    return TextAreaBuilder().apply(config)
-}
+inline fun textAreaBuilder(config: TextAreaBuilder.() -> Unit): TextAreaBuilder =
+    TextAreaBuilder().apply(config)
 
-inline fun TextArea.config(config: TextAreaBuilder.() -> Unit): TextArea {
-    TextAreaBuilder().apply {
-        delayMode()
-        config()
-    }.config(this)
-    return this
-}
+fun textAreaConfig(config: TextAreaBuilder.() -> Unit): TextAreaBuilder.() -> Unit =
+    config
+
+inline fun TextArea.config(config: TextAreaBuilder.() -> Unit): TextArea =
+    apply {
+        TextAreaBuilder().apply {
+            delayMode()
+            config()
+        }.config(this@config)
+    }
+
 
 // CheckBox 衍生
-inline fun checkBox(config: CheckBoxBuilder.() -> Unit): CheckBox {
-    return checkBoxBuilder(config).build()
-}
+inline fun checkBox(config: CheckBoxBuilder.() -> Unit): CheckBox =
+    checkBoxBuilder(config).build()
 
-inline fun checkBox(text: String, config: CheckBoxBuilder.() -> Unit = {}): CheckBox {
-    return checkBoxBuilder {
+inline fun checkBox(text: String, config: CheckBoxBuilder.() -> Unit = {}): CheckBox =
+    checkBoxBuilder {
         text(text)
         config()
     }.build()
-}
 
-inline fun checkBoxBuilder(config: CheckBoxBuilder.() -> Unit): CheckBoxBuilder {
-    return CheckBoxBuilder().apply(config)
-}
+inline fun checkBoxBuilder(config: CheckBoxBuilder.() -> Unit): CheckBoxBuilder =
+    CheckBoxBuilder().apply(config)
 
-inline fun CheckBox.config(config: CheckBoxBuilder.() -> Unit): CheckBox {
-    CheckBoxBuilder().apply {
-        delayMode()
-        config()
-    }.config(this)
-    return this
-}
+fun checkBoxConfig(config: CheckBoxBuilder.() -> Unit): CheckBoxBuilder.() -> Unit =
+    config
+
+inline fun CheckBox.config(config: CheckBoxBuilder.() -> Unit): CheckBox =
+    apply {
+        CheckBoxBuilder().apply {
+            delayMode()
+            config()
+        }.config(this@config)
+    }
+
 
 // RadioButton 衍生
-inline fun radioButton(config: RadioButtonBuilder.() -> Unit): RadioButton {
-    return radioButtonBuilder(config).build()
-}
+inline fun radioButton(config: RadioButtonBuilder.() -> Unit): RadioButton =
+    radioButtonBuilder(config).build()
 
-inline fun radioButton(text: String, config: RadioButtonBuilder.() -> Unit = {}): RadioButton {
-    return radioButtonBuilder {
+inline fun radioButton(text: String, config: RadioButtonBuilder.() -> Unit = {}): RadioButton =
+    radioButtonBuilder {
         text(text)
         config()
     }.build()
-}
 
 inline fun radioButton(
     text: String,
     toggleGroup: ToggleGroup,
     config: RadioButtonBuilder.() -> Unit = {}
-): RadioButton {
-    return radioButtonBuilder {
+): RadioButton =
+    radioButtonBuilder {
         text(text)
         toggleGroup(toggleGroup)
         config()
     }.build()
-}
 
-inline fun radioButtonBuilder(config: RadioButtonBuilder.() -> Unit): RadioButtonBuilder {
-    return RadioButtonBuilder().apply(config)
-}
+inline fun radioButtonBuilder(config: RadioButtonBuilder.() -> Unit): RadioButtonBuilder =
+    RadioButtonBuilder().apply(config)
 
-inline fun RadioButton.config(config: RadioButtonBuilder.() -> Unit): RadioButton {
-    RadioButtonBuilder().apply {
-        delayMode()
-        config()
-    }.config(this)
-    return this
-}
+fun radioButtonConfig(config: RadioButtonBuilder.() -> Unit): RadioButtonBuilder.() -> Unit =
+    config
+
+inline fun RadioButton.config(config: RadioButtonBuilder.() -> Unit): RadioButton =
+    apply {
+        RadioButtonBuilder().apply {
+            delayMode()
+            config()
+        }.config(this@config)
+    }
+
 
 // ComboBox 衍生
-inline fun <T> comboBox(config: ComboBoxBuilder<T>.() -> Unit): ComboBox<T> {
-    return comboBoxBuilder(config).build()
-}
+inline fun <T> comboBox(config: ComboBoxBuilder<T>.() -> Unit): ComboBox<T> =
+    comboBoxBuilder(config).build()
 
-inline fun <T> comboBox(items: List<T>, config: ComboBoxBuilder<T>.() -> Unit = {}): ComboBox<T> {
-    return comboBoxBuilder {
+inline fun <T> comboBox(items: List<T>, config: ComboBoxBuilder<T>.() -> Unit = {}): ComboBox<T> =
+    comboBoxBuilder {
         items(items)
         config()
     }.build()
-}
 
-inline fun <T> comboBoxBuilder(config: ComboBoxBuilder<T>.() -> Unit): ComboBoxBuilder<T> {
-    return ComboBoxBuilder<T>().apply(config)
-}
+inline fun <T> comboBoxBuilder(config: ComboBoxBuilder<T>.() -> Unit): ComboBoxBuilder<T> =
+    ComboBoxBuilder<T>().apply(config)
 
-inline fun <T> ComboBox<T>.config(config: ComboBoxBuilder<T>.() -> Unit): ComboBox<T> {
-    ComboBoxBuilder<T>().apply {
-        delayMode()
-        config()
-    }.config(this)
-    return this
-}
+fun <T> comboBoxConfig(config: ComboBoxBuilder<T>.() -> Unit): ComboBoxBuilder<T>.() -> Unit =
+    config
+
+inline fun <T> ComboBox<T>.config(config: ComboBoxBuilder<T>.() -> Unit): ComboBox<T> =
+    apply {
+        ComboBoxBuilder<T>().apply {
+            delayMode()
+            config()
+        }.config(this@config)
+    }
+
 
 // ListView 衍生
-inline fun <T> listView(config: ListViewBuilder<T>.() -> Unit): ListView<T> {
-    return listViewBuilder(config).build()
-}
+inline fun <T> listView(config: ListViewBuilder<T>.() -> Unit): ListView<T> =
+    listViewBuilder(config).build()
 
-inline fun <T> listView(items: List<T>, config: ListViewBuilder<T>.() -> Unit = {}): ListView<T> {
-    return listViewBuilder {
+inline fun <T> listView(items: List<T>, config: ListViewBuilder<T>.() -> Unit = {}): ListView<T> =
+    listViewBuilder {
         items(items)
         config()
     }.build()
-}
 
-inline fun <T> listViewBuilder(config: ListViewBuilder<T>.() -> Unit): ListViewBuilder<T> {
-    return ListViewBuilder<T>().apply(config)
-}
+inline fun <T> listViewBuilder(config: ListViewBuilder<T>.() -> Unit): ListViewBuilder<T> =
+    ListViewBuilder<T>().apply(config)
 
-inline fun <T> ListView<T>.config(config: ListViewBuilder<T>.() -> Unit): ListView<T> {
-    ListViewBuilder<T>().apply {
-        delayMode()
-        config()
-    }.config(this)
-    return this
-}
+fun <T> listViewConfig(config: ListViewBuilder<T>.() -> Unit): ListViewBuilder<T>.() -> Unit =
+    config
+
+inline fun <T> ListView<T>.config(config: ListViewBuilder<T>.() -> Unit): ListView<T> =
+    apply {
+        ListViewBuilder<T>().apply {
+            delayMode()
+            config()
+        }.config(this@config)
+    }
+
 
 // TableColumn 衍生
 inline fun <S, T> tableColumn(
     text: String = "",
     config: TableColumnBuilder<S, T>.() -> Unit = {}
-): TableColumn<S, T> {
-    return tableColumnBuilder(text, config).build()
-}
+): TableColumn<S, T> =
+    tableColumnBuilder(text, config).build()
 
 inline fun <S, T> tableColumnBuilder(
     text: String = "",
     config: TableColumnBuilder<S, T>.() -> Unit = {}
-): TableColumnBuilder<S, T> {
-    return TableColumnBuilder<S, T>().apply {
+): TableColumnBuilder<S, T> =
+    TableColumnBuilder<S, T>().apply {
         text(text)
         config()
     }
-}
 
-inline fun <S, T> TableColumn<S, T>.config(config: TableColumnBuilder<S, T>.() -> Unit): TableColumn<S, T> {
-    TableColumnBuilder<S, T>().apply {
-        delayMode()
-        config()
-    }.config(this)
-    return this
-}
+fun <S, T> tableColumnConfig(
+    config: TableColumnBuilder<S, T>.() -> Unit
+): TableColumnBuilder<S, T>.() -> Unit =
+    config
+
+inline fun <S, T> TableColumn<S, T>.config(
+    config: TableColumnBuilder<S, T>.() -> Unit
+): TableColumn<S, T> =
+    apply {
+        TableColumnBuilder<S, T>().apply {
+            delayMode()
+            config()
+        }.config(this@config)
+    }
+
 
 // TableView 衍生
-inline fun <T> tableView(config: TableViewBuilder<T>.() -> Unit): TableView<T> {
-    return tableViewBuilder(config).build()
-}
+inline fun <T> tableView(config: TableViewBuilder<T>.() -> Unit): TableView<T> =
+    tableViewBuilder(config).build()
 
-inline fun <T> tableView(items: List<T>, config: TableViewBuilder<T>.() -> Unit = {}): TableView<T> {
-    return tableViewBuilder {
+inline fun <T> tableView(items: List<T>, config: TableViewBuilder<T>.() -> Unit = {}): TableView<T> =
+    tableViewBuilder {
         items(items)
         config()
     }.build()
-}
 
-inline fun <T> tableViewBuilder(config: TableViewBuilder<T>.() -> Unit): TableViewBuilder<T> {
-    return TableViewBuilder<T>().apply(config)
-}
+inline fun <T> tableViewBuilder(config: TableViewBuilder<T>.() -> Unit): TableViewBuilder<T> =
+    TableViewBuilder<T>().apply(config)
 
-inline fun <T> TableView<T>.config(config: TableViewBuilder<T>.() -> Unit): TableView<T> {
-    TableViewBuilder<T>().apply {
-        delayMode()
-        config()
-    }.config(this)
-    return this
-}
+fun <T> tableViewConfig(config: TableViewBuilder<T>.() -> Unit): TableViewBuilder<T>.() -> Unit =
+    config
+
+inline fun <T> TableView<T>.config(config: TableViewBuilder<T>.() -> Unit): TableView<T> =
+    apply {
+        TableViewBuilder<T>().apply {
+            delayMode()
+            config()
+        }.config(this@config)
+    }
+
 
 // ProgressBar 衍生
-inline fun progressBar(config: ProgressBarBuilder.() -> Unit = {}): ProgressBar {
-    return progressBarBuilder(config).build()
-}
+inline fun progressBar(config: ProgressBarBuilder.() -> Unit = {}): ProgressBar =
+    progressBarBuilder(config).build()
 
-inline fun progressBarBuilder(config: ProgressBarBuilder.() -> Unit): ProgressBarBuilder {
-    return ProgressBarBuilder().apply(config)
-}
+inline fun progressBarBuilder(config: ProgressBarBuilder.() -> Unit): ProgressBarBuilder =
+    ProgressBarBuilder().apply(config)
 
-inline fun ProgressBar.config(config: ProgressBarBuilder.() -> Unit): ProgressBar {
-    ProgressBarBuilder().apply {
-        delayMode()
-        config()
-    }.config(this)
-    return this
-}
+fun progressBarConfig(config: ProgressBarBuilder.() -> Unit): ProgressBarBuilder.() -> Unit =
+    config
+
+inline fun ProgressBar.config(config: ProgressBarBuilder.() -> Unit): ProgressBar =
+    apply {
+        ProgressBarBuilder().apply {
+            delayMode()
+            config()
+        }.config(this@config)
+    }
+
 
 // Slider 衍生
-inline fun slider(config: SliderBuilder.() -> Unit = {}): Slider {
-    return sliderBuilder(config).build()
-}
+inline fun slider(config: SliderBuilder.() -> Unit = {}): Slider =
+    sliderBuilder(config).build()
 
-inline fun sliderBuilder(config: SliderBuilder.() -> Unit): SliderBuilder {
-    return SliderBuilder().apply(config)
-}
+inline fun sliderBuilder(config: SliderBuilder.() -> Unit): SliderBuilder =
+    SliderBuilder().apply(config)
 
-inline fun Slider.config(config: SliderBuilder.() -> Unit): Slider {
-    SliderBuilder().apply {
-        delayMode()
-        config()
-    }.config(this)
-    return this
-}
+fun sliderConfig(config: SliderBuilder.() -> Unit): SliderBuilder.() -> Unit =
+    config
+
+inline fun Slider.config(config: SliderBuilder.() -> Unit): Slider =
+    apply {
+        SliderBuilder().apply {
+            delayMode()
+            config()
+        }.config(this@config)
+    }
+
 
 // ImageView 衍生
-inline fun imageView(config: ImageViewBuilder.() -> Unit = {}): ImageView {
-    return imageViewBuilder(config).build()
-}
+inline fun imageView(config: ImageViewBuilder.() -> Unit = {}): ImageView =
+    imageViewBuilder(config).build()
 
-inline fun imageView(url: String, config: ImageViewBuilder.() -> Unit = {}): ImageView {
-    return imageViewBuilder {
+inline fun imageView(url: String, config: ImageViewBuilder.() -> Unit = {}): ImageView =
+    imageViewBuilder {
         image(url)
         config()
     }.build()
-}
 
-inline fun imageViewBuilder(config: ImageViewBuilder.() -> Unit): ImageViewBuilder {
-    return ImageViewBuilder().apply(config)
-}
+inline fun imageViewBuilder(config: ImageViewBuilder.() -> Unit): ImageViewBuilder =
+    ImageViewBuilder().apply(config)
 
-inline fun ImageView.config(config: ImageViewBuilder.() -> Unit): ImageView {
-    ImageViewBuilder().apply {
-        delayMode()
-        config()
-    }.config(this)
-    return this
-}
+fun imageViewConfig(config: ImageViewBuilder.() -> Unit): ImageViewBuilder.() -> Unit =
+    config
+
+inline fun ImageView.config(config: ImageViewBuilder.() -> Unit): ImageView =
+    apply {
+        ImageViewBuilder().apply {
+            delayMode()
+            config()
+        }.config(this@config)
+    }
+
 
 // Separator 衍生
-inline fun separator(config: SeparatorBuilder.() -> Unit = {}): Separator {
-    return separatorBuilder(config).build()
-}
+inline fun separator(config: SeparatorBuilder.() -> Unit = {}): Separator =
+    separatorBuilder(config).build()
 
-inline fun separatorBuilder(config: SeparatorBuilder.() -> Unit): SeparatorBuilder {
-    return SeparatorBuilder().apply(config)
-}
+inline fun separatorBuilder(config: SeparatorBuilder.() -> Unit): SeparatorBuilder =
+    SeparatorBuilder().apply(config)
 
-inline fun Separator.config(config: SeparatorBuilder.() -> Unit): Separator {
-    SeparatorBuilder().apply {
-        delayMode()
-        config()
-    }.config(this)
-    return this
-}
+fun separatorConfig(config: SeparatorBuilder.() -> Unit): SeparatorBuilder.() -> Unit =
+    config
+
+inline fun Separator.config(config: SeparatorBuilder.() -> Unit): Separator =
+    apply {
+        SeparatorBuilder().apply {
+            delayMode()
+            config()
+        }.config(this@config)
+    }
+
 
 // Pagination 衍生
-inline fun pagination(config: PaginationBuilder.() -> Unit = {}): Pagination {
-    return paginationBuilder(config).build()
-}
+inline fun pagination(config: PaginationBuilder.() -> Unit = {}): Pagination =
+    paginationBuilder(config).build()
 
-inline fun paginationBuilder(config: PaginationBuilder.() -> Unit): PaginationBuilder {
-    return PaginationBuilder().apply(config)
-}
+inline fun paginationBuilder(config: PaginationBuilder.() -> Unit): PaginationBuilder =
+    PaginationBuilder().apply(config)
 
-inline fun Pagination.config(config: PaginationBuilder.() -> Unit): Pagination {
-    PaginationBuilder().apply {
-        delayMode()
-        config()
-    }.config(this)
-    return this
-}
+fun paginationConfig(config: PaginationBuilder.() -> Unit): PaginationBuilder.() -> Unit =
+    config
+
+inline fun Pagination.config(config: PaginationBuilder.() -> Unit): Pagination =
+    apply {
+        PaginationBuilder().apply {
+            delayMode()
+            config()
+        }.config(this@config)
+    }
+
 
 // Spacer 衍生
-inline fun hSpacer(priority: Priority = Priority.ALWAYS, config: Region.() -> Unit = {}): Region {
-    val region = Region()
-    region.config()
-    HBox.setHgrow(region, priority)
-    return region
-}
+inline fun hSpacer(priority: Priority = Priority.ALWAYS, config: Region.() -> Unit = {}): Region =
+    Region().apply {
+        config()
+        HBox.setHgrow(this, priority)
+    }
 
-inline fun vSpacer(priority: Priority = Priority.ALWAYS, config: Region.() -> Unit = {}): Region {
-    val region = Region()
-    region.config()
-    VBox.setVgrow(region, priority)
-    return region
-}
+inline fun vSpacer(priority: Priority = Priority.ALWAYS, config: Region.() -> Unit = {}): Region =
+    Region().apply {
+        config()
+        VBox.setVgrow(this, priority)
+    }
 
-// Switch衍生
-inline fun switch(config: SwitchBuilder.() -> Unit) = SwitchBuilder().apply(config).build()
 
-inline fun switchBuilder(config: SwitchBuilder.() -> Unit) = SwitchBuilder().apply(config)
+// Switch 衍生
+inline fun switch(config: SwitchBuilder.() -> Unit): Switch =
+    switchBuilder(config).build()
+
+inline fun switchBuilder(config: SwitchBuilder.() -> Unit): SwitchBuilder =
+    SwitchBuilder().apply(config)
+
+fun switchConfig(config: SwitchBuilder.() -> Unit): SwitchBuilder.() -> Unit =
+    config

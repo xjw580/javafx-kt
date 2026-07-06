@@ -1,8 +1,10 @@
 package club.xiaojiawei.kt.dsl
 
 import club.xiaojiawei.kt.controls.PageResult
+import club.xiaojiawei.kt.controls.addPaginationTableView
 import club.xiaojiawei.kt.ext.getValue
 import club.xiaojiawei.kt.ext.setValue
+import com.sun.org.apache.xalan.internal.lib.ExsltStrings.padding
 import javafx.animation.Animation
 import javafx.animation.KeyFrame
 import javafx.animation.Timeline

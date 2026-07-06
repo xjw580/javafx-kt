@@ -975,180 +975,237 @@ class TitledPaneBuilder : DslBuilder<TitledPane>() {
 
 
 // Pane 衍生
-inline fun pane(config: PaneBuilder.() -> Unit): Pane {
-    return paneBuilder(config).build()
-}
+inline fun pane(config: PaneBuilder.() -> Unit): Pane =
+    paneBuilder(config).build()
 
-inline fun paneBuilder(config: PaneBuilder.() -> Unit): PaneBuilder {
-    return PaneBuilder().apply(config)
-}
+inline fun paneBuilder(config: PaneBuilder.() -> Unit): PaneBuilder =
+    PaneBuilder().apply(config)
+
+fun paneConfig(config: PaneBuilder.() -> Unit): PaneBuilder.() -> Unit =
+    config
+
+//inline fun Pane.config(config: PaneBuilder.() -> Unit): Pane =
+//    apply {
+//        PaneBuilder().apply {
+//            delayMode()
+//            config()
+//        }.config(this@config)
+//    }
+
 
 // VBox 衍生
-inline fun vbox(config: VBoxBuilder.() -> Unit): VBox {
-    return vboxBuilder(config).build()
-}
+inline fun vbox(config: VBoxBuilder.() -> Unit): VBox =
+    vboxBuilder(config).build()
 
-inline fun vboxBuilder(config: VBoxBuilder.() -> Unit): VBoxBuilder {
-    return VBoxBuilder().apply(config)
-}
+inline fun vboxBuilder(config: VBoxBuilder.() -> Unit): VBoxBuilder =
+    VBoxBuilder().apply(config)
 
-inline fun VBox.config(config: VBoxBuilder.() -> Unit): VBox {
-    VBoxBuilder().apply {
-        delayMode()
-        config()
-    }.config(this)
-    return this
-}
+fun vboxConfig(config: VBoxBuilder.() -> Unit): VBoxBuilder.() -> Unit =
+    config
+
+inline fun VBox.config(config: VBoxBuilder.() -> Unit): VBox =
+    apply {
+        VBoxBuilder().apply {
+            delayMode()
+            config()
+        }.config(this@config)
+    }
+
 
 // HBox 衍生
-inline fun hbox(config: HBoxBuilder.() -> Unit): HBox {
-    return hboxBuilder(config).build()
-}
+inline fun hbox(config: HBoxBuilder.() -> Unit): HBox =
+    hboxBuilder(config).build()
 
-inline fun hboxBuilder(config: HBoxBuilder.() -> Unit): HBoxBuilder {
-    return HBoxBuilder().apply(config)
-}
+inline fun hboxBuilder(config: HBoxBuilder.() -> Unit): HBoxBuilder =
+    HBoxBuilder().apply(config)
 
-inline fun HBox.config(config: HBoxBuilder.() -> Unit): HBox {
-    HBoxBuilder().apply {
-        delayMode()
-        config()
-    }.config(this)
-    return this
-}
+fun hboxConfig(config: HBoxBuilder.() -> Unit): HBoxBuilder.() -> Unit =
+    config
+
+inline fun HBox.config(config: HBoxBuilder.() -> Unit): HBox =
+    apply {
+        HBoxBuilder().apply {
+            delayMode()
+            config()
+        }.config(this@config)
+    }
+
 
 // StackPane 衍生
-inline fun stackPane(config: StackPaneBuilder.() -> Unit): StackPane {
-    return stackPaneBuilder(config).build()
-}
+inline fun stackPane(config: StackPaneBuilder.() -> Unit): StackPane =
+    stackPaneBuilder(config).build()
 
-inline fun stackPaneBuilder(config: StackPaneBuilder.() -> Unit): StackPaneBuilder {
-    return StackPaneBuilder().apply(config)
-}
+inline fun stackPaneBuilder(config: StackPaneBuilder.() -> Unit): StackPaneBuilder =
+    StackPaneBuilder().apply(config)
 
-inline fun StackPane.config(config: StackPaneBuilder.() -> Unit): StackPane {
-    StackPaneBuilder().apply {
-        delayMode()
-        config()
-    }.config(this)
-    return this
-}
+fun stackPaneConfig(config: StackPaneBuilder.() -> Unit): StackPaneBuilder.() -> Unit =
+    config
+
+inline fun StackPane.config(config: StackPaneBuilder.() -> Unit): StackPane =
+    apply {
+        StackPaneBuilder().apply {
+            delayMode()
+            config()
+        }.config(this@config)
+    }
+
 
 // BorderPane 衍生
-inline fun borderPane(config: BorderPaneBuilder.() -> Unit): BorderPane {
-    return borderPaneBuilder(config).build()
-}
+inline fun borderPane(config: BorderPaneBuilder.() -> Unit): BorderPane =
+    borderPaneBuilder(config).build()
 
-inline fun borderPaneBuilder(config: BorderPaneBuilder.() -> Unit): BorderPaneBuilder {
-    return BorderPaneBuilder().apply(config)
-}
+inline fun borderPaneBuilder(config: BorderPaneBuilder.() -> Unit): BorderPaneBuilder =
+    BorderPaneBuilder().apply(config)
 
-inline fun BorderPane.config(config: BorderPaneBuilder.() -> Unit): BorderPane {
-    BorderPaneBuilder().apply {
-        delayMode()
-        config()
-    }.config(this)
-    return this
-}
+fun borderPaneConfig(config: BorderPaneBuilder.() -> Unit): BorderPaneBuilder.() -> Unit =
+    config
+
+inline fun BorderPane.config(config: BorderPaneBuilder.() -> Unit): BorderPane =
+    apply {
+        BorderPaneBuilder().apply {
+            delayMode()
+            config()
+        }.config(this@config)
+    }
+
 
 // GridPane 衍生
-inline fun gridPane(config: GridPaneBuilder.() -> Unit): GridPane {
-    return gridPaneBuilder(config).build()
-}
+inline fun gridPane(config: GridPaneBuilder.() -> Unit): GridPane =
+    gridPaneBuilder(config).build()
 
-inline fun gridPaneBuilder(config: GridPaneBuilder.() -> Unit): GridPaneBuilder {
-    return GridPaneBuilder().apply(config)
-}
+inline fun gridPaneBuilder(config: GridPaneBuilder.() -> Unit): GridPaneBuilder =
+    GridPaneBuilder().apply(config)
 
-inline fun GridPane.config(config: GridPaneBuilder.() -> Unit): GridPane {
-    GridPaneBuilder().apply {
-        delayMode()
-        config()
-    }.config(this)
-    return this
-}
+fun gridPaneConfig(config: GridPaneBuilder.() -> Unit): GridPaneBuilder.() -> Unit =
+    config
+
+inline fun GridPane.config(config: GridPaneBuilder.() -> Unit): GridPane =
+    apply {
+        GridPaneBuilder().apply {
+            delayMode()
+            config()
+        }.config(this@config)
+    }
+
 
 // AnchorPane 衍生
-inline fun anchorPane(config: AnchorPaneBuilder.() -> Unit): AnchorPane {
-    return AnchorPaneBuilder().apply(config).build()
-}
+inline fun anchorPane(config: AnchorPaneBuilder.() -> Unit): AnchorPane =
+    anchorPaneBuilder(config).build()
 
-inline fun AnchorPane.config(config: AnchorPaneBuilder.() -> Unit): AnchorPane {
-    AnchorPaneBuilder().apply {
-        delayMode()
-        config()
-    }.config(this)
-    return this
-}
+inline fun anchorPaneBuilder(config: AnchorPaneBuilder.() -> Unit): AnchorPaneBuilder =
+    AnchorPaneBuilder().apply(config)
+
+fun anchorPaneConfig(config: AnchorPaneBuilder.() -> Unit): AnchorPaneBuilder.() -> Unit =
+    config
+
+inline fun AnchorPane.config(config: AnchorPaneBuilder.() -> Unit): AnchorPane =
+    apply {
+        AnchorPaneBuilder().apply {
+            delayMode()
+            config()
+        }.config(this@config)
+    }
+
 
 // FlowPane 衍生
-inline fun flowPane(config: FlowPaneBuilder.() -> Unit): FlowPane {
-    return FlowPaneBuilder().apply(config).build()
-}
+inline fun flowPane(config: FlowPaneBuilder.() -> Unit): FlowPane =
+    flowPaneBuilder(config).build()
 
-inline fun FlowPane.config(config: FlowPaneBuilder.() -> Unit): FlowPane {
-    FlowPaneBuilder().apply {
-        delayMode()
-        config()
-    }.config(this)
-    return this
-}
+inline fun flowPaneBuilder(config: FlowPaneBuilder.() -> Unit): FlowPaneBuilder =
+    FlowPaneBuilder().apply(config)
+
+fun flowPaneConfig(config: FlowPaneBuilder.() -> Unit): FlowPaneBuilder.() -> Unit =
+    config
+
+inline fun FlowPane.config(config: FlowPaneBuilder.() -> Unit): FlowPane =
+    apply {
+        FlowPaneBuilder().apply {
+            delayMode()
+            config()
+        }.config(this@config)
+    }
+
 
 // TilePane 衍生
-inline fun tilePane(config: TilePaneBuilder.() -> Unit): TilePane {
-    return TilePaneBuilder().apply(config).build()
-}
+inline fun tilePane(config: TilePaneBuilder.() -> Unit): TilePane =
+    tilePaneBuilder(config).build()
 
-inline fun TilePane.config(config: TilePaneBuilder.() -> Unit): TilePane {
-    TilePaneBuilder().apply {
-        delayMode()
-        config()
-    }.config(this)
-    return this
-}
+inline fun tilePaneBuilder(config: TilePaneBuilder.() -> Unit): TilePaneBuilder =
+    TilePaneBuilder().apply(config)
+
+fun tilePaneConfig(config: TilePaneBuilder.() -> Unit): TilePaneBuilder.() -> Unit =
+    config
+
+inline fun TilePane.config(config: TilePaneBuilder.() -> Unit): TilePane =
+    apply {
+        TilePaneBuilder().apply {
+            delayMode()
+            config()
+        }.config(this@config)
+    }
+
 
 // ScrollPane 衍生
-inline fun scrollPane(config: ScrollPaneBuilder.() -> Unit): ScrollPane {
-    return ScrollPaneBuilder().apply(config).build()
-}
+inline fun scrollPane(config: ScrollPaneBuilder.() -> Unit): ScrollPane =
+    scrollPaneBuilder(config).build()
 
-inline fun ScrollPane.config(config: ScrollPaneBuilder.() -> Unit): ScrollPane {
-    ScrollPaneBuilder().apply {
-        delayMode()
-        config()
-    }.config(this)
-    return this
-}
+inline fun scrollPaneBuilder(config: ScrollPaneBuilder.() -> Unit): ScrollPaneBuilder =
+    ScrollPaneBuilder().apply(config)
+
+fun scrollPaneConfig(config: ScrollPaneBuilder.() -> Unit): ScrollPaneBuilder.() -> Unit =
+    config
+
+inline fun ScrollPane.config(config: ScrollPaneBuilder.() -> Unit): ScrollPane =
+    apply {
+        ScrollPaneBuilder().apply {
+            delayMode()
+            config()
+        }.config(this@config)
+    }
+
 
 // SplitPane 衍生
-inline fun splitPane(config: SplitPaneBuilder.() -> Unit): SplitPane {
-    return SplitPaneBuilder().apply(config).build()
-}
+inline fun splitPane(config: SplitPaneBuilder.() -> Unit): SplitPane =
+    splitPaneBuilder(config).build()
 
-inline fun SplitPane.config(config: SplitPaneBuilder.() -> Unit): SplitPane {
-    SplitPaneBuilder().apply {
-        delayMode()
-        config()
-    }.config(this)
-    return this
-}
+inline fun splitPaneBuilder(config: SplitPaneBuilder.() -> Unit): SplitPaneBuilder =
+    SplitPaneBuilder().apply(config)
+
+fun splitPaneConfig(config: SplitPaneBuilder.() -> Unit): SplitPaneBuilder.() -> Unit =
+    config
+
+inline fun SplitPane.config(config: SplitPaneBuilder.() -> Unit): SplitPane =
+    apply {
+        SplitPaneBuilder().apply {
+            delayMode()
+            config()
+        }.config(this@config)
+    }
+
 
 // TitledPane 衍生
-inline fun titledPane(config: TitledPaneBuilder.() -> Unit): TitledPane {
-    return TitledPaneBuilder().apply(config).build()
-}
+inline fun titledPane(config: TitledPaneBuilder.() -> Unit): TitledPane =
+    titledPaneBuilder(config).build()
 
-inline fun titledPane(title: String, config: TitledPaneBuilder.() -> Unit = {}): TitledPane {
-    return TitledPaneBuilder().apply {
+inline fun titledPane(
+    title: String,
+    config: TitledPaneBuilder.() -> Unit = {}
+): TitledPane =
+    titledPaneBuilder {
         text(title)
         config()
     }.build()
-}
 
-inline fun TitledPane.config(config: TitledPaneBuilder.() -> Unit): TitledPane {
-    TitledPaneBuilder().apply {
-        delayMode()
-        config()
-    }.config(this)
-    return this
-}
+inline fun titledPaneBuilder(config: TitledPaneBuilder.() -> Unit): TitledPaneBuilder =
+    TitledPaneBuilder().apply(config)
+
+fun titledPaneConfig(config: TitledPaneBuilder.() -> Unit): TitledPaneBuilder.() -> Unit =
+    config
+
+inline fun TitledPane.config(config: TitledPaneBuilder.() -> Unit): TitledPane =
+    apply {
+        TitledPaneBuilder().apply {
+            delayMode()
+            config()
+        }.config(this@config)
+    }
