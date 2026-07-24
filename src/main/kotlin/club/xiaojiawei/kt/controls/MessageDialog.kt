@@ -50,10 +50,10 @@ class MessageDialog(val baseParent: Parent) {
         this.contentNode = content
         stage.config {
             scene {
-                JavaFXUI.addjavafxUIStylesheet(instance())
                 root {
                     buildRootPane(content)
                 }
+                JavaFXUI.addjavafxUIStylesheet(instance())
                 fill(Color.TRANSPARENT)
             }
             initStyle(StageStyle.TRANSPARENT)
