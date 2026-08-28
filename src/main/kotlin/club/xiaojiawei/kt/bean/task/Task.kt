@@ -109,7 +109,8 @@ data class CompositeTask(
                         subTask.id,
                         subTaskProgresses[subTask.id]?.subTaskName ?: "",
                         status,
-                        0.0
+                        0.0,
+                        result.error.orEmpty()
                     )
                     progressCallback(
                         TaskProgress(

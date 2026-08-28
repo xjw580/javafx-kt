@@ -350,6 +350,7 @@ class TaskProgressView<T : TaskBuilder> : VBox() {
         }
     }
 
+    // 更新子任务ui
     private fun updateSubTaskProgress(taskId: String, subTaskId: String, progress: SubTaskProgress) {
         val taskSubViews = subTaskViews[taskId] ?: return
 
