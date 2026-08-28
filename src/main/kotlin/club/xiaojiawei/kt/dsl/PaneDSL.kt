@@ -939,12 +939,8 @@ class SplitPaneBuilder : DslBuilder<SplitPane>() {
 // ======================== TitledPane ========================
 
 @FXMarker
-class TitledPaneBuilder : DslBuilder<TitledPane>() {
+class TitledPaneBuilder : LabeledBuilder<TitledPane>() {
     override fun buildInstance(): TitledPane = TitledPane()
-
-    fun text(text: String) = settings {
-        this.text = text
-    }
 
     fun content(node: Node) = settings {
         content = node
@@ -966,11 +962,9 @@ class TitledPaneBuilder : DslBuilder<TitledPane>() {
         isAnimated = animated
     }
 
-    fun graphic(node: Node) = settings {
-        graphic = node
+    override fun style(styleColor: StyleColor, styleSize: StyleSize) = settings {
+        styleClass.add("titled-pane-ui")
     }
-
-    fun graphic(builder: () -> Node) = settings { graphic = builder() }
 }
 
 

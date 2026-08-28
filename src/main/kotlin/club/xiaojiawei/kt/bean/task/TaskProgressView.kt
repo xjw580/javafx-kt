@@ -208,6 +208,8 @@ class TaskProgressView<T : TaskBuilder> : VBox() {
                     spacing(6.0)
                 }
                 val subTaskPane = titledPane("子任务") {
+                    style()
+                    styleClass("titled-pane-ui-pure")
                     content(subTaskContainer)
                     expanded(false)
                 }.apply {
