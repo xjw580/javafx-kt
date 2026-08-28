@@ -4,6 +4,8 @@ import club.xiaojiawei.controls.ico.FailIco
 import club.xiaojiawei.controls.ico.OKIco
 import club.xiaojiawei.kt.dsl.FontWeight
 import club.xiaojiawei.kt.dsl.styled
+import club.xiaojiawei.kt.dsl.titledPane
+import club.xiaojiawei.kt.dsl.vbox
 import club.xiaojiawei.kt.ext.runUI
 import javafx.geometry.Insets
 import javafx.geometry.Pos
@@ -24,6 +26,7 @@ class TaskProgressView<T : TaskBuilder> : VBox() {
     private val taskStatuses = mutableMapOf<String, Label>()
     private val taskControlButtons = mutableMapOf<String, HBox>()
     private val subTaskViews = mutableMapOf<String, MutableMap<String, VBox>>()
+    private val subTaskContainers = mutableMapOf<String, VBox>()
 
     // 状态显示标签
     private var runningCountLabel: Label? = null
@@ -201,7 +204,17 @@ class TaskProgressView<T : TaskBuilder> : VBox() {
                 statusLabel.applyStatusStyle()
                 statusLabel.contentDisplay = ContentDisplay.RIGHT
 
-                container.children.addAll(headerBox, progressBar, statusLabel)
+                val subTaskContainer = vbox {
+                    spacing(6.0)
+                }
+                val subTaskPane = titledPane("子任务") {
+                    content(subTaskContainer)
+                    expanded(false)
+                }.apply {
+                    styleClass.add("radius-ui")
+                }
+
+                container.children.addAll(headerBox, progressBar, statusLabel, subTaskPane)
 
                 taskContainers[task.id] = container
                 taskProgressBars[task.id] = progressBar
@@ -209,6 +222,7 @@ class TaskProgressView<T : TaskBuilder> : VBox() {
                 taskStatuses[task.id] = statusLabel
                 taskControlButtons[task.id] = controlBox
                 subTaskViews[task.id] = mutableMapOf()
+                subTaskContainers[task.id] = subTaskContainer
 
                 newContainers.add(container)
             }
@@ -373,7 +387,7 @@ class TaskProgressView<T : TaskBuilder> : VBox() {
 
             subContainer.children.addAll(subLabel, subProgressBar, subStatus)
             taskSubViews[subTaskId] = subContainer
-            taskContainers[taskId]?.children?.add(subContainer)
+            subTaskContainers[taskId]?.children?.add(subContainer)
         }
 
         val subContainer = taskSubViews[subTaskId]
@@ -497,6 +511,7 @@ class TaskProgressView<T : TaskBuilder> : VBox() {
                 taskStatuses.remove(taskId)
                 taskControlButtons.remove(taskId)
                 subTaskViews.remove(taskId)
+                subTaskContainers.remove(taskId)
             }
         }
     }
@@ -512,6 +527,7 @@ class TaskProgressView<T : TaskBuilder> : VBox() {
             taskStatuses.clear()
             taskControlButtons.clear()
             subTaskViews.clear()
+            subTaskContainers.clear()
         }
     }
 }
