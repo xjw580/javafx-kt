@@ -180,3 +180,48 @@ hbox {
     +button("B")
 }
 ```
+
+## 7. 多语言与运行时切换
+
+资源文件使用 `i18n/messages.properties`、`i18n/messages_zh_CN.properties`、`i18n/messages_en.properties` 命名。
+
+```kotlin
+val messages = I18nContext(
+    baseName = "i18n.messages",
+    supportedLocales = setOf(Locale.SIMPLIFIED_CHINESE, Locale.ENGLISH),
+    initialLocale = Locale.SIMPLIFIED_CHINESE,
+)
+I18n.configure(messages)
+
+launchApp {
+    title(i18n("app.title"))
+    root {
+        vbox {
+            spacing(12.0)
+            padding(16.0)
+
+            addLabel(i18n("home.welcome"))
+            addTextField {
+                promptText(i18n("search.prompt"))
+            }
+            addButton(i18n("language.english")) {
+                onAction {
+                    runUI { I18n.locale = Locale.ENGLISH }
+                }
+            }
+        }
+    }
+}
+```
+
+需要模块隔离时直接使用独立上下文：
+
+```kotlin
+val moduleMessages = I18nContext(
+    baseName = "module.messages",
+    supportedLocales = setOf(Locale.SIMPLIFIED_CHINESE, Locale.ENGLISH),
+    initialLocale = Locale.ENGLISH,
+)
+
+label(moduleMessages.localized("module.title"))
+```

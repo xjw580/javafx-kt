@@ -4,6 +4,7 @@ import club.xiaojiawei.JavaFXUI
 import club.xiaojiawei.kt.annotations.FXMarker
 import club.xiaojiawei.kt.dsl.*
 import club.xiaojiawei.kt.ext.runUI
+import club.xiaojiawei.kt.i18n.LocalizedText
 import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.Group
@@ -180,7 +181,7 @@ class MessageDialog(val baseParent: Parent) {
 
 @FXMarker
 class MessageDialogBuilder(val baseParent: Parent) : DslBuilder<MessageDialog>() {
-    private var headingText: String? = null
+    private var headingText: Any? = null
     private var contentObj: Any? = null
     private val buttonBuilders = mutableListOf<ButtonBuilder>()
 
@@ -190,7 +191,15 @@ class MessageDialogBuilder(val baseParent: Parent) : DslBuilder<MessageDialog>()
         this.headingText = text
     }
 
+    fun heading(text: LocalizedText) {
+        this.headingText = text
+    }
+
     fun content(text: String) {
+        this.contentObj = text
+    }
+
+    fun content(text: LocalizedText) {
         this.contentObj = text
     }
 
@@ -221,6 +230,14 @@ class MessageDialogBuilder(val baseParent: Parent) : DslBuilder<MessageDialog>()
         })
     }
 
+    fun button(text: LocalizedText, block: ButtonBuilder.() -> Unit) {
+        buttonBuilders.add(ButtonBuilder().apply {
+            text(text)
+            styleClass("btn-ui")
+            block()
+        })
+    }
+
     fun okButton(text: String = "确认", action: () -> Unit = {}) {
         button(text) {
             styleClass("btn-ui-success")
@@ -228,7 +245,20 @@ class MessageDialogBuilder(val baseParent: Parent) : DslBuilder<MessageDialog>()
         }
     }
 
+    fun okButton(text: LocalizedText, action: () -> Unit = {}) {
+        button(text) {
+            styleClass("btn-ui-success")
+            onAction { action() }
+        }
+    }
+
     fun cancelButton(text: String = "取消", action: () -> Unit = {}) {
+        button(text) {
+            onAction { action() }
+        }
+    }
+
+    fun cancelButton(text: LocalizedText, action: () -> Unit = {}) {
         button(text) {
             onAction { action() }
         }
@@ -247,7 +277,11 @@ class MessageDialogBuilder(val baseParent: Parent) : DslBuilder<MessageDialog>()
         headingText?.let {
             vBox.children.add(HBox().apply {
                 alignment = Pos.CENTER_LEFT
-                children.add(Label(it).apply {
+                children.add(Label().apply {
+                    when (it) {
+                        is String -> text = it
+                        is LocalizedText -> textProperty().bind(it.binding())
+                    }
                     style = "-fx-font-weight: bold; -fx-font-size: 14; -fx-wrap-text: true; -fx-text-fill: black"
                 })
             })
@@ -255,14 +289,18 @@ class MessageDialogBuilder(val baseParent: Parent) : DslBuilder<MessageDialog>()
 
         contentObj?.let {
             when (it) {
-                is String -> {
+                is String, is LocalizedText -> {
                     val maxWidth = vBox.prefWidth - 40
                     val scrollPane = ScrollPane().apply {
                         styleClass.add("edge-to-edge")
                         style = "-fx-background: white; -fx-hbar-policy: NEVER; -fx-padding: 0 0 0 5"
                         this.maxWidth = maxWidth
                         maxHeight = 200.0
-                        content = Text(it).apply {
+                        content = Text().apply {
+                            when (it) {
+                                is String -> text = it
+                                is LocalizedText -> textProperty().bind(it.binding())
+                            }
                             wrappingWidth = maxWidth - 15
                             style = "-fx-font-size: 14;"
                         }

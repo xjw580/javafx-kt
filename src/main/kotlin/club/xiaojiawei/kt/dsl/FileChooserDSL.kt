@@ -3,6 +3,7 @@
 package club.xiaojiawei.kt.dsl
 
 import club.xiaojiawei.kt.annotations.FXMarker
+import club.xiaojiawei.kt.i18n.LocalizedText
 import javafx.stage.DirectoryChooser
 import javafx.stage.FileChooser
 import javafx.stage.FileChooser.ExtensionFilter
@@ -29,6 +30,10 @@ class FileChooserBuilder : DslBuilder<FileChooser>() {
         this.title = title
     }
 
+    fun title(title: LocalizedText) = settings {
+        titleProperty().bind(title.binding())
+    }
+
     fun initialDirectory(path: String) = initialDirectory(File(path))
 
     fun initialDirectory(path: Path) = initialDirectory(path.toFile())
@@ -45,6 +50,10 @@ class FileChooserBuilder : DslBuilder<FileChooser>() {
 
     fun filter(description: String, vararg extensions: String) = settings {
         extensionFilters.add(ExtensionFilter(description, extensions.toList()))
+    }
+
+    fun filter(description: LocalizedText, vararg extensions: String) = settings {
+        extensionFilters.add(ExtensionFilter(description.value, extensions.toList()))
     }
 
     fun allFilesFilter() = filter("所有文件", "*.*")
@@ -78,6 +87,12 @@ class FileChooserBuilder : DslBuilder<FileChooser>() {
             "未找到文件过滤器: $description"
         }
     }
+
+    fun selectedFilter(description: LocalizedText) = settings {
+        selectedExtensionFilter = requireNotNull(extensionFilters.find { it.description == description.value }) {
+            "未找到文件过滤器: ${description.value}"
+        }
+    }
 }
 
 @FXMarker
@@ -89,6 +104,10 @@ class DirectoryChooserBuilder : DslBuilder<DirectoryChooser>() {
 
     fun title(title: String) = settings {
         this.title = title
+    }
+
+    fun title(title: LocalizedText) = settings {
+        titleProperty().bind(title.binding())
     }
 
     fun initialDirectory(path: String) = initialDirectory(File(path))

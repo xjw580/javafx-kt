@@ -3,6 +3,7 @@ package club.xiaojiawei.kt.dsl
 import club.xiaojiawei.controls.FilterComboBox
 import club.xiaojiawei.controls.Title
 import club.xiaojiawei.kt.annotations.FXMarker
+import club.xiaojiawei.kt.i18n.LocalizedText
 import javafx.collections.FXCollections
 import javafx.geometry.*
 import javafx.scene.Node
@@ -172,6 +173,10 @@ abstract class PaneBaseBuilder<T : Pane> : RegionBaseBuilder<T>() {
 
     fun addText(text: String = "") = add(Text(text))
 
+    fun addText(text: LocalizedText) {
+        add(Text().apply { textProperty().bind(text.binding()) })
+    }
+
     fun addText(config: TextBuilder.() -> Unit = {}) = add(TextBuilder().apply {
         setMode(this@PaneBaseBuilder.buildMode)
         config()
@@ -181,6 +186,13 @@ abstract class PaneBaseBuilder<T : Pane> : RegionBaseBuilder<T>() {
         setMode(this@PaneBaseBuilder.buildMode)
         config()
     })
+
+    inline fun addText(text: LocalizedText, config: Text.() -> Unit) {
+        add(Text().apply {
+            textProperty().bind(text.binding())
+            config()
+        })
+    }
 
     inline fun addPolygon(points: List<Double>, config: (Polygon.() -> Unit) = {}) {
         add(Polygon().apply {
@@ -199,6 +211,13 @@ abstract class PaneBaseBuilder<T : Pane> : RegionBaseBuilder<T>() {
     inline fun addLabel(text: String, config: (Label.() -> Unit) = {}) {
         add(Label(text).apply {
             setMode(this@PaneBaseBuilder.buildMode)
+            config()
+        })
+    }
+
+    inline fun addLabel(text: LocalizedText, config: Label.() -> Unit = {}) {
+        add(Label().apply {
+            textProperty().bind(text.binding())
             config()
         })
     }
@@ -236,6 +255,13 @@ abstract class PaneBaseBuilder<T : Pane> : RegionBaseBuilder<T>() {
         add(title)
     }
 
+    inline fun addTitle(text: LocalizedText, config: Title.() -> Unit = {}) {
+        add(Title().apply {
+            textProperty().bind(text.binding())
+            config()
+        })
+    }
+
     inline fun addCheckBox(config: (CheckBoxBuilder.() -> Unit) = {}) {
         add(CheckBoxBuilder().apply {
             setMode(this@PaneBaseBuilder.buildMode)
@@ -251,6 +277,14 @@ abstract class PaneBaseBuilder<T : Pane> : RegionBaseBuilder<T>() {
         })
     }
 
+    inline fun addCheckBox(text: LocalizedText, config: CheckBoxBuilder.() -> Unit = {}) {
+        add(CheckBoxBuilder().apply {
+            setMode(this@PaneBaseBuilder.buildMode)
+            text(text)
+            config()
+        })
+    }
+
     inline fun addRadioButton(config: (RadioButtonBuilder.() -> Unit) = {}) {
         add(RadioButtonBuilder().apply {
             setMode(this@PaneBaseBuilder.buildMode)
@@ -263,6 +297,14 @@ abstract class PaneBaseBuilder<T : Pane> : RegionBaseBuilder<T>() {
             setMode(this@PaneBaseBuilder.buildMode)
             text(text)
             this.config()
+        })
+    }
+
+    inline fun addRadioButton(text: LocalizedText, config: RadioButtonBuilder.() -> Unit = {}) {
+        add(RadioButtonBuilder().apply {
+            setMode(this@PaneBaseBuilder.buildMode)
+            text(text)
+            config()
         })
     }
 
@@ -282,6 +324,19 @@ abstract class PaneBaseBuilder<T : Pane> : RegionBaseBuilder<T>() {
             text(text)
             toggleGroup(toggleGroup)
             this.config()
+        })
+    }
+
+    inline fun addRadioButton(
+        text: LocalizedText,
+        toggleGroup: ToggleGroup,
+        config: RadioButtonBuilder.() -> Unit = {},
+    ) {
+        add(RadioButtonBuilder().apply {
+            setMode(this@PaneBaseBuilder.buildMode)
+            text(text)
+            toggleGroup(toggleGroup)
+            config()
         })
     }
 
@@ -321,6 +376,13 @@ abstract class PaneBaseBuilder<T : Pane> : RegionBaseBuilder<T>() {
     inline fun addButton(text: String, config: (Button.() -> Unit) = {}) {
         add(Button(text).apply {
             setMode(this@PaneBaseBuilder.buildMode)
+            config()
+        })
+    }
+
+    inline fun addButton(text: LocalizedText, config: Button.() -> Unit = {}) {
+        add(Button().apply {
+            textProperty().bind(text.binding())
             config()
         })
     }
@@ -635,6 +697,13 @@ class GridPaneBuilder : PaneBaseBuilder<GridPane>() {
             item(item)
         }
 
+        inline fun itemLabel(text: LocalizedText, block: LabelBuilder.() -> Unit = {}) {
+            item(LabelBuilder().apply {
+                text(text)
+                block()
+            }.build())
+        }
+
         inline fun itemButton(text: String = "", block: ButtonBuilder.() -> Unit = {}) {
             val item = ButtonBuilder().apply {
                 if (text.isNotEmpty()) {
@@ -645,6 +714,13 @@ class GridPaneBuilder : PaneBaseBuilder<GridPane>() {
             item(item)
         }
 
+        inline fun itemButton(text: LocalizedText, block: ButtonBuilder.() -> Unit = {}) {
+            item(ButtonBuilder().apply {
+                text(text)
+                block()
+            }.build())
+        }
+
         inline fun itemTextField(text: String = "", block: TextFieldBuilder.() -> Unit = {}) {
             val item = TextFieldBuilder().apply {
                 if (text.isNotEmpty()) {
@@ -653,6 +729,13 @@ class GridPaneBuilder : PaneBaseBuilder<GridPane>() {
                 block()
             }.build()
             item(item)
+        }
+
+        inline fun itemTextField(text: LocalizedText, block: TextFieldBuilder.() -> Unit = {}) {
+            item(TextFieldBuilder().apply {
+                text(text)
+                block()
+            }.build())
         }
     }
 }
@@ -1184,6 +1267,15 @@ inline fun titledPane(config: TitledPaneBuilder.() -> Unit): TitledPane =
 inline fun titledPane(
     title: String,
     config: TitledPaneBuilder.() -> Unit = {}
+): TitledPane =
+    titledPaneBuilder {
+        text(title)
+        config()
+    }.build()
+
+inline fun titledPane(
+    title: LocalizedText,
+    config: TitledPaneBuilder.() -> Unit = {},
 ): TitledPane =
     titledPaneBuilder {
         text(title)

@@ -293,7 +293,8 @@ internal class DSLExamples : Application() {
                     this.heading("操作提示")
                     this.content("这是一条简单的提示消息。")
                     this.okButton { println("点击了确认") }
-                }.show()
+                }.showAndWait {  }
+                println("wait end")
             }
         }
 

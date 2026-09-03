@@ -2,6 +2,7 @@ package club.xiaojiawei.kt.dsl
 
 import club.xiaojiawei.controls.ico.AbstractIco
 import club.xiaojiawei.kt.annotations.FXMarker
+import club.xiaojiawei.kt.i18n.LocalizedText
 import javafx.beans.value.ChangeListener
 import javafx.event.ActionEvent
 import javafx.event.EventHandler
@@ -74,6 +75,14 @@ abstract class MenuItemBaseBuilder<T : MenuItem> : DslBuilder<T>() {
     }
 
     operator fun String.unaryPlus() = text(this)
+
+    open fun text(text: LocalizedText) {
+        settings {
+            textProperty().bind(text.binding())
+        }
+    }
+
+    operator fun LocalizedText.unaryPlus() = text(this)
 
     open fun ico(ico: AbstractIco, width: Double = 20.0) {
         settings {
@@ -237,6 +246,12 @@ inline fun menuItem(text: String, config: MenuItemBuilder.() -> Unit = {}): Menu
         config()
     }.build()
 
+inline fun menuItem(text: LocalizedText, config: MenuItemBuilder.() -> Unit = {}): MenuItem =
+    menuItemBuilder {
+        text(text)
+        config()
+    }.build()
+
 inline fun menuItemBuilder(config: MenuItemBuilder.() -> Unit): MenuItemBuilder =
     MenuItemBuilder().apply(config)
 
@@ -262,6 +277,15 @@ inline fun radioMenuItem(text: String, config: RadioMenuItemBuilder.() -> Unit =
         config()
     }.build()
 
+inline fun radioMenuItem(
+    text: LocalizedText,
+    config: RadioMenuItemBuilder.() -> Unit = {},
+): RadioMenuItem =
+    radioMenuItemBuilder {
+        text(text)
+        config()
+    }.build()
+
 inline fun radioMenuItemBuilder(config: RadioMenuItemBuilder.() -> Unit): RadioMenuItemBuilder =
     RadioMenuItemBuilder().apply(config)
 
@@ -282,6 +306,12 @@ inline fun menu(config: MenuBuilder.() -> Unit): Menu =
     menuBuilder(config).build()
 
 inline fun menu(text: String, config: MenuBuilder.() -> Unit = {}): Menu =
+    menuBuilder {
+        text(text)
+        config()
+    }.build()
+
+inline fun menu(text: LocalizedText, config: MenuBuilder.() -> Unit = {}): Menu =
     menuBuilder {
         text(text)
         config()

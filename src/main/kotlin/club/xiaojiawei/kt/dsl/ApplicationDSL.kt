@@ -6,6 +6,7 @@ package club.xiaojiawei.kt.dsl
  */
 import club.xiaojiawei.JavaFXUI
 import club.xiaojiawei.kt.annotations.FXMarker
+import club.xiaojiawei.kt.i18n.LocalizedText
 import javafx.application.Application
 import javafx.event.EventHandler
 import javafx.scene.Parent
@@ -115,6 +116,12 @@ class StageBuilder(private val existingStage: Stage? = null) : DslBuilder<Stage>
             this.title = this@unaryPlus
         }
     }
+
+    fun title(title: LocalizedText) = settings {
+        titleProperty().bind(title.binding())
+    }
+
+    operator fun LocalizedText.unaryPlus() = title(this)
 
     fun root(provider: () -> Parent) {
         scene {

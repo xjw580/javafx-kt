@@ -51,6 +51,16 @@
   - `textProperty().bind(...)`
   - `observe(...)`、`observes(...)`
 
+## 国际化
+
+- `I18nContext(...)`: 创建独立资源包上下文，显式声明资源包名称、支持语言和初始语言
+- `I18n.configure(context)`: 安装一次性的应用默认上下文
+- `i18n("key")`: 创建供控件 DSL 使用的动态文案引用
+- `context["key"]`: 获取当前语言的字符串快照
+- `context.binding("key")`: 获取随 `locale` 切换而更新的 `StringBinding`
+- `text(...)`、`title(...)`、`promptText(...)`、菜单、表格列及容器快捷函数均可接收 `LocalizedText`
+- 语言切换涉及已绑定 UI 时，应在 `runUI {}` 中修改 `I18n.locale` 或独立上下文的 `locale`
+
 ## 动画
 
 - `fadeIn(...)`、`fadeOut(...)`

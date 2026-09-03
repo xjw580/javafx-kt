@@ -9,6 +9,7 @@ import club.xiaojiawei.controls.FilterComboBox
 import club.xiaojiawei.controls.Switch
 import club.xiaojiawei.enums.BaseTransitionEnum
 import club.xiaojiawei.kt.annotations.FXMarker
+import club.xiaojiawei.kt.i18n.LocalizedText
 import javafx.beans.binding.Bindings
 import javafx.beans.property.*
 import javafx.beans.value.ChangeListener
@@ -197,6 +198,12 @@ abstract class LabeledBuilder<T : Labeled> : RegionBaseBuilder<T>() {
 
     operator fun String.unaryPlus() = text(this)
 
+    fun text(text: LocalizedText) = settings {
+        textProperty().bind(text.binding())
+    }
+
+    operator fun LocalizedText.unaryPlus() = text(this)
+
     /**
      * 观察单个 Property，值变化时自动更新 text
      */
@@ -323,6 +330,12 @@ class TextBuilder : NodeBuilder<Text>() {
     fun text(text: String) = settings { this.text = text }
 
     operator fun String.unaryPlus() = text(this)
+
+    fun text(text: LocalizedText) = settings {
+        textProperty().bind(text.binding())
+    }
+
+    operator fun LocalizedText.unaryPlus() = text(this)
 
     fun <T> observe(state: ObservableValue<T>, block: (T) -> String) = settings {
         val binding = Bindings.createStringBinding({ block(state.value) }, state)
@@ -452,6 +465,12 @@ class TextFieldBuilder : RegionBaseBuilder<TextField>() {
 
     operator fun String.unaryPlus() = text(this)
 
+    fun text(text: LocalizedText) {
+        settings { this.text = text.value }
+    }
+
+    operator fun LocalizedText.unaryPlus() = text(this)
+
     fun <T> observe(state: ObservableValue<T>, block: (T) -> String) = settings {
         val binding = Bindings.createStringBinding({ block(state.value) }, state)
         textProperty().bind(binding)
@@ -464,6 +483,10 @@ class TextFieldBuilder : RegionBaseBuilder<TextField>() {
 
     fun promptText(prompt: String) {
         settings { promptText = prompt }
+    }
+
+    fun promptText(prompt: LocalizedText) {
+        settings { promptTextProperty().bind(prompt.binding()) }
     }
 
     fun editable(editable: Boolean = true) {
@@ -528,8 +551,18 @@ class TextAreaBuilder : RegionBaseBuilder<TextArea>() {
 
     operator fun String.unaryPlus() = text(this)
 
+    fun text(text: LocalizedText) {
+        settings { this.text = text.value }
+    }
+
+    operator fun LocalizedText.unaryPlus() = text(this)
+
     fun promptText(prompt: String) {
         settings { promptText = prompt }
+    }
+
+    fun promptText(prompt: LocalizedText) {
+        settings { promptTextProperty().bind(prompt.binding()) }
     }
 
     fun editable(editable: Boolean = true) {
@@ -768,6 +801,10 @@ abstract class ComboBoxBaseBuilder<S : ComboBox<T>, T> : RegionBaseBuilder<S>() 
         settings { promptText = prompt }
     }
 
+    fun promptText(prompt: LocalizedText) {
+        settings { promptTextProperty().bind(prompt.binding()) }
+    }
+
     fun editable(editable: Boolean = true) {
         settings { isEditable = editable }
     }
@@ -915,6 +952,12 @@ class TableColumnBuilder<S, T> : DslBuilder<TableColumn<S, T>>() {
 
     operator fun String.unaryPlus() = text(this)
 
+    fun text(text: LocalizedText) = settings {
+        textProperty().bind(text.binding())
+    }
+
+    operator fun LocalizedText.unaryPlus() = text(this)
+
     fun cellValue(valueFactory: (S) -> T) = cellDataValueFactory {
         ReadOnlyObjectWrapper(valueFactory(it.value))
     }
@@ -1045,6 +1088,24 @@ class TableViewBuilder<T> : RegionBaseBuilder<TableView<T>>() {
         text: String,
         cellValue: (T) -> V,
         config: TableColumnBuilder<T, V>.() -> Unit = {}
+    ) = settings {
+        columns.add(tableColumn<T, V>(text) {
+            cellValue(cellValue)
+            config()
+        })
+    }
+
+    fun <V> addColumn(
+        text: LocalizedText,
+        config: TableColumnBuilder<T, V>.() -> Unit = {},
+    ) = settings {
+        columns.add(tableColumn(text, config))
+    }
+
+    fun <V> addColumn(
+        text: LocalizedText,
+        cellValue: (T) -> V,
+        config: TableColumnBuilder<T, V>.() -> Unit = {},
     ) = settings {
         columns.add(tableColumn<T, V>(text) {
             cellValue(cellValue)
@@ -1293,6 +1354,12 @@ inline fun text(text: String, config: TextBuilder.() -> Unit = {}): Text =
         config()
     }.build()
 
+inline fun text(text: LocalizedText, config: TextBuilder.() -> Unit = {}): Text =
+    textBuilder {
+        text(text)
+        config()
+    }.build()
+
 inline fun textBuilder(config: TextBuilder.() -> Unit): TextBuilder =
     TextBuilder().apply(config)
 
@@ -1369,6 +1436,12 @@ inline fun label(text: String, config: LabelBuilder.() -> Unit = {}): Label =
         config()
     }.build()
 
+inline fun label(text: LocalizedText, config: LabelBuilder.() -> Unit = {}): Label =
+    labelBuilder {
+        text(text)
+        config()
+    }.build()
+
 inline fun labelBuilder(config: LabelBuilder.() -> Unit): LabelBuilder =
     LabelBuilder().apply(config)
 
@@ -1389,6 +1462,12 @@ inline fun button(config: ButtonBuilder.() -> Unit): Button =
     buttonBuilder(config).build()
 
 inline fun button(text: String, config: ButtonBuilder.() -> Unit = {}): Button =
+    buttonBuilder {
+        text(text)
+        config()
+    }.build()
+
+inline fun button(text: LocalizedText, config: ButtonBuilder.() -> Unit = {}): Button =
     buttonBuilder {
         text(text)
         config()
@@ -1419,6 +1498,12 @@ inline fun textField(text: String, config: TextFieldBuilder.() -> Unit = {}): Te
         config()
     }.build()
 
+inline fun textField(text: LocalizedText, config: TextFieldBuilder.() -> Unit = {}): TextField =
+    textFieldBuilder {
+        text(text)
+        config()
+    }.build()
+
 inline fun textFieldBuilder(config: TextFieldBuilder.() -> Unit): TextFieldBuilder =
     TextFieldBuilder().apply(config)
 
@@ -1439,6 +1524,12 @@ inline fun textArea(config: TextAreaBuilder.() -> Unit = {}): TextArea =
     textAreaBuilder(config).build()
 
 inline fun textArea(text: String, config: TextAreaBuilder.() -> Unit = {}): TextArea =
+    textAreaBuilder {
+        text(text)
+        config()
+    }.build()
+
+inline fun textArea(text: LocalizedText, config: TextAreaBuilder.() -> Unit = {}): TextArea =
     textAreaBuilder {
         text(text)
         config()
@@ -1469,6 +1560,12 @@ inline fun checkBox(text: String, config: CheckBoxBuilder.() -> Unit = {}): Chec
         config()
     }.build()
 
+inline fun checkBox(text: LocalizedText, config: CheckBoxBuilder.() -> Unit = {}): CheckBox =
+    checkBoxBuilder {
+        text(text)
+        config()
+    }.build()
+
 inline fun checkBoxBuilder(config: CheckBoxBuilder.() -> Unit): CheckBoxBuilder =
     CheckBoxBuilder().apply(config)
 
@@ -1494,10 +1591,27 @@ inline fun radioButton(text: String, config: RadioButtonBuilder.() -> Unit = {})
         config()
     }.build()
 
+inline fun radioButton(text: LocalizedText, config: RadioButtonBuilder.() -> Unit = {}): RadioButton =
+    radioButtonBuilder {
+        text(text)
+        config()
+    }.build()
+
 inline fun radioButton(
     text: String,
     toggleGroup: ToggleGroup,
     config: RadioButtonBuilder.() -> Unit = {}
+): RadioButton =
+    radioButtonBuilder {
+        text(text)
+        toggleGroup(toggleGroup)
+        config()
+    }.build()
+
+inline fun radioButton(
+    text: LocalizedText,
+    toggleGroup: ToggleGroup,
+    config: RadioButtonBuilder.() -> Unit = {},
 ): RadioButton =
     radioButtonBuilder {
         text(text)
@@ -1577,9 +1691,24 @@ inline fun <S, T> tableColumn(
 ): TableColumn<S, T> =
     tableColumnBuilder(text, config).build()
 
+inline fun <S, T> tableColumn(
+    text: LocalizedText,
+    config: TableColumnBuilder<S, T>.() -> Unit = {},
+): TableColumn<S, T> =
+    tableColumnBuilder(text, config).build()
+
 inline fun <S, T> tableColumnBuilder(
     text: String = "",
     config: TableColumnBuilder<S, T>.() -> Unit = {}
+): TableColumnBuilder<S, T> =
+    TableColumnBuilder<S, T>().apply {
+        text(text)
+        config()
+    }
+
+inline fun <S, T> tableColumnBuilder(
+    text: LocalizedText,
+    config: TableColumnBuilder<S, T>.() -> Unit = {},
 ): TableColumnBuilder<S, T> =
     TableColumnBuilder<S, T>().apply {
         text(text)
