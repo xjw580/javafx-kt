@@ -122,6 +122,32 @@ class MessageDialog(val baseParent: Parent) {
         stage.y = window.y + scene.y
     }
 
+    fun showAndWait(shownRunnable: (() -> Unit)? = null){
+        runUI {
+            if (!baseParent.scene.window.isShowing) return@runUI
+
+            initSize()
+            parallelTransition {
+                +fadeTransition {
+                    node(rootPane)
+                    from(0.0)
+                    to(1.0)
+                    duration(200.0)
+                }
+                +translateTransition {
+                    node(topPane)
+                    from(0.0, 25.0)
+                    to(0.0, 0.0)
+                    duration(200.0)
+                }
+                onFinished {
+                    shownRunnable?.invoke()
+                }
+            }.play()
+            stage.showAndWait()
+        }
+    }
+
     fun show(shownRunnable: (() -> Unit)? = null) {
         runUI {
             if (!baseParent.scene.window.isShowing) return@runUI
