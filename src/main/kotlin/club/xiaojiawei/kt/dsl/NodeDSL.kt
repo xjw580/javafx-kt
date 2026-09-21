@@ -85,6 +85,18 @@ abstract class NodeBuilder<T : Node> : DslBuilder<T>() {
     fun translate(x: Double, y: Double) = settings { translateX = x; translateY = y }
     fun mouseTransparent(mouseTransparent: Boolean) = settings { isMouseTransparent = mouseTransparent }
 
+    fun bindDisable(observable: ObservableValue<Boolean>) = settings { disableProperty().bind(observable) }
+
+    fun bindVisible(observable: ObservableValue<Boolean>) = settings { visibleProperty().bind(observable) }
+
+    fun bindManaged(observable: ObservableValue<Boolean>) = settings { managedProperty().bind(observable) }
+
+    /** 同时绑定可见性与布局参与状态，隐藏时不再占据布局空间。 */
+    fun bindVisibleAndManaged(observable: ObservableValue<Boolean>) = settings {
+        visibleProperty().bind(observable)
+        managedProperty().bind(observable)
+    }
+
     // --- 光标控制 ---
     fun cursor(c: Cursor = Cursor.DEFAULT) = settings { cursor = c }
     fun cursorHand() = cursor(Cursor.HAND)
