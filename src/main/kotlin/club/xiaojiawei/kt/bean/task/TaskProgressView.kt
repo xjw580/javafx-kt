@@ -1,5 +1,7 @@
 package club.xiaojiawei.kt.bean.task
 
+import club.xiaojiawei.kt.ext.addChildren
+import club.xiaojiawei.kt.ext.clearChildren
 import club.xiaojiawei.controls.ico.FailIco
 import club.xiaojiawei.controls.ico.OKIco
 import club.xiaojiawei.kt.dsl.FontWeight
@@ -96,7 +98,7 @@ class TaskProgressView<T : TaskBuilder> : VBox() {
 
         val totalLabel = Label("总计: 0").applyStatisticStyle("#5f6875")
 
-        statisticsContainer.children.addAll(runningLabel, pendingLabel, completedLabel, failedLabel, totalLabel)
+        statisticsContainer.addChildren(runningLabel, pendingLabel, completedLabel, failedLabel, totalLabel)
 
         // 存储标签引用以便更新
         this.runningCountLabel = runningLabel
@@ -121,16 +123,16 @@ class TaskProgressView<T : TaskBuilder> : VBox() {
         val deleteAllBtn = Button("删除所有").applyActionStyle("btn-ui-normal")
         deleteAllBtn.setOnAction { onDeleteAll?.invoke() }
 
-        buttonContainer.children.addAll(pauseAllBtn, resumeAllBtn, cancelAllBtn, deleteAllBtn)
+        buttonContainer.addChildren(pauseAllBtn, resumeAllBtn, cancelAllBtn, deleteAllBtn)
 
         // 布局：标题 - 统计信息 - 按钮
         val leftContainer = VBox(6.0)
-        leftContainer.children.addAll(titleLabel, statisticsContainer)
+        leftContainer.addChildren(titleLabel, statisticsContainer)
 
         HBox.setHgrow(leftContainer, Priority.ALWAYS)
-        globalControlPanel.children.addAll(leftContainer, buttonContainer)
+        globalControlPanel.addChildren(leftContainer, buttonContainer)
 
-        children.addAll(globalControlPanel, ScrollPane(taskPane).apply {
+        addChildren(globalControlPanel, ScrollPane(taskPane).apply {
             maxHeight = 800.0
             isFitToWidth = true
             hbarPolicy = ScrollPane.ScrollBarPolicy.NEVER
@@ -186,11 +188,11 @@ class TaskProgressView<T : TaskBuilder> : VBox() {
                 val deleteBtn = Button("删除").applyActionStyle("btn-ui-normal", compact = true)
                 deleteBtn.setOnAction { onDeleteTask?.invoke(task.id) }
 
-                controlBox.children.addAll(pauseBtn, resumeBtn, cancelBtn, deleteBtn)
+                controlBox.addChildren(pauseBtn, resumeBtn, cancelBtn, deleteBtn)
 
                 // 使用HBox的grow属性让label占据剩余空间
                 HBox.setHgrow(label, Priority.ALWAYS)
-                headerBox.children.addAll(label, controlBox)
+                headerBox.addChildren(label, controlBox)
 
                 val progressBar = ProgressBar(0.0)
                 progressBar.prefWidthProperty().bind(container.widthProperty())
@@ -216,7 +218,7 @@ class TaskProgressView<T : TaskBuilder> : VBox() {
                     styleClass.add("radius-ui")
                 }
 
-                container.children.addAll(headerBox, progressBar, statusLabel, subTaskPane)
+                container.addChildren(headerBox, progressBar, statusLabel, subTaskPane)
 
                 taskContainers[task.id] = container
                 taskProgressBars[task.id] = progressBar
@@ -231,7 +233,7 @@ class TaskProgressView<T : TaskBuilder> : VBox() {
 
             // 批量添加到 UI，减少布局计算次数
             if (newContainers.isNotEmpty()) {
-                taskPane.children.addAll(0, newContainers)
+                taskPane.addChildren(0, newContainers)
             }
         }
     }
@@ -387,9 +389,9 @@ class TaskProgressView<T : TaskBuilder> : VBox() {
             val subStatus = Label("等待中")
             subStatus.applySubStatusStyle()
 
-            subContainer.children.addAll(subLabel, subProgressBar, subStatus)
+            subContainer.addChildren(subLabel, subProgressBar, subStatus)
             taskSubViews[subTaskId] = subContainer
-            subTaskContainers[taskId]?.children?.add(subContainer)
+            subTaskContainers[taskId]?.addChildren(subContainer)
         }
 
         val subContainer = taskSubViews[subTaskId]
@@ -521,7 +523,7 @@ class TaskProgressView<T : TaskBuilder> : VBox() {
     fun clearTasks() {
         runUI {
             // 保留全局控制面板，只清除任务
-            taskPane.children.clear()
+            taskPane.clearChildren()
 
             taskContainers.clear()
             taskProgressBars.clear()

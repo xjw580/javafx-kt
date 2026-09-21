@@ -2,6 +2,7 @@ package club.xiaojiawei.kt.dsl.examples
 
 import club.xiaojiawei.kt.controls.messageDialog
 import club.xiaojiawei.kt.dsl.*
+import club.xiaojiawei.kt.ext.setAllChildren
 import javafx.application.Application
 import javafx.scene.Node
 import javafx.scene.Parent
@@ -293,7 +294,7 @@ internal class DSLExamples : Application() {
                     this.heading("操作提示")
                     this.content("这是一条简单的提示消息。")
                     this.okButton { println("点击了确认") }
-                }.showAndWait {  }
+                }.showAndWait { }
                 println("wait end")
             }
         }
@@ -384,8 +385,7 @@ internal class DSLExamples : Application() {
                             textFill("white")
                         }
                         onClick {
-                            contentPane.children.clear()
-                            contentPane.children.add(builder())
+                            contentPane.setAllChildren(builder())
                         }
                     }
                 }

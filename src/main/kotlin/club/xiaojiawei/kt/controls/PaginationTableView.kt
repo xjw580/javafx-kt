@@ -1,5 +1,6 @@
 package club.xiaojiawei.kt.controls
 
+import club.xiaojiawei.kt.ext.addChildren
 import club.xiaojiawei.kt.annotations.FXMarker
 import club.xiaojiawei.kt.dsl.PaginationBuilder
 import club.xiaojiawei.kt.dsl.PaneBaseBuilder
@@ -85,7 +86,7 @@ open class PaginationTableView<T> : VBox() {
 
     init {
         spacing = 8.0
-        children.addAll(tableView, pagination)
+        addChildren(tableView, pagination)
         pagination.currentPageIndexProperty().addListener { _, _, newValue ->
             loadPage(newValue.toInt())
         }

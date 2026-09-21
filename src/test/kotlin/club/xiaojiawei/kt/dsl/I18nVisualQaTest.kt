@@ -25,6 +25,7 @@ class I18nVisualQaTest {
     @Test
     fun capturesLocalizedSurfaceBeforeAndAfterLocaleSwitch() {
         runOnJavaFxThread {
+            Platform.setImplicitExit(false)
             val context = I18nContext(
                 baseName = "i18n.messages",
                 supportedLocales = setOf(Locale.SIMPLIFIED_CHINESE, Locale.ENGLISH),

@@ -1,5 +1,8 @@
 package club.xiaojiawei.kt.dsl
 
+import club.xiaojiawei.kt.ext.addChildren
+import club.xiaojiawei.kt.ext.addItem
+import club.xiaojiawei.kt.ext.addItems
 import club.xiaojiawei.controls.FilterComboBox
 import club.xiaojiawei.controls.Title
 import club.xiaojiawei.kt.annotations.FXMarker
@@ -36,37 +39,37 @@ abstract class PaneBaseBuilder<T : Pane> : RegionBaseBuilder<T>() {
     fun add(node: Node?) {
         node ?: return
         settings {
-            children.add(node)
+            addChildren(node)
         }
     }
 
     fun add(builder: () -> Node?) = settings {
         val node = builder() ?: return@settings
-        children.add(node)
+        addChildren(node)
     }
 
     fun add(node: NodeBuilder<*>) {
         settings {
-            children.add(node.build())
+            addChildren(node.build())
         }
     }
 
     fun add(node: PaneBaseBuilder<*>) {
         settings {
-            children.add(node.build())
+            addChildren(node.build())
         }
     }
 
     fun addAll(vararg nodes: Node) {
         settings {
-            children.addAll(nodes)
+            addChildren(*nodes)
         }
     }
 
 
     fun addAll(vararg nodes: NodeBuilder<*>) {
         settings {
-            children.addAll(nodes.map { it.build() })
+            addChildren(nodes.map { it.build() })
         }
     }
 
@@ -416,7 +419,7 @@ abstract class PaneBaseBuilder<T : Pane> : RegionBaseBuilder<T>() {
     })
 
     inline fun addScrollPane(crossinline config: (ScrollPaneBuilder.() -> Unit) = {}) = settings {
-        children.add(ScrollPaneBuilder().apply {
+        addChildren(ScrollPaneBuilder().apply {
             setMode(this@PaneBaseBuilder.buildMode)
             config()
         }.build())
@@ -1003,7 +1006,7 @@ class SplitPaneBuilder : DslBuilder<SplitPane>() {
     }
 
     fun items(vararg nodes: Node) = settings {
-        items.addAll(nodes)
+        addItems(*nodes)
     }
 
     fun dividerPosition(index: Int, position: Double) = settings {
@@ -1015,7 +1018,7 @@ class SplitPaneBuilder : DslBuilder<SplitPane>() {
     }
 
     operator fun Node.unaryPlus() {
-        settings { items.add(this@unaryPlus) }
+        settings { addItem(this@unaryPlus) }
     }
 }
 

@@ -1,5 +1,6 @@
 package club.xiaojiawei.kt.dsl
 
+import club.xiaojiawei.kt.ext.addItems
 /**
  * @author 肖嘉威
  * @date 2025/8/14 16:19
@@ -766,11 +767,11 @@ class RadioButtonBuilder : LabeledBuilder<RadioButton>() {
 abstract class ComboBoxBaseBuilder<S : ComboBox<T>, T> : RegionBaseBuilder<S>() {
 
     fun items(vararg items: T) {
-        settings { this.items.addAll(items) }
+        settings { this.addItems(*items) }
     }
 
     fun items(items: List<T>) {
-        settings { this.items.addAll(items) }
+        settings { this.addItems(items) }
     }
 
     fun items(items: ObservableList<T>) {
@@ -910,11 +911,11 @@ class ListViewBuilder<T> : RegionBaseBuilder<ListView<T>>() {
     override fun buildInstance(): ListView<T> = ListView<T>()
 
     fun items(vararg items: T) {
-        settings { this.items.addAll(items) }
+        settings { this.addItems(*items) }
     }
 
     fun items(items: List<T>) {
-        settings { this.items.addAll(items) }
+        settings { this.addItems(items) }
     }
 
     fun items(items: ObservableList<T>) {
@@ -1034,11 +1035,11 @@ class TableViewBuilder<T> : RegionBaseBuilder<TableView<T>>() {
     override fun buildInstance(): TableView<T> = TableView<T>()
 
     fun items(vararg items: T) {
-        settings { this.items.addAll(items) }
+        settings { this.addItems(*items) }
     }
 
     fun items(items: List<T>) {
-        settings { this.items.addAll(items) }
+        settings { this.addItems(items) }
     }
 
     fun items(items: ObservableList<T>) {

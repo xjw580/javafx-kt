@@ -1,5 +1,6 @@
 package club.xiaojiawei.kt.controls
 
+import club.xiaojiawei.kt.ext.addChildren
 import club.xiaojiawei.JavaFXUI
 import club.xiaojiawei.kt.annotations.FXMarker
 import club.xiaojiawei.kt.dsl.*
@@ -122,7 +123,7 @@ class MessageDialog(val baseParent: Parent) {
         stage.y = window.y + scene.y
     }
 
-    fun showAndWait(shownRunnable: (() -> Unit)? = null){
+    fun showAndWait(shownRunnable: (() -> Unit)? = null) {
         runUI {
             if (!baseParent.scene.window.isShowing) return@runUI
 
@@ -301,9 +302,9 @@ class MessageDialogBuilder(val baseParent: Parent) : DslBuilder<MessageDialog>()
         }
 
         headingText?.let {
-            vBox.children.add(HBox().apply {
+            vBox.addChildren(HBox().apply {
                 alignment = Pos.CENTER_LEFT
-                children.add(Label().apply {
+                addChildren(Label().apply {
                     when (it) {
                         is String -> text = it
                         is LocalizedText -> textProperty().bind(it.binding())
@@ -331,15 +332,15 @@ class MessageDialogBuilder(val baseParent: Parent) : DslBuilder<MessageDialog>()
                             style = "-fx-font-size: 14;"
                         }
                     }
-                    vBox.children.add(scrollPane)
+                    vBox.addChildren(scrollPane)
                 }
 
-                is Node -> vBox.children.add(it)
+                is Node -> vBox.addChildren(it)
             }
         }
 
         if (buttonBuilders.isNotEmpty()) {
-            vBox.children.add(HBox().apply {
+            vBox.addChildren(HBox().apply {
                 style = "-fx-spacing: 15; -fx-alignment: CENTER_RIGHT"
                 buttonBuilders.forEach { builder ->
                     val btn = builder.build()
@@ -348,7 +349,7 @@ class MessageDialogBuilder(val baseParent: Parent) : DslBuilder<MessageDialog>()
                         messageBox.close()
                         onAction?.handle(it)
                     }
-                    children.add(btn)
+                    addChildren(btn)
                 }
             })
         }

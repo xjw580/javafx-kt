@@ -1,5 +1,7 @@
 package club.xiaojiawei.kt.dsl
 
+import club.xiaojiawei.kt.ext.addChildren
+import club.xiaojiawei.kt.ext.addItems
 import club.xiaojiawei.controls.ico.AbstractIco
 import club.xiaojiawei.kt.annotations.FXMarker
 import club.xiaojiawei.kt.i18n.LocalizedText
@@ -54,7 +56,7 @@ class ContextMenuBuilder : DslBuilder<ContextMenu>() {
     }
 
     private fun applyMenuItems(contextMenu: ContextMenu) {
-        contextMenu.items.addAll(
+        contextMenu.addItems(
             menuItemBuilders.map { it() }.toList()
         )
     }
@@ -87,7 +89,7 @@ abstract class MenuItemBaseBuilder<T : MenuItem> : DslBuilder<T>() {
     open fun ico(ico: AbstractIco, width: Double = 20.0) {
         settings {
             graphic = HBox().apply {
-                children.add(ico)
+                addChildren(ico)
                 prefWidth = width
                 style = "-fx-alignment: CENTER_LEFT"
             }
@@ -151,7 +153,7 @@ class MenuBuilder() : MenuItemBaseBuilder<Menu>() {
     }
 
     private fun applyMenuItems(menu: Menu) {
-        menu.items.addAll(
+        menu.addItems(
             menuItemProviders.map { it() }.toList()
         )
     }

@@ -1,5 +1,6 @@
 package club.xiaojiawei.kt.controls
 
+import club.xiaojiawei.kt.ext.addChildren
 import club.xiaojiawei.controls.ico.AbstractIco
 import club.xiaojiawei.kt.bean.task.TaskBuilder
 import club.xiaojiawei.kt.bean.task.TaskController
@@ -43,6 +44,7 @@ open class TaskNode<T : TaskBuilder> : StackPane() {
 
     // 使用原子变量确保线程安全
     private val taskCountAtomic = AtomicInteger(0)
+
     // 动画节流控制
     private val isAnimating = AtomicBoolean(false)
     private var pendingAnimationCount = AtomicInteger(0)
@@ -103,10 +105,10 @@ open class TaskNode<T : TaskBuilder> : StackPane() {
             }
             icoProperty = graphicProperty()
         }
-        children.addAll(
+        addChildren(
             StackPane().apply {
                 padding = Insets(10.0)
-                children.add(icoBtn)
+                addChildren(icoBtn)
             },
             taskCountPane
         )
