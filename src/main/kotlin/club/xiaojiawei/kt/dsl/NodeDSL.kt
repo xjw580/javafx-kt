@@ -70,7 +70,7 @@ abstract class NodeBuilder<T : Node> : DslBuilder<T>() {
     fun styleBg() = settings { styleClass.add("bg-ui") }
     fun styleBgHover() = settings { styleClass.add("bg-hover-ui") }
     fun styled(block: StyleBuilder.() -> Unit) = settings { this.styled(block) }
-    fun styled(styleBuilder: StyleBuilder) = settings { style = styleBuilder.build() }
+    fun styled(styleBuilder: StyleBuilder) = settings { this.styled(styleBuilder) }
 
     // --- 基础 Node 属性 ---
     fun id(v: String) = settings { id = v }

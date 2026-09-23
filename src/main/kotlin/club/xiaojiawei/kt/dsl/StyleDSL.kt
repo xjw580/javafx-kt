@@ -1,8 +1,13 @@
 package club.xiaojiawei.kt.dsl
 
 import club.xiaojiawei.kt.annotations.FXMarker
+import javafx.beans.value.ChangeListener
 import javafx.scene.Node
+import javafx.scene.Parent
 import javafx.scene.Scene
+import java.nio.charset.StandardCharsets
+import java.util.Base64
+import java.util.UUID
 
 /**
  * @author 肖嘉威
@@ -35,7 +40,35 @@ enum class StyleColor {
 
 @FXMarker
 class StyleBuilder {
-    private val styles = mutableMapOf<String, String>()
+    private val styles = linkedMapOf<String, String>()
+    private val pseudoRules = mutableListOf<PseudoRule>()
+
+    private data class PseudoRule(
+        val name: String,
+        val style: StyleBuilder,
+    )
+
+    /**
+     * 添加不带冒号的单个伪类；可在 [block] 中继续嵌套形成伪类组合。
+     */
+    fun pseudoClass(name: String, block: StyleBuilder.() -> Unit) {
+        require(PSEUDO_CLASS_NAME.matches(name)) {
+            "Pseudo-class name must be a single CSS identifier without ':' or whitespace: '$name'"
+        }
+        pseudoRules += PseudoRule(name, StyleBuilder().apply(block))
+    }
+
+    fun hover(block: StyleBuilder.() -> Unit) = pseudoClass("hover", block)
+
+    fun pressed(block: StyleBuilder.() -> Unit) = pseudoClass("pressed", block)
+
+    fun focused(block: StyleBuilder.() -> Unit) = pseudoClass("focused", block)
+
+    fun disabled(block: StyleBuilder.() -> Unit) = pseudoClass("disabled", block)
+
+    fun selected(block: StyleBuilder.() -> Unit) = pseudoClass("selected", block)
+
+    fun armed(block: StyleBuilder.() -> Unit) = pseudoClass("armed", block)
 
     // 背景相关
     fun background(background: String) {
@@ -187,9 +220,12 @@ class StyleBuilder {
     }
 
     // 鼠标交互
+    @Deprecated(
+        message = "Use hover { custom(property, value) }",
+        replaceWith = ReplaceWith("hover { custom(property, value) }"),
+    )
     fun hoverEffect(property: String, value: String) {
-        // 注: hover 需要通过伪类实现,这里提供基础支持
-        styles["$property:hover"] = value
+        hover { custom(property, value) }
     }
 
     // 控件特定
@@ -309,7 +345,67 @@ class StyleBuilder {
         styles[property] = value
     }
 
-    fun build(): String = styles.entries.joinToString("; ") { "${it.key}: ${it.value}" }
+    /**
+     * 构建纯 inline 样式；含伪类时应改用 [Node.styled] 或 [StylesheetBuilder]。
+     */
+    fun build(): String {
+        check(pseudoRules.isEmpty()) {
+            "StyleBuilder.build() only supports inline styles; use Node.styled or StylesheetBuilder for pseudo-classes"
+        }
+        return inlineStyle()
+    }
+
+    internal fun snapshot(): StyleSnapshot = StyleSnapshot(
+        declarations = styles.entries.map { it.key to it.value },
+        pseudoRules = pseudoRules.map { PseudoRuleSnapshot(it.name, it.style.snapshot()) },
+    )
+
+    private fun inlineStyle(): String = styles.entries.joinToString("; ") { "${it.key}: ${it.value}" }
+
+    private companion object {
+        val PSEUDO_CLASS_NAME = Regex("""(?:-?[_a-zA-Z\u0080-\uFFFF]|--)[-_a-zA-Z0-9\u0080-\uFFFF]*""")
+    }
+}
+
+internal data class PseudoRuleSnapshot(
+    val name: String,
+    val style: StyleSnapshot,
+)
+
+internal data class StyleSnapshot(
+    val declarations: List<Pair<String, String>>,
+    val pseudoRules: List<PseudoRuleSnapshot>,
+) {
+    val hasPseudoClasses: Boolean
+        get() = pseudoRules.isNotEmpty()
+
+    fun inlineStyle(): String = declarations.joinToString("; ") { (property, value) -> "$property: $value" }
+
+    fun stylesheet(selector: String): String {
+        val selectors = selector.split(',').map(String::trim)
+        require(selectors.all(String::isNotEmpty)) { "Selector groups must not contain empty selectors: '$selector'" }
+        return buildString { appendRules(selectors, emptyList(), this@StyleSnapshot) }
+    }
+
+    private fun StringBuilder.appendRules(
+        selectors: List<String>,
+        pseudoClasses: List<String>,
+        style: StyleSnapshot,
+    ) {
+        if (style.declarations.isNotEmpty()) {
+            append(selectors.joinToString(", ") { selector ->
+                selector + pseudoClasses.joinToString(separator = "") { ":$it" }
+            })
+            append(" {\n")
+            style.declarations.forEach { (property, value) ->
+                append("    ").append(property).append(": ").append(value).append(";\n")
+            }
+            append("}\n\n")
+        }
+        style.pseudoRules.forEach { pseudoRule ->
+            appendRules(selectors, pseudoClasses + pseudoRule.name, pseudoRule.style)
+        }
+    }
 }
 
 @FXMarker
@@ -360,24 +456,15 @@ class StylesheetBuilder : DslBuilder<String>() {
      * 构建最终的 CSS 字符串
      */
     override fun build(): String {
-        val sb = StringBuilder()
-        ruleMap.forEach { (selector, style) ->
-            sb.append(selector).append(" {\n")
-            // 这里的 style.build() 会返回 "key: value; key: value"
-            // 我们稍微格式化一下美化输出
-            style.build().split("; ").forEach {
-                if (it.isNotBlank()) sb.append("    ").append(it).append(";\n")
+        return buildString {
+            ruleMap.forEach { (selector, style) ->
+                append(style.snapshot().stylesheet(selector))
             }
-            sb.append("}\n\n")
         }
-        return sb.toString()
     }
 
     fun toDataUri(): String {
-        val css = build()
-        val encoder = java.util.Base64.getEncoder()
-        val base64 = encoder.encodeToString(css.toByteArray())
-        return "data:text/css;base64,$base64"
+        return build().toDataUri()
     }
 }
 
@@ -401,5 +488,70 @@ fun styleConfig(config: StyleBuilder.() -> Unit): StyleBuilder.() -> Unit =
     config
 
 fun Node.styled(block: StyleBuilder.() -> Unit) {
-    style = StyleBuilder().apply(block).build()
+    styled(StyleBuilder().apply(block))
 }
+
+/**
+ * 替换本函数上次应用的样式。含伪类时使用 Parent author stylesheet，
+ * 以保留 JavaFX 原生级联和 !important 行为。
+ */
+fun Node.styled(styleBuilder: StyleBuilder) {
+    val snapshot = styleBuilder.snapshot()
+    val generatedStyle = if (snapshot.hasPseudoClasses) {
+        val className = "javafx-kt-style-${UUID.randomUUID().toString().replace("-", "")}"
+        GeneratedNodeStyle(this, className, snapshot.stylesheet(".$className").toDataUri())
+    } else {
+        null
+    }
+
+    check(!styleProperty().isBound) { "Cannot apply styled() while Node.styleProperty is bound" }
+    (properties[GENERATED_STYLE_KEY] as? GeneratedNodeStyle)?.dispose()
+    style = generatedStyle?.let { "" } ?: snapshot.inlineStyle()
+    generatedStyle?.install()
+}
+
+private class GeneratedNodeStyle(
+    private val node: Node,
+    private val className: String,
+    private val stylesheet: String,
+) {
+    private var stylesheetOwner: Parent? = null
+    private val parentListener = ChangeListener<Parent?> { _, _, newParent ->
+        attachTo(newParent)
+    }
+
+    fun install() {
+        node.styleClass += className
+        if (node is Parent) {
+            attachTo(node)
+        } else {
+            node.parentProperty().addListener(parentListener)
+            attachTo(node.parent)
+        }
+        node.properties[GENERATED_STYLE_KEY] = this
+    }
+
+    fun dispose() {
+        if (node !is Parent) {
+            node.parentProperty().removeListener(parentListener)
+        }
+        stylesheetOwner?.stylesheets?.remove(stylesheet)
+        stylesheetOwner = null
+        node.styleClass.remove(className)
+        node.properties.remove(GENERATED_STYLE_KEY)
+    }
+
+    private fun attachTo(parent: Parent?) {
+        if (stylesheetOwner === parent) return
+        stylesheetOwner?.stylesheets?.remove(stylesheet)
+        stylesheetOwner = parent
+        parent?.stylesheets?.add(stylesheet)
+    }
+}
+
+private fun String.toDataUri(): String {
+    val payload = Base64.getEncoder().encodeToString(toByteArray(StandardCharsets.UTF_8))
+    return "data:text/css;base64,$payload"
+}
+
+private val GENERATED_STYLE_KEY = Any()
