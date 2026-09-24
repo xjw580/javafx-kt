@@ -73,14 +73,6 @@ abstract class PaneBaseBuilder<T : Pane> : RegionBaseBuilder<T>() {
         }
     }
 
-    fun padding(value: Double) {
-        settings { padding = Insets(value) }
-    }
-
-    fun padding(top: Double = 0.0, right: Double = 0.0, bottom: Double = 0.0, left: Double = 0.0) {
-        settings { padding = Insets(top, right, bottom, left) }
-    }
-
     fun background(color: String) {
         settings {
             background = Background(BackgroundFill(Color.web(color), null, null))

@@ -40,3 +40,4 @@ build/
 /easy-release_static/
 /.claude
 .codegraph
+.omo
