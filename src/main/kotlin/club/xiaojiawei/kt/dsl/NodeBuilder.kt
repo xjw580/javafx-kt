@@ -65,10 +65,10 @@ abstract class NodeBuilder<T : Node> : DslBuilder<T>() {
     fun cursorMove() = cursor(Cursor.MOVE)
 
     // --- 属性 ---
-    fun bindDisable(observable: ObservableValue<Boolean>) = settings { disableProperty().bind(observable) }
-    fun bindVisible(observable: ObservableValue<Boolean>) = settings { visibleProperty().bind(observable) }
-    fun bindManaged(observable: ObservableValue<Boolean>) = settings { managedProperty().bind(observable) }
-    fun bindVisibleAndManaged(observable: ObservableValue<Boolean>) = settings {
+    fun bindDisable(observable: ObservableValue<out Boolean>) = settings { disableProperty().bind(observable) }
+    fun bindVisible(observable: ObservableValue<out Boolean>) = settings { visibleProperty().bind(observable) }
+    fun bindManaged(observable: ObservableValue<out Boolean>) = settings { managedProperty().bind(observable) }
+    fun bindVisibleAndManaged(observable: ObservableValue<out Boolean>) = settings {
         visibleProperty().bind(observable)
         managedProperty().bind(observable)
     }

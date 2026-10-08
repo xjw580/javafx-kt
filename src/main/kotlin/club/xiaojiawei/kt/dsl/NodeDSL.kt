@@ -67,8 +67,8 @@ abstract class RegionBaseBuilder<T : Region> : NodeBuilder<T>() {
     fun fixedHeigh(v: Double) = settings { prefHeight = v; maxHeight = v; minHeight = v }
 
     // --- 基础宽高 (只读属性) 绑定与监听 ---
-    fun byBindWidth(p: DoubleProperty) = settings { p.bind(widthProperty()) }
-    fun byBindHeight(p: DoubleProperty) = settings { p.bind(heightProperty()) }
+    fun byBindWidth(p: Property<in Number>) = settings { p.bind(widthProperty()) }
+    fun byBindHeight(p: Property<in Number>) = settings { p.bind(heightProperty()) }
     fun addWidthListener(l: ChangeListener<Number>) = settings { widthProperty().addListener(l) }
     fun addHeightListener(l: ChangeListener<Number>) = settings { heightProperty().addListener(l) }
     fun removeWidthListener(l: ChangeListener<Number>) = settings { widthProperty().removeListener(l) }
@@ -77,8 +77,8 @@ abstract class RegionBaseBuilder<T : Region> : NodeBuilder<T>() {
     // --- Pref 宽高绑定与监听 ---
     fun bindPrefWidth(p: ObservableValue<out Number>) = settings { prefWidthProperty().bind(p) }
     fun bindPrefHeight(p: ObservableValue<out Number>) = settings { prefHeightProperty().bind(p) }
-    fun byBindPrefWidth(p: DoubleProperty) = settings { p.bind(prefWidthProperty()) }
-    fun byBindPrefHeight(p: DoubleProperty) = settings { p.bind(prefHeightProperty()) }
+    fun byBindPrefWidth(p: Property<in Number>) = settings { p.bind(prefWidthProperty()) }
+    fun byBindPrefHeight(p: Property<in Number>) = settings { p.bind(prefHeightProperty()) }
     fun addPrefWidthListener(l: ChangeListener<Number>) = settings { prefWidthProperty().addListener(l) }
     fun addPrefHeightListener(l: ChangeListener<Number>) = settings { prefHeightProperty().addListener(l) }
     fun removePrefWidthListener(l: ChangeListener<Number>) = settings { prefWidthProperty().removeListener(l) }
@@ -87,8 +87,8 @@ abstract class RegionBaseBuilder<T : Region> : NodeBuilder<T>() {
     // --- Min 宽高绑定与监听 ---
     fun bindMinWidth(p: ObservableValue<out Number>) = settings { minWidthProperty().bind(p) }
     fun bindMinHeight(p: ObservableValue<out Number>) = settings { minHeightProperty().bind(p) }
-    fun byBindMinWidth(p: DoubleProperty) = settings { p.bind(minWidthProperty()) }
-    fun byBindMinHeight(p: DoubleProperty) = settings { p.bind(minHeightProperty()) }
+    fun byBindMinWidth(p: Property<in Number>) = settings { p.bind(minWidthProperty()) }
+    fun byBindMinHeight(p: Property<in Number>) = settings { p.bind(minHeightProperty()) }
     fun addMinWidthListener(l: ChangeListener<Number>) = settings { minWidthProperty().addListener(l) }
     fun addMinHeightListener(l: ChangeListener<Number>) = settings { minHeightProperty().addListener(l) }
     fun removeMinWidthListener(l: ChangeListener<Number>) = settings { minWidthProperty().removeListener(l) }
@@ -97,8 +97,8 @@ abstract class RegionBaseBuilder<T : Region> : NodeBuilder<T>() {
     // --- Max 宽高绑定与监听 ---
     fun bindMaxWidth(p: ObservableValue<out Number>) = settings { maxWidthProperty().bind(p) }
     fun bindMaxHeight(p: ObservableValue<out Number>) = settings { maxHeightProperty().bind(p) }
-    fun byBindMaxWidth(p: DoubleProperty) = settings { p.bind(maxWidthProperty()) }
-    fun byBindMaxHeight(p: DoubleProperty) = settings { p.bind(maxHeightProperty()) }
+    fun byBindMaxWidth(p: Property<in Number>) = settings { p.bind(maxWidthProperty()) }
+    fun byBindMaxHeight(p: Property<in Number>) = settings { p.bind(maxHeightProperty()) }
     fun addMaxWidthListener(l: ChangeListener<Number>) = settings { maxWidthProperty().addListener(l) }
     fun addMaxHeightListener(l: ChangeListener<Number>) = settings { maxHeightProperty().addListener(l) }
     fun removeMaxWidthListener(l: ChangeListener<Number>) = settings { maxWidthProperty().removeListener(l) }
@@ -167,13 +167,13 @@ abstract class LabeledBuilder<T : Labeled> : ControlBuilder<T>() {
     }
 
     // 数据绑定
-    fun byBindText(property: StringProperty) = settings { property.bind(textProperty()) }
+    fun byBindText(property: Property<in String>) = settings { property.bind(textProperty()) }
 
-    fun bindText(property: StringProperty) = settings { textProperty().bind(property) }
+    fun bindText(property: ObservableValue<out String>) = settings { textProperty().bind(property) }
 
-    fun bindBidirectionalText(property: StringProperty) = settings { textProperty().bindBidirectional(property) }
+    fun bindBidirectionalText(property: Property<String>) = settings { textProperty().bindBidirectional(property) }
 
-    fun byBindBidirectionalText(property: StringProperty) = settings { property.bindBidirectional(textProperty()) }
+    fun byBindBidirectionalText(property: Property<String>) = settings { property.bindBidirectional(textProperty()) }
 
     fun font(font: Font) = settings { this.font = font }
 
@@ -294,13 +294,13 @@ class TextBuilder : NodeBuilder<Text>() {
     }
 
     // 数据绑定
-    fun byBindText(property: StringProperty) = settings { property.bind(textProperty()) }
+    fun byBindText(property: Property<in String>) = settings { property.bind(textProperty()) }
 
-    fun bindText(property: StringProperty) = settings { textProperty().bind(property) }
+    fun bindText(property: ObservableValue<out String>) = settings { textProperty().bind(property) }
 
-    fun bindBidirectionalText(property: StringProperty) = settings { textProperty().bindBidirectional(property) }
+    fun bindBidirectionalText(property: Property<String>) = settings { textProperty().bindBidirectional(property) }
 
-    fun byBindBidirectionalText(property: StringProperty) = settings { property.bindBidirectional(textProperty()) }
+    fun byBindBidirectionalText(property: Property<String>) = settings { property.bindBidirectional(textProperty()) }
 
 }
 
@@ -456,19 +456,19 @@ class TextFieldBuilder : RegionBaseBuilder<TextField>() {
     }
 
     // 数据绑定
-    fun byBindText(property: StringProperty) {
+    fun byBindText(property: Property<in String>) {
         settings { property.bind(textProperty()) }
     }
 
-    fun bindText(property: StringProperty) {
+    fun bindText(property: ObservableValue<out String>) {
         settings { textProperty().bind(property) }
     }
 
-    fun bindBidirectionalText(property: StringProperty) {
+    fun bindBidirectionalText(property: Property<String>) {
         settings { textProperty().bindBidirectional(property) }
     }
 
-    fun byBindBidirectionalText(property: StringProperty) {
+    fun byBindBidirectionalText(property: Property<String>) {
         settings { property.bindBidirectional(textProperty()) }
     }
 
@@ -547,13 +547,13 @@ class TextAreaBuilder : RegionBaseBuilder<TextArea>() {
     }
 
     // 数据绑定
-    fun byBindText(property: StringProperty) = settings { property.bind(textProperty()) }
+    fun byBindText(property: Property<in String>) = settings { property.bind(textProperty()) }
 
-    fun bindText(property: StringProperty) = settings { textProperty().bind(property) }
+    fun bindText(property: ObservableValue<out String>) = settings { textProperty().bind(property) }
 
-    fun bindBidirectionalText(property: StringProperty) = settings { textProperty().bindBidirectional(property) }
+    fun bindBidirectionalText(property: Property<String>) = settings { textProperty().bindBidirectional(property) }
 
-    fun byBindBidirectionalText(property: StringProperty) = settings { property.bindBidirectional(textProperty()) }
+    fun byBindBidirectionalText(property: Property<String>) = settings { property.bindBidirectional(textProperty()) }
 
     override fun style(styleColor: StyleColor, styleSize: StyleSize) {
         settings {
@@ -595,19 +595,19 @@ class CheckBoxBuilder : LabeledBuilder<CheckBox>() {
     }
 
     // 数据绑定
-    fun byBindSelected(property: BooleanProperty) {
+    fun byBindSelected(property: Property<in Boolean>) {
         settings { property.bind(selectedProperty()) }
     }
 
-    fun bindSelected(property: BooleanProperty) {
+    fun bindSelected(property: ObservableValue<out Boolean>) {
         settings { selectedProperty().bind(property) }
     }
 
-    fun bindBidirectionalSelected(property: BooleanProperty) {
+    fun bindBidirectionalSelected(property: Property<Boolean>) {
         settings { selectedProperty().bindBidirectional(property) }
     }
 
-    fun byBindBidirectionalSelected(property: BooleanProperty) {
+    fun byBindBidirectionalSelected(property: Property<Boolean>) {
         settings { property.bindBidirectional(selectedProperty()) }
     }
 
@@ -677,14 +677,14 @@ class RadioButtonBuilder : LabeledBuilder<RadioButton>() {
     }
 
     // 数据绑定
-    fun byBindSelected(property: BooleanProperty) = settings { property.bind(selectedProperty()) }
+    fun byBindSelected(property: Property<in Boolean>) = settings { property.bind(selectedProperty()) }
 
-    fun bindSelected(property: BooleanProperty) = settings { selectedProperty().bind(property) }
+    fun bindSelected(property: ObservableValue<out Boolean>) = settings { selectedProperty().bind(property) }
 
-    fun bindBidirectionalSelected(property: BooleanProperty) =
+    fun bindBidirectionalSelected(property: Property<Boolean>) =
         settings { selectedProperty().bindBidirectional(property) }
 
-    fun byBindBidirectionalSelected(property: BooleanProperty) =
+    fun byBindBidirectionalSelected(property: Property<Boolean>) =
         settings { property.bindBidirectional(selectedProperty()) }
 
     override fun style(styleColor: StyleColor, styleSize: StyleSize) {
@@ -774,13 +774,13 @@ abstract class ComboBoxBaseBuilder<S : ComboBox<T>, T> : RegionBaseBuilder<S>() 
     }
 
     // 数据绑定
-    fun byBindValue(property: ObjectProperty<T>) = settings { property.bind(valueProperty()) }
+    fun byBindValue(property: Property<in T>) = settings { property.bind(valueProperty()) }
 
-    fun bindValue(property: ObjectProperty<T>) = settings { valueProperty().bind(property) }
+    fun bindValue(property: ObservableValue<out T>) = settings { valueProperty().bind(property) }
 
-    fun bindBidirectionalValue(property: ObjectProperty<T>) = settings { valueProperty().bindBidirectional(property) }
+    fun bindBidirectionalValue(property: Property<T>) = settings { valueProperty().bindBidirectional(property) }
 
-    fun byBindBidirectionalValue(property: ObjectProperty<T>) = settings { property.bindBidirectional(valueProperty()) }
+    fun byBindBidirectionalValue(property: Property<T>) = settings { property.bindBidirectional(valueProperty()) }
 
     override fun style(styleColor: StyleColor, styleSize: StyleSize) {
         settings {
@@ -1093,9 +1093,9 @@ class ProgressBarBuilder : RegionBaseBuilder<ProgressBar>() {
     }
 
     // 数据绑定
-    fun byBindProgress(property: DoubleProperty) = settings { property.bind(progressProperty()) }
+    fun byBindProgress(property: Property<in Number>) = settings { property.bind(progressProperty()) }
 
-    fun bindProgress(property: DoubleProperty) = settings { progressProperty().bind(property) }
+    fun bindProgress(property: ObservableValue<out Number>) = settings { progressProperty().bind(property) }
 
     override fun style(styleColor: StyleColor, styleSize: StyleSize) {
         settings {
@@ -1148,9 +1148,9 @@ class SliderBuilder : RegionBaseBuilder<Slider>() {
     }
 
     // 数据绑定
-    fun byBindValue(property: DoubleProperty) = settings { property.bind(valueProperty()) }
+    fun byBindValue(property: Property<in Number>) = settings { property.bind(valueProperty()) }
 
-    fun bindValue(property: DoubleProperty) = settings { valueProperty().bind(property) }
+    fun bindValue(property: ObservableValue<out Number>) = settings { valueProperty().bind(property) }
 
     fun addValueListener(listener: ChangeListener<Number>) = settings { valueProperty().addListener(listener) }
 
@@ -1186,8 +1186,8 @@ class ImageViewBuilder : NodeBuilder<ImageView>() {
 
     fun bindFitWidth(p: ObservableValue<out Number>) = settings { fitWidthProperty().bind(p) }
     fun bindFitHeight(p: ObservableValue<out Number>) = settings { fitHeightProperty().bind(p) }
-    fun byBindFitWidth(p: DoubleProperty) = settings { p.bind(fitWidthProperty()) }
-    fun byBindFitHeight(p: DoubleProperty) = settings { p.bind(fitHeightProperty()) }
+    fun byBindFitWidth(p: Property<in Number>) = settings { p.bind(fitWidthProperty()) }
+    fun byBindFitHeight(p: Property<in Number>) = settings { p.bind(fitHeightProperty()) }
 
     fun preserveRatio(preserve: Boolean = true) {
         settings { isPreserveRatio = preserve }
@@ -1272,19 +1272,19 @@ open class SwitchBuilder : RegionBaseBuilder<Switch>() {
     }
 
     // 数据绑定
-    fun byBindStatus(property: BooleanProperty) {
+    fun byBindStatus(property: Property<in Boolean>) {
         settings { property.bind(statusProperty()) }
     }
 
-    fun bindStatus(property: BooleanProperty) {
+    fun bindStatus(property: ObservableValue<out Boolean>) {
         settings { statusProperty().bind(property) }
     }
 
-    fun bindBidirectionalStatus(property: BooleanProperty) {
+    fun bindBidirectionalStatus(property: Property<Boolean>) {
         settings { statusProperty().bindBidirectional(property) }
     }
 
-    fun byBindBidirectionalStatus(property: BooleanProperty) {
+    fun byBindBidirectionalStatus(property: Property<Boolean>) {
         settings { property.bindBidirectional(statusProperty()) }
     }
 }

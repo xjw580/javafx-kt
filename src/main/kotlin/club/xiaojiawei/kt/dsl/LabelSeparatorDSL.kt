@@ -3,7 +3,7 @@ package club.xiaojiawei.kt.dsl
 import club.xiaojiawei.controls.LabelSeparator
 import club.xiaojiawei.kt.annotations.FXMarker
 import club.xiaojiawei.kt.i18n.LocalizedText
-import javafx.beans.property.StringProperty
+import javafx.beans.property.Property
 import javafx.beans.value.ObservableValue
 import javafx.geometry.HPos
 import javafx.scene.Node
@@ -24,7 +24,7 @@ class LabelSeparatorBuilder : ControlBuilder<LabelSeparator>() {
 
     fun bindText(text: ObservableValue<out String>) = settings { textProperty().bind(text) }
 
-    fun bindBidirectionalText(text: StringProperty) = settings { textProperty().bindBidirectional(text) }
+    fun bindBidirectionalText(text: Property<String>) = settings { textProperty().bindBidirectional(text) }
 
     fun graphic(node: Node?) = settings { graphic = node }
 
