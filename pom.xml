@@ -34,7 +34,7 @@
         <javafx-version>21.0.5</javafx-version>
         <kotlin-logging-jvm-version>5.1.4</kotlin-logging-jvm-version>
         <kt-version>2.2.0</kt-version>
-        <javafx-ui-version>v2.39.2</javafx-ui-version>
+        <javafx-ui-version>2.52.0</javafx-ui-version>
         <k-coroutines-version>1.10.2</k-coroutines-version>
     </properties>
 
@@ -79,7 +79,7 @@
         </dependency>
         <!--javafx UI组件库-->
         <dependency>
-            <groupId>com.github.xjw580</groupId>
+            <groupId>club.xiaojiawei</groupId>
             <artifactId>javafx-ui</artifactId>
             <version>${javafx-ui-version}</version>
         </dependency>

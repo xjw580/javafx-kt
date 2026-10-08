@@ -224,6 +224,27 @@ abstract class PaneBaseBuilder<T : Pane> : RegionBaseBuilder<T>() {
         })
     }
 
+    inline fun addLabelSeparator(config: LabelSeparatorBuilder.() -> Unit = {}) {
+        add(LabelSeparatorBuilder().apply {
+            setMode(this@PaneBaseBuilder.buildMode)
+            config()
+        })
+    }
+
+    inline fun addLabelSeparator(text: String, config: LabelSeparatorBuilder.() -> Unit = {}) {
+        addLabelSeparator {
+            text(text)
+            config()
+        }
+    }
+
+    inline fun addLabelSeparator(text: LocalizedText, config: LabelSeparatorBuilder.() -> Unit = {}) {
+        addLabelSeparator {
+            text(text)
+            config()
+        }
+    }
+
     inline fun addCircle(config: (CircleBuilder.() -> Unit) = {}) {
         add(CircleBuilder().apply {
             setMode(this@PaneBaseBuilder.buildMode)
