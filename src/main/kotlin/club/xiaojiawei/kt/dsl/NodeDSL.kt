@@ -37,7 +37,6 @@ import javafx.scene.text.FontWeight
 import javafx.scene.text.Text
 import javafx.util.Callback
 import javafx.util.Duration
-import javafx.util.StringConverter
 
 @FXMarker
 abstract class RegionBaseBuilder<T : Region> : ParentBaseBuilder<T>() {
@@ -248,7 +247,7 @@ class LabelBuilder : LabeledBuilder<Label>() {
 
 // Circle 构建器
 @FXMarker
-class CircleBuilder : NodeBuilder<Circle>() {
+class CircleBuilder : ShapeBuilder<Circle>() {
 
     override fun buildInstance(): Circle = Circle()
 
@@ -269,7 +268,7 @@ class CircleBuilder : NodeBuilder<Circle>() {
 
 // Text 构建器
 @FXMarker
-class TextBuilder : NodeBuilder<Text>() {
+class TextBuilder : ShapeBuilder<Text>() {
 
     override fun buildInstance(): Text = Text()
 
@@ -305,7 +304,7 @@ class TextBuilder : NodeBuilder<Text>() {
 }
 
 @FXMarker
-class PolygonBuilder : NodeBuilder<Polygon>() {
+class PolygonBuilder : ShapeBuilder<Polygon>() {
 
     override fun buildInstance(): Polygon = Polygon()
 
@@ -331,39 +330,14 @@ class PolygonBuilder : NodeBuilder<Polygon>() {
         settings { points.clear() }
     }
 
-    fun fill(paint: Paint) = settings { fill = paint }
-
-    fun stroke(paint: Paint) = settings { stroke = paint }
-
-    fun strokeWidth(width: Double) = settings { strokeWidth = width }
-
-    fun strokeType(type: StrokeType) = settings { strokeType = type }
-
-    fun strokeLineJoin(join: StrokeLineJoin) = settings { strokeLineJoin = join }
-
-    fun strokeLineCap(cap: StrokeLineCap) = settings { strokeLineCap = cap }
-
-    fun strokeDashArray(vararg dashes: Double) {
-        settings { strokeDashArray.setAll(dashes.toList()) }
-    }
-
-    fun strokeDashOffset(offset: Double) = settings { strokeDashOffset = offset }
-
-    fun strokeMiterLimit(limit: Double) = settings { strokeMiterLimit = limit }
-
-    fun smooth(smooth: Boolean = true) = settings { isSmooth = smooth }
 
 }
 
 // Button 构建器
 @FXMarker
-class ButtonBuilder : LabeledBuilder<Button>() {
+class ButtonBuilder : ButtonBaseBuilder<Button>() {
 
     override fun buildInstance(): Button = Button()
-
-    fun onAction(handler: EventHandler<ActionEvent>?) {
-        settings { onAction = handler }
-    }
 
     fun onAction(handler: (ActionEvent) -> Unit) {
         settings { onAction = EventHandler(handler) }
@@ -401,43 +375,9 @@ class ButtonBuilder : LabeledBuilder<Button>() {
 
 // TextField 构建器
 @FXMarker
-class TextFieldBuilder : RegionBaseBuilder<TextField>() {
+class TextFieldBuilder : TextInputControlBuilder<TextField>() {
 
     override fun buildInstance(): TextField = TextField()
-
-    fun text(text: String) {
-        settings { this.text = text }
-    }
-
-    operator fun String.unaryPlus() = text(this)
-
-    fun text(text: LocalizedText) {
-        settings { this.text = text.value }
-    }
-
-    operator fun LocalizedText.unaryPlus() = text(this)
-
-    fun <T> observe(state: ObservableValue<T>, block: (T) -> String) = settings {
-        val binding = Bindings.createStringBinding({ block(state.value) }, state)
-        textProperty().bind(binding)
-    }
-
-    fun observes(vararg states: ObservableValue<*>, block: () -> String) = settings {
-        val binding = Bindings.createStringBinding({ block() }, *states)
-        textProperty().bind(binding)
-    }
-
-    fun promptText(prompt: String) {
-        settings { promptText = prompt }
-    }
-
-    fun promptText(prompt: LocalizedText) {
-        settings { promptTextProperty().bind(prompt.binding()) }
-    }
-
-    fun editable(editable: Boolean = true) {
-        settings { isEditable = editable }
-    }
 
     fun prefColumnCount(count: Int) {
         settings { prefColumnCount = count }
@@ -445,31 +385,6 @@ class TextFieldBuilder : RegionBaseBuilder<TextField>() {
 
     fun alignment(alignment: Pos) {
         settings { this.alignment = alignment }
-    }
-
-    fun font(font: Font) {
-        settings { this.font = font }
-    }
-
-    fun fontSize(size: Double) {
-        settings { font = Font.font(size) }
-    }
-
-    // 数据绑定
-    fun byBindText(property: Property<in String>) {
-        settings { property.bind(textProperty()) }
-    }
-
-    fun bindText(property: ObservableValue<out String>) {
-        settings { textProperty().bind(property) }
-    }
-
-    fun bindBidirectionalText(property: Property<String>) {
-        settings { textProperty().bindBidirectional(property) }
-    }
-
-    fun byBindBidirectionalText(property: Property<String>) {
-        settings { property.bindBidirectional(textProperty()) }
     }
 
     override fun style(styleColor: StyleColor, styleSize: StyleSize) {
@@ -487,33 +402,9 @@ class TextFieldBuilder : RegionBaseBuilder<TextField>() {
 
 // TextArea 构建器
 @FXMarker
-class TextAreaBuilder : RegionBaseBuilder<TextArea>() {
+class TextAreaBuilder : TextInputControlBuilder<TextArea>() {
 
     override fun buildInstance(): TextArea = TextArea()
-
-    fun text(text: String) {
-        settings { this.text = text }
-    }
-
-    operator fun String.unaryPlus() = text(this)
-
-    fun text(text: LocalizedText) {
-        settings { this.text = text.value }
-    }
-
-    operator fun LocalizedText.unaryPlus() = text(this)
-
-    fun promptText(prompt: String) {
-        settings { promptText = prompt }
-    }
-
-    fun promptText(prompt: LocalizedText) {
-        settings { promptTextProperty().bind(prompt.binding()) }
-    }
-
-    fun editable(editable: Boolean = true) {
-        settings { isEditable = editable }
-    }
 
     fun wrapText(wrap: Boolean = true) {
         settings { isWrapText = wrap }
@@ -527,34 +418,6 @@ class TextAreaBuilder : RegionBaseBuilder<TextArea>() {
         settings { prefColumnCount = columns }
     }
 
-    fun font(font: Font) {
-        settings { this.font = font }
-    }
-
-    fun fontSize(size: Double) {
-        settings { font = Font.font(size) }
-    }
-
-    // 响应式观察
-    fun <T> observe(state: ObservableValue<T>, block: (T) -> String) = settings {
-        val binding = Bindings.createStringBinding({ block(state.value) }, state)
-        textProperty().bind(binding)
-    }
-
-    fun observes(vararg states: ObservableValue<*>, block: () -> String) = settings {
-        val binding = Bindings.createStringBinding({ block() }, *states)
-        textProperty().bind(binding)
-    }
-
-    // 数据绑定
-    fun byBindText(property: Property<in String>) = settings { property.bind(textProperty()) }
-
-    fun bindText(property: ObservableValue<out String>) = settings { textProperty().bind(property) }
-
-    fun bindBidirectionalText(property: Property<String>) = settings { textProperty().bindBidirectional(property) }
-
-    fun byBindBidirectionalText(property: Property<String>) = settings { property.bindBidirectional(textProperty()) }
-
     override fun style(styleColor: StyleColor, styleSize: StyleSize) {
         settings {
             styleClass.add("text-area-ui")
@@ -564,7 +427,7 @@ class TextAreaBuilder : RegionBaseBuilder<TextArea>() {
 
 // CheckBox 构建器
 @FXMarker
-class CheckBoxBuilder : LabeledBuilder<CheckBox>() {
+class CheckBoxBuilder : ButtonBaseBuilder<CheckBox>() {
 
     override fun buildInstance(): CheckBox = CheckBox()
 
@@ -578,10 +441,6 @@ class CheckBoxBuilder : LabeledBuilder<CheckBox>() {
 
     fun allowIndeterminate(allow: Boolean = true) {
         settings { isAllowIndeterminate = allow }
-    }
-
-    fun onAction(handler: EventHandler<ActionEvent>) {
-        settings { onAction = handler }
     }
 
     fun onAction(handler: () -> Unit) {
@@ -640,52 +499,9 @@ class CheckBoxBuilder : LabeledBuilder<CheckBox>() {
 
 // RadioButton 构建器
 @FXMarker
-class RadioButtonBuilder : LabeledBuilder<RadioButton>() {
+class RadioButtonBuilder : ToggleButtonBaseBuilder<RadioButton>() {
 
     override fun buildInstance(): RadioButton = RadioButton()
-
-    fun selected(selected: Boolean = true) {
-        settings { isSelected = selected }
-    }
-
-    fun toggleGroup(group: ToggleGroup) {
-        settings { this.toggleGroup = group }
-    }
-
-    fun listenSelected(selectedCallback: () -> Unit) {
-        settings {
-            selectedProperty().addListener { p0, p1, p2 ->
-                if (p2) {
-                    selectedCallback()
-                }
-            }
-        }
-    }
-
-    fun onAction(handler: EventHandler<ActionEvent>) {
-        settings { onAction = handler }
-    }
-
-    fun onAction(handler: () -> Unit) {
-        settings { onAction = EventHandler { handler() } }
-    }
-
-    // 响应式观察
-    fun <T> observeSelected(state: ObservableValue<T>, block: (T) -> Boolean) = settings {
-        val binding = Bindings.createBooleanBinding({ block(state.value) }, state)
-        selectedProperty().bind(binding)
-    }
-
-    // 数据绑定
-    fun byBindSelected(property: Property<in Boolean>) = settings { property.bind(selectedProperty()) }
-
-    fun bindSelected(property: ObservableValue<out Boolean>) = settings { selectedProperty().bind(property) }
-
-    fun bindBidirectionalSelected(property: Property<Boolean>) =
-        settings { selectedProperty().bindBidirectional(property) }
-
-    fun byBindBidirectionalSelected(property: Property<Boolean>) =
-        settings { property.bindBidirectional(selectedProperty()) }
 
     override fun style(styleColor: StyleColor, styleSize: StyleSize) {
         settings {
@@ -708,104 +524,9 @@ class RadioButtonBuilder : LabeledBuilder<RadioButton>() {
     }
 }
 
-@FXMarker
-abstract class ComboBoxBaseBuilder<S : ComboBox<T>, T> : RegionBaseBuilder<S>() {
-
-    fun items(vararg items: T) {
-        settings { this.addItems(*items) }
-    }
-
-    fun items(items: List<T>) {
-        settings { this.addItems(items) }
-    }
-
-    fun items(items: ObservableList<T>) {
-        settings { this.items = items }
-    }
-
-    fun converter(stringConverter: StringConverter<T>) {
-        settings {
-            converter = stringConverter
-        }
-    }
-
-    fun converter(fromString: ((String?) -> T?)? = null, toString: ((T?) -> String?)?) {
-        settings {
-            converter = object : StringConverter<T>() {
-                override fun toString(p0: T?): String? = toString?.invoke(p0)
-
-                override fun fromString(p0: String?): T? = fromString?.invoke(p0)
-            }
-        }
-    }
-
-    fun value(value: T) {
-        settings { this.value = value }
-    }
-
-    fun promptText(prompt: String) {
-        settings { promptText = prompt }
-    }
-
-    fun promptText(prompt: LocalizedText) {
-        settings { promptTextProperty().bind(prompt.binding()) }
-    }
-
-    fun editable(editable: Boolean = true) {
-        settings { isEditable = editable }
-    }
-
-    fun visibleRowCount(count: Int) {
-        settings { visibleRowCount = count }
-    }
-
-    fun onAction(handler: EventHandler<ActionEvent>) {
-        settings { onAction = handler }
-    }
-
-    fun onAction(handler: () -> Unit) {
-        settings { onAction = EventHandler { handler() } }
-    }
-
-    // 响应式观察
-    fun <V> observeValue(state: ObservableValue<V>, block: (V) -> T) = settings {
-        val binding = Bindings.createObjectBinding({ block(state.value) }, state)
-        valueProperty().bind(binding)
-    }
-
-    // 数据绑定
-    fun byBindValue(property: Property<in T>) = settings { property.bind(valueProperty()) }
-
-    fun bindValue(property: ObservableValue<out T>) = settings { valueProperty().bind(property) }
-
-    fun bindBidirectionalValue(property: Property<T>) = settings { valueProperty().bindBidirectional(property) }
-
-    fun byBindBidirectionalValue(property: Property<T>) = settings { property.bindBidirectional(valueProperty()) }
-
-    override fun style(styleColor: StyleColor, styleSize: StyleSize) {
-        settings {
-            styleClass.add("combo-box-ui")
-            when (styleColor) {
-                StyleColor.MAIN -> {}
-                StyleColor.NORMAL -> styleClass.add("combo-box-ui-normal")
-                StyleColor.SUCCESS -> styleClass.add("combo-box-ui-success")
-                StyleColor.WARN -> styleClass.add("combo-box-ui-warn")
-                StyleColor.ERROR -> styleClass.add("combo-box-ui-error")
-                StyleColor.DEFAULT -> {}
-            }
-            when (styleSize) {
-                StyleSize.TINY -> {}
-                StyleSize.SMALL -> styleClass.add("combo-box-ui-small")
-                StyleSize.BIG -> styleClass.add("combo-box-ui-big")
-                StyleSize.DEFAULT -> {}
-            }
-        }
-    }
-
-}
 
 @FXMarker
-class FilterComboBoxBuilder<T> : ComboBoxBaseBuilder<FilterComboBox<T>, T>() {
+class FilterComboBoxBuilder<T> : ComboBoxControlBuilder<FilterComboBox<T>, T>() {
 
     override fun buildInstance(): FilterComboBox<T> = FilterComboBox()
 
@@ -819,39 +540,14 @@ class FilterComboBoxBuilder<T> : ComboBoxBaseBuilder<FilterComboBox<T>, T>() {
 
 // ComboBox 构建器
 @FXMarker
-open class ComboBoxBuilder<T> : ComboBoxBaseBuilder<ComboBox<T>, T>() {
+open class ComboBoxBuilder<T> : ComboBoxControlBuilder<ComboBox<T>, T>() {
 
     override fun buildInstance(): ComboBox<T> = ComboBox<T>()
-
-    fun addValueListener(changeListener: ChangeListener<in T>) {
-        settings {
-            valueProperty().addListener(changeListener)
-        }
-    }
-
-    fun removeValueListener(changeListener: ChangeListener<in T>) {
-        settings {
-            valueProperty().removeListener(changeListener)
-        }
-    }
-
-//    fun addItemsListener(changeListener: ChangeListener<in ObservableList<T?>>) {
-//        settings {
-//            itemsProperty().addListener(changeListener)
-//        }
-//    }
-//
-//    fun removeItemsListener(changeListener: ChangeListener<in ObservableList<T?>>) {
-//        settings {
-//            itemsProperty().removeListener(changeListener)
-//        }
-//    }
-
 }
 
 // ListView 构建器
 @FXMarker
-class ListViewBuilder<T> : RegionBaseBuilder<ListView<T>>() {
+class ListViewBuilder<T> : ControlBuilder<ListView<T>>() {
 
     override fun buildInstance(): ListView<T> = ListView<T>()
 
@@ -975,7 +671,7 @@ class TableColumnBuilder<S, T> : DslBuilder<TableColumn<S, T>>() {
 
 // TableView 构建器
 @FXMarker
-class TableViewBuilder<T> : RegionBaseBuilder<TableView<T>>() {
+class TableViewBuilder<T> : ControlBuilder<TableView<T>>() {
 
     override fun buildInstance(): TableView<T> = TableView<T>()
 
@@ -1074,7 +770,7 @@ class TableViewBuilder<T> : RegionBaseBuilder<TableView<T>>() {
 
 // ProgressBar 构建器
 @FXMarker
-class ProgressBarBuilder : RegionBaseBuilder<ProgressBar>() {
+class ProgressBarBuilder : ControlBuilder<ProgressBar>() {
 
     override fun buildInstance(): ProgressBar = ProgressBar()
 
@@ -1106,7 +802,7 @@ class ProgressBarBuilder : RegionBaseBuilder<ProgressBar>() {
 
 // Slider 构建器
 @FXMarker
-class SliderBuilder : RegionBaseBuilder<Slider>() {
+class SliderBuilder : ControlBuilder<Slider>() {
 
     override fun buildInstance(): Slider = Slider()
 
@@ -1205,7 +901,7 @@ class ImageViewBuilder : NodeBuilder<ImageView>() {
 }
 
 @FXMarker
-class SeparatorBuilder : RegionBaseBuilder<Separator>() {
+class SeparatorBuilder : ControlBuilder<Separator>() {
     override fun buildInstance() = Separator()
 
 
@@ -1220,7 +916,7 @@ class SeparatorBuilder : RegionBaseBuilder<Separator>() {
 }
 
 @FXMarker
-class PaginationBuilder : RegionBaseBuilder<Pagination>() {
+class PaginationBuilder : ControlBuilder<Pagination>() {
 
     override fun buildInstance(): Pagination = Pagination()
 

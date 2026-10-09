@@ -950,7 +950,7 @@ class TilePaneBuilder : PaneBaseBuilder<TilePane>() {
 // ======================== ScrollPane ========================
 
 @FXMarker
-class ScrollPaneBuilder : DslBuilder<ScrollPane>() {
+class ScrollPaneBuilder : ControlBuilder<ScrollPane>() {
     override fun buildInstance(): ScrollPane = ScrollPane()
 
     fun content(node: Node) = settings {
@@ -1005,13 +1005,12 @@ class ScrollPaneBuilder : DslBuilder<ScrollPane>() {
         vmax = max
     }
 
-    fun styled(block: StyleBuilder.() -> Unit) = settings { this.styled(block) }
 }
 
 // ======================== SplitPane ========================
 
 @FXMarker
-class SplitPaneBuilder : DslBuilder<SplitPane>() {
+class SplitPaneBuilder : ControlBuilder<SplitPane>() {
     override fun buildInstance(): SplitPane = SplitPane()
 
     fun orientation(orientation: Orientation) = settings {
