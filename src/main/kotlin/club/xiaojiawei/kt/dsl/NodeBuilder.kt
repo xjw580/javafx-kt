@@ -40,7 +40,7 @@ abstract class NodeBuilder<T : Node> : DslBuilder<T>() {
     fun styleRadiusBig() = settings { styleClass.add("radius-ui-big") }
     fun styleBg() = settings { styleClass.add("bg-ui") }
     fun styleBgHover() = settings { styleClass.add("bg-hover-ui") }
-    fun styled(block: StyleBuilder.() -> Unit) = settings { this.styled(block) }
+    fun styled(config: StyleBuilder.() -> Unit) = settings { this.styled(config) }
     fun styled(styleBuilder: StyleBuilder) = settings { this.styled(styleBuilder) }
 
     // --- 基础 Node 属性 ---
@@ -74,8 +74,10 @@ abstract class NodeBuilder<T : Node> : DslBuilder<T>() {
     }
 
     // --- 监听 ---
-    fun addVisibleListener(changeListener: ChangeListener<Boolean>) = settings { visibleProperty().addListener(changeListener) }
-    fun removeVisibleListener(changeListener: ChangeListener<Boolean>) = settings { visibleProperty().removeListener(changeListener) }
+    fun addVisibleListener(changeListener: ChangeListener<Boolean>) =
+        settings { visibleProperty().addListener(changeListener) }
+    fun removeVisibleListener(changeListener: ChangeListener<Boolean>) =
+        settings { visibleProperty().removeListener(changeListener) }
 
     // --- 鼠标 & 拖拽事件 ---
     fun onMouseClicked(h: EventHandler<MouseEvent>? = null) = settings { onMouseClicked = h }

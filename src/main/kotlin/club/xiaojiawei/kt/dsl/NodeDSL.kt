@@ -40,7 +40,7 @@ import javafx.util.Duration
 import javafx.util.StringConverter
 
 @FXMarker
-abstract class RegionBaseBuilder<T : Region> : NodeBuilder<T>() {
+abstract class RegionBaseBuilder<T : Region> : ParentBaseBuilder<T>() {
     // --- 综合尺寸设定 ---
     fun size(w: Double = -1.0, h: Double = -1.0) = settings { prefWidth = w; prefHeight = h }
     fun minSize(w: Double = -1.0, h: Double = -1.0) = settings { minWidth = w; minHeight = h }
