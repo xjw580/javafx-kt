@@ -1,7 +1,7 @@
 package club.xiaojiawei.kt.dsl
 
 import club.xiaojiawei.controls.FilterComboBox
-import javafx.application.Platform
+import club.xiaojiawei.kt.test.onFxThread as runOnJavaFxThread
 import javafx.beans.property.Property
 import javafx.beans.property.ReadOnlyObjectWrapper
 import javafx.beans.property.SimpleBooleanProperty
@@ -19,9 +19,6 @@ import javafx.scene.control.ToggleGroup
 import java.time.LocalDate
 import javafx.scene.paint.Color
 import javafx.scene.paint.Paint
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.FutureTask
-import java.util.concurrent.TimeUnit
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -391,17 +388,4 @@ class BuilderHierarchyTest {
         }
     }
 
-    private fun <T> runOnJavaFxThread(action: () -> T): T {
-        if (Platform.isFxApplicationThread()) return action()
-        val started = CountDownLatch(1)
-        try {
-            Platform.startup { started.countDown() }
-        } catch (_: IllegalStateException) {
-            started.countDown()
-        }
-        assertTrue(started.await(10, TimeUnit.SECONDS))
-        val future = FutureTask(action)
-        Platform.runLater(future)
-        return future.get(10, TimeUnit.SECONDS)
-    }
 }

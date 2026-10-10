@@ -1,6 +1,6 @@
 package club.xiaojiawei.kt.dsl
 
-import javafx.application.Platform
+import club.xiaojiawei.kt.test.onFxThread as runOnJavaFxThread
 import javafx.beans.property.Property
 import javafx.beans.property.ReadOnlyObjectWrapper
 import javafx.beans.property.ReadOnlyStringWrapper
@@ -8,9 +8,6 @@ import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.value.ObservableValue
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.FutureTask
-import java.util.concurrent.TimeUnit
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -213,16 +210,4 @@ class BindingParameterTypeTest {
         assertEquals("again", reverseBidirectional.value)
     }
 
-    private fun <T> runOnJavaFxThread(action: () -> T): T {
-        val started = CountDownLatch(1)
-        try {
-            Platform.startup { started.countDown() }
-        } catch (_: IllegalStateException) {
-            started.countDown()
-        }
-        assertTrue(started.await(10, TimeUnit.SECONDS))
-        val future = FutureTask(action)
-        Platform.runLater(future)
-        return future.get(10, TimeUnit.SECONDS)
-    }
 }

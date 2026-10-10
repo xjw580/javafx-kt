@@ -2,7 +2,7 @@ package club.xiaojiawei.kt.dsl
 
 import club.xiaojiawei.kt.controls.messageDialog
 import club.xiaojiawei.kt.i18n.I18nContext
-import javafx.application.Platform
+import club.xiaojiawei.kt.test.onFxThread as runOnJavaFxThread
 import javafx.scene.Scene
 import javafx.scene.control.Button
 import javafx.scene.control.CheckBox
@@ -15,9 +15,6 @@ import javafx.scene.layout.VBox
 import javafx.scene.text.Text
 import javafx.stage.Stage
 import java.util.Locale
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.FutureTask
-import java.util.concurrent.TimeUnit
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -210,20 +207,4 @@ class I18nDSLTest {
         classLoader = javaClass.classLoader,
     )
 
-    private fun <T> runOnJavaFxThread(action: () -> T): T {
-        startJavaFx()
-        val future = FutureTask(action)
-        Platform.runLater(future)
-        return future.get(10, TimeUnit.SECONDS)
-    }
-
-    private fun startJavaFx() {
-        val started = CountDownLatch(1)
-        try {
-            Platform.startup { started.countDown() }
-        } catch (_: IllegalStateException) {
-            started.countDown()
-        }
-        assertTrue(started.await(10, TimeUnit.SECONDS))
-    }
 }

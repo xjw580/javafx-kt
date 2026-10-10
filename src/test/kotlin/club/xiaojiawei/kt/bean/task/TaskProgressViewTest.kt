@@ -1,17 +1,13 @@
 package club.xiaojiawei.kt.bean.task
 
-import javafx.application.Platform
+import club.xiaojiawei.kt.test.onFxThread as runOnJavaFxThread
 import javafx.scene.control.ScrollPane
 import javafx.scene.control.TitledPane
 import javafx.scene.layout.VBox
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.FutureTask
-import java.util.concurrent.TimeUnit
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertIs
-import kotlin.test.assertTrue
 
 class TaskProgressViewTest {
 
@@ -51,20 +47,4 @@ class TaskProgressViewTest {
         assertEquals(1, (subTaskPane.content as VBox).children.size)
     }
 
-    private fun <T> runOnJavaFxThread(action: () -> T): T {
-        startJavaFx()
-        val future = FutureTask(action)
-        Platform.runLater(future)
-        return future.get(10, TimeUnit.SECONDS)
-    }
-
-    private fun startJavaFx() {
-        val started = CountDownLatch(1)
-        try {
-            Platform.startup { started.countDown() }
-        } catch (_: IllegalStateException) {
-            started.countDown()
-        }
-        assertTrue(started.await(10, TimeUnit.SECONDS))
-    }
 }

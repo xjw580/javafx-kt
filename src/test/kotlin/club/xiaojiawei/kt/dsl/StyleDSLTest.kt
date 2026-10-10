@@ -1,20 +1,18 @@
 package club.xiaojiawei.kt.dsl
 
-import javafx.application.Platform
+import club.xiaojiawei.kt.test.onFxThread as runOnJavaFxThread
 import javafx.beans.property.SimpleStringProperty
 import javafx.css.PseudoClass
 import javafx.scene.Group
 import javafx.scene.Node
 import javafx.scene.Scene
 import javafx.scene.SubScene
+import javafx.scene.control.Label
 import javafx.scene.layout.StackPane
 import javafx.scene.paint.Color
 import javafx.scene.shape.Rectangle
 import java.nio.charset.StandardCharsets
 import java.util.Base64
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.FutureTask
-import java.util.concurrent.TimeUnit
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -23,6 +21,81 @@ import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 
 class StyleDSLTest {
+
+    @Test
+    fun inlineDslStylesRenderLikeHandwrittenJavaFxCss() = runOnJavaFxThread {
+        val actual = Label("Styled").apply {
+            styled {
+                backgroundColor("#123456")
+                backgroundRadius(6.0)
+                borderColor("#abcdef")
+                borderWidth(2.0)
+                borderRadius(4.0)
+                fontSize(19.0)
+                fontWeight(FontWeight.BOLD)
+                textFill("#335577")
+                padding(2.0, 4.0, 6.0, 8.0)
+                opacity(0.7)
+                cursor(Cursor.HAND)
+                underline(true)
+            }
+        }
+        val expected = Label("Styled").apply {
+            style = """
+                -fx-background-color: #123456;
+                -fx-background-radius: 6;
+                -fx-border-color: #abcdef;
+                -fx-border-width: 2;
+                -fx-border-radius: 4;
+                -fx-font-size: 19px;
+                -fx-font-weight: bold;
+                -fx-text-fill: #335577;
+                -fx-padding: 2 4 6 8;
+                -fx-opacity: 0.7;
+                -fx-cursor: hand;
+                -fx-underline: true;
+            """.trimIndent()
+        }
+        val scene = Scene(StackPane(actual, expected))
+        scene.root.applyCss()
+
+        assertEquals(expected.background, actual.background)
+        assertEquals(expected.border, actual.border)
+        assertEquals(expected.font, actual.font)
+        assertEquals(expected.textFill, actual.textFill)
+        assertEquals(expected.padding, actual.padding)
+        assertEquals(expected.opacity, actual.opacity)
+        assertEquals(expected.cursor, actual.cursor)
+        assertEquals(expected.isUnderline, actual.isUnderline)
+    }
+
+    @Test
+    fun stylesheetDslMatchesNativeCssAcrossPseudoClassTransitions() = runOnJavaFxThread {
+        val actual = Rectangle(20.0, 20.0).apply { styleClass += "sample" }
+        val expected = Rectangle(20.0, 20.0).apply { styleClass += "sample" }
+        val actualRoot = StackPane(actual)
+        val expectedRoot = StackPane(expected)
+        val actualScene = Scene(actualRoot)
+        val expectedScene = Scene(expectedRoot)
+        actualScene.configStylesheet {
+            styleClass("sample") {
+                custom("-fx-fill", "#123456")
+                hover { custom("-fx-fill", "#abcdef") }
+            }
+        }
+        val css = ".sample { -fx-fill: #123456; } .sample:hover { -fx-fill: #abcdef; }"
+        expectedScene.stylesheets += "data:text/css;base64," +
+                Base64.getEncoder().encodeToString(css.toByteArray(StandardCharsets.UTF_8))
+
+        listOf(false, true, false).forEach { active ->
+            actual.setPseudo("hover", active)
+            expected.setPseudo("hover", active)
+            actualRoot.applyCss()
+            expectedRoot.applyCss()
+            assertEquals(Color.web(if (active) "#abcdef" else "#123456"), expected.fill)
+            assertEquals(expected.fill, actual.fill)
+        }
+    }
 
     @Test
     fun staticStylesRemainInline() {
@@ -315,21 +388,4 @@ class StyleDSLTest {
         return String(Base64.getDecoder().decode(payload), StandardCharsets.UTF_8)
     }
 
-    private fun <T> runOnJavaFxThread(action: () -> T): T {
-        startJavaFx()
-        if (Platform.isFxApplicationThread()) return action()
-        val future = FutureTask(action)
-        Platform.runLater(future)
-        return future.get(10, TimeUnit.SECONDS)
-    }
-
-    private fun startJavaFx() {
-        val started = CountDownLatch(1)
-        try {
-            Platform.startup { started.countDown() }
-        } catch (_: IllegalStateException) {
-            started.countDown()
-        }
-        assertTrue(started.await(10, TimeUnit.SECONDS))
-    }
 }

@@ -2,7 +2,7 @@ package club.xiaojiawei.kt.dsl
 
 import club.xiaojiawei.kt.i18n.I18nContext
 import club.xiaojiawei.kt.i18n.i18n
-import javafx.application.Platform
+import club.xiaojiawei.kt.test.onFxThread as runOnJavaFxThread
 import javafx.geometry.Insets
 import javafx.scene.Scene
 import javafx.scene.control.MenuBar
@@ -12,9 +12,6 @@ import java.awt.image.BufferedImage
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.Locale
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.FutureTask
-import java.util.concurrent.TimeUnit
 import javax.imageio.ImageIO
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -25,7 +22,6 @@ class I18nVisualQaTest {
     @Test
     fun capturesLocalizedSurfaceBeforeAndAfterLocaleSwitch() {
         runOnJavaFxThread {
-            Platform.setImplicitExit(false)
             val context = I18nContext(
                 baseName = "i18n.messages",
                 supportedLocales = setOf(Locale.SIMPLIFIED_CHINESE, Locale.ENGLISH),
@@ -54,18 +50,20 @@ class I18nVisualQaTest {
                 show()
             }
 
-            root.applyCss()
-            root.layout()
-            writePng(stage.scene.snapshot(null), Path.of("target", "visual-qa", "i18n-zh.png"))
-            assertEquals("中文标题", stage.title)
+            try {
+                root.applyCss()
+                root.layout()
+                writePng(stage.scene.snapshot(null), Path.of("target", "visual-qa", "i18n-zh.png"))
+                assertEquals("中文标题", stage.title)
 
-            context.locale = Locale.ENGLISH
-            root.applyCss()
-            root.layout()
-            writePng(stage.scene.snapshot(null), Path.of("target", "visual-qa", "i18n-en.png"))
-            assertEquals("English title", stage.title)
-
-            stage.close()
+                context.locale = Locale.ENGLISH
+                root.applyCss()
+                root.layout()
+                writePng(stage.scene.snapshot(null), Path.of("target", "visual-qa", "i18n-en.png"))
+                assertEquals("English title", stage.title)
+            } finally {
+                stage.close()
+            }
         }
     }
 
@@ -83,20 +81,4 @@ class I18nVisualQaTest {
         assertTrue(ImageIO.write(bufferedImage, "png", path.toFile()))
     }
 
-    private fun <T> runOnJavaFxThread(action: () -> T): T {
-        startJavaFx()
-        val future = FutureTask(action)
-        Platform.runLater(future)
-        return future.get(10, TimeUnit.SECONDS)
-    }
-
-    private fun startJavaFx() {
-        val started = CountDownLatch(1)
-        try {
-            Platform.startup { started.countDown() }
-        } catch (_: IllegalStateException) {
-            started.countDown()
-        }
-        assertTrue(started.await(10, TimeUnit.SECONDS))
-    }
 }

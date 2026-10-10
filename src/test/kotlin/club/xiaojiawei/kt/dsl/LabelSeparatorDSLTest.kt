@@ -2,7 +2,7 @@ package club.xiaojiawei.kt.dsl
 
 import club.xiaojiawei.controls.LabelSeparator
 import club.xiaojiawei.kt.i18n.I18nContext
-import javafx.application.Platform
+import club.xiaojiawei.kt.test.onFxThread as runOnJavaFxThread
 import javafx.beans.property.SimpleStringProperty
 import javafx.geometry.HPos
 import javafx.scene.Scene
@@ -10,9 +10,6 @@ import javafx.scene.control.ContentDisplay
 import javafx.scene.control.Label
 import javafx.scene.shape.Circle
 import java.util.Locale
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.FutureTask
-import java.util.concurrent.TimeUnit
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -22,6 +19,67 @@ import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
 class LabelSeparatorDSLTest {
+
+    @Test
+    fun defaultAndConfiguredControlsMatchNativeConstructionInBothModes() = runOnJavaFxThread {
+        val expectedDefault = LabelSeparator()
+        val actualDefault = labelSeparator()
+        assertEquivalent(expectedDefault, actualDefault)
+
+        DslBuilder.BuildMode.entries.forEach { mode ->
+            val actual = labelSeparatorBuilder {
+                setMode(mode)
+                text("Section")
+                graphic { Circle(5.0) }
+                contentDisplay(ContentDisplay.RIGHT)
+                graphicTextGap(7.0)
+                alignLeft()
+                id("section-title")
+                prefWidth(280.0)
+            }.build()
+            val expected = LabelSeparator("Section").apply {
+                graphic = Circle(5.0)
+                contentDisplay = ContentDisplay.RIGHT
+                graphicTextGap = 7.0
+                textAlignment = HPos.LEFT
+                id = "section-title"
+                prefWidth = 280.0
+            }
+
+            assertEquivalent(expected, actual)
+            assertEquals((expected.graphic as Circle).radius, (actual.graphic as Circle).radius)
+        }
+    }
+
+    @Test
+    fun configuringExistingControlMatchesNativePropertyUpdates() = runOnJavaFxThread {
+        val actual = LabelSeparator("before").apply { id = "preserved" }
+        val expected = LabelSeparator("before").apply { id = "preserved" }
+
+        actual.config {
+            text("after")
+            alignRight()
+            contentDisplay(ContentDisplay.TOP)
+            graphicTextGap(9.0)
+        }
+        expected.text = "after"
+        expected.textAlignment = HPos.RIGHT
+        expected.contentDisplay = ContentDisplay.TOP
+        expected.graphicTextGap = 9.0
+
+        assertEquivalent(expected, actual)
+    }
+
+    private fun assertEquivalent(expected: LabelSeparator, actual: LabelSeparator) {
+        assertEquals(expected.text, actual.text)
+        assertEquals(expected.textAlignment, actual.textAlignment)
+        assertEquals(expected.contentDisplay, actual.contentDisplay)
+        assertEquals(expected.graphicTextGap, actual.graphicTextGap)
+        assertEquals(expected.id, actual.id)
+        assertEquals(expected.prefWidth, actual.prefWidth)
+        assertEquals(expected.styleClass, actual.styleClass)
+        assertEquals(expected.userAgentStylesheet, actual.userAgentStylesheet)
+    }
 
     @Test
     fun factoryConfiguresControlAndPreservesDefaults() = runOnJavaFxThread {
@@ -186,16 +244,4 @@ class LabelSeparatorDSLTest {
         assertEquals("更新标题", renderedLabel.text)
     }
 
-    private fun <T> runOnJavaFxThread(action: () -> T): T {
-        val started = CountDownLatch(1)
-        try {
-            Platform.startup { started.countDown() }
-        } catch (_: IllegalStateException) {
-            started.countDown()
-        }
-        assertTrue(started.await(10, TimeUnit.SECONDS))
-        val future = FutureTask(action)
-        Platform.runLater(future)
-        return future.get(10, TimeUnit.SECONDS)
-    }
 }

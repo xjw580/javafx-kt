@@ -1,6 +1,6 @@
 package club.xiaojiawei.kt.ext
 
-import javafx.application.Platform
+import club.xiaojiawei.kt.test.onFxThread
 import javafx.collections.FXCollections
 import javafx.collections.ListChangeListener
 import javafx.scene.Scene
@@ -19,8 +19,6 @@ import javafx.scene.control.ToolBar
 import javafx.scene.layout.Pane
 import javafx.scene.layout.VBox
 import javafx.scene.text.Text
-import java.util.concurrent.FutureTask
-import java.util.concurrent.TimeUnit
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -327,14 +325,4 @@ class CollectionExtTest {
         assertEquals(2, changes)
     }
 
-    private fun onFxThread(action: () -> Unit) {
-        val task = FutureTask(action)
-        try {
-            Platform.startup { Platform.setImplicitExit(false) }
-        } catch (_: IllegalStateException) {
-            // 其他测试已启动 JavaFX，复用同一个工具包。
-        }
-        Platform.runLater(task)
-        task.get(10, TimeUnit.SECONDS)
-    }
 }
