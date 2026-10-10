@@ -53,6 +53,33 @@ class DatePickerBuilder : ComboBoxBaseBuilder<DatePicker, LocalDate>() {
 
 `ScrollPaneBuilder` 移除重复的 `styled` 实现，继承 `NodeBuilder.styled`。普通 `styled { ... }` 调用不变；如果使用显式命名参数，将 `styled(block = { ... })` 改为 `styled(config = { ... })`。
 
+## Pane / Region 已有实例配置
+
+已有实例使用 `configPane { ... }`、`configRegion { ... }`，返回原对象并保留其具体类型：
+
+```kotlin
+import club.xiaojiawei.kt.dsl.*
+import javafx.scene.layout.Pane
+import javafx.scene.layout.Region
+import javafx.scene.layout.VBox
+
+val region = Region().configRegion {
+    size(200.0, 80.0)
+    padding(8.0)
+}
+val pane = Pane().configPane {
+    addLabel("内容")
+}
+val column: VBox = VBox()
+    .configRegion { padding(8.0) }
+    .configPane { addLabel("标题") }
+    .config { spacing(12.0) }
+```
+
+使用不同名称是为了避免 Kotlin 扩展重载歧义：直接增加 `Region.config`、`Pane.config` 会与现有 `VBox.config`、`Slider.config` 等冲突。已有具体类型的 `config { ... }` 无需迁移。
+
+`regionConfig { ... }`、`paneConfig { ... }` 仍用于保存可复用的配置块，分别传给 `configRegion`、`configPane`。配置在传入实例上按顺序执行，不清空未设置的属性或已有子节点。复用配置且希望每个父容器拥有独立子节点时，使用 `addLabel { ... }` 等构建入口或 `add { ... }` 工厂，避免复用同一个 JavaFX Node。
+
 ## 范围
 
 `CheckBox` 不属于 `ToggleButton` 分支；`Switch` 实际继承 `StackPane`，未接入 `ControlBuilder`。本次未新增具体控件工厂，也未调整 Window、Animation、ProgressIndicator 或 TableColumnBase 分支。

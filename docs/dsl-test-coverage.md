@@ -18,6 +18,7 @@
 | `EventHandlerDSLTest` | 实际鼠标/键盘事件分发、快捷键、捕获与冒泡、消费事件、拖拽开始 |
 | `FxStateTest` | 单源/多源文本观察、依赖更新、解绑和重新绑定 |
 | `DslBuilderTest` | 即时与延迟构建、重复构建、已有实例配置、clear、条件配置 |
+| `BaseConfigurationDSLTest` | Pane/Region 已有实例配置、原对象与子类类型保留、子节点追加、配置复用、绑定和监听器移除、空配置 |
 | `StyleDSLTest` / `LabelSeparatorDSLTest` | 保留既有回归测试，并补充原生 CSS／原生控件对照 |
 
 控件和容器主要使用 `BuildMode` 参数化测试，分别报告即时与延迟模式。其他构建器在对应测试中检查两种模式，并覆盖代表性的 `config` 路径；不宣称覆盖每个重载或每种组合。

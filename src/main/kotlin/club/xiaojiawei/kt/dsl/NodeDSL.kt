@@ -1058,14 +1058,16 @@ inline fun regionBuilder(config: RegionBuilder.() -> Unit): RegionBuilder =
 fun regionConfig(config: RegionBuilder.() -> Unit): RegionBuilder.() -> Unit =
     config
 
-// 如果后续 RegionBuilder 支持 config(region)，可以再打开
-// inline fun Region.config(config: RegionBuilder.() -> Unit): Region =
-//     apply {
-//         RegionBuilder().apply {
-//             delayMode()
-//             config()
-//         }.config(this@config)
-//     }
+/**
+ * 使用 Region DSL 配置当前实例并保留具体类型，避免与子类的 config 扩展产生重载歧义。
+ */
+inline fun <T : Region> T.configRegion(config: RegionBuilder.() -> Unit): T =
+    apply {
+        RegionBuilder().apply {
+            delayMode()
+            config()
+        }.config(this@configRegion)
+    }
 
 
 // Label 衍生

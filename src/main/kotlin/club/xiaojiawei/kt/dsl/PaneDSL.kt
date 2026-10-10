@@ -1076,13 +1076,16 @@ inline fun paneBuilder(config: PaneBuilder.() -> Unit): PaneBuilder =
 fun paneConfig(config: PaneBuilder.() -> Unit): PaneBuilder.() -> Unit =
     config
 
-//inline fun Pane.config(config: PaneBuilder.() -> Unit): Pane =
-//    apply {
-//        PaneBuilder().apply {
-//            delayMode()
-//            config()
-//        }.config(this@config)
-//    }
+/**
+ * 使用 Pane DSL 配置当前实例并保留具体类型，避免与子类的 config 扩展产生重载歧义。
+ */
+inline fun <T : Pane> T.configPane(config: PaneBuilder.() -> Unit): T =
+    apply {
+        PaneBuilder().apply {
+            delayMode()
+            config()
+        }.config(this@configPane)
+    }
 
 
 // VBox 衍生
