@@ -139,6 +139,8 @@ abstract class LabeledBuilder<T : Labeled> : ControlBuilder<T>() {
 
     fun graphic(builder: () -> Node) = settings { graphic = builder() }
 
+    fun graphicTextGap(gap: Double) =settings { graphicTextGap = gap }
+
     fun text(text: String) = settings { this.text = text }
 
     operator fun String.unaryPlus() = text(this)
