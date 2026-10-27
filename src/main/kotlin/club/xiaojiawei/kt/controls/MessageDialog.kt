@@ -55,7 +55,7 @@ class MessageDialog(val baseParent: Parent) {
                 root {
                     buildRootPane(content)
                 }
-                JavaFXUI.addjavafxUIStylesheet(instance())
+                JavaFXUI.setTheme(instance())
                 fill(Color.TRANSPARENT)
             }
             initStyle(StageStyle.TRANSPARENT)

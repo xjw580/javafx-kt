@@ -63,7 +63,7 @@ class SceneBuilder : DslBuilder<Scene>() {
      */
     override fun style(styleColor: StyleColor, styleSize: StyleSize) {
         settings {
-            JavaFXUI.addStylesheet(this)
+            JavaFXUI.setTheme(this)
         }
     }
 
@@ -130,7 +130,7 @@ class StageBuilder(private val existingStage: Stage? = null) : DslBuilder<Stage>
     }
 
     fun style() = settings {
-        JavaFXUI.addjavafxUIStylesheet(scene)
+        JavaFXUI.setTheme(scene)
     }
 
     fun initOwner(window: Window?) {
