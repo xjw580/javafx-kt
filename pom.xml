@@ -6,7 +6,7 @@
 
     <groupId>club.xiaojiawei</groupId>
     <artifactId>javafx-kt</artifactId>
-    <version>0.3.0</version>
+    <version>0.3.1</version>
 
     <repositories>
         <repository>
@@ -34,7 +34,7 @@
         <javafx-version>21.0.5</javafx-version>
         <kotlin-logging-jvm-version>5.1.4</kotlin-logging-jvm-version>
         <kt-version>2.2.0</kt-version>
-        <javafx-ui-version>3.0.0</javafx-ui-version>
+        <javafx-ui-version>v3.0.0</javafx-ui-version>
         <k-coroutines-version>1.10.2</k-coroutines-version>
     </properties>
 
@@ -79,7 +79,7 @@
         </dependency>
         <!--javafx UI组件库-->
         <dependency>
-            <groupId>club.xiaojiawei</groupId>
+            <groupId>com.github.xjw580</groupId>
             <artifactId>javafx-ui</artifactId>
             <version>${javafx-ui-version}</version>
         </dependency>
